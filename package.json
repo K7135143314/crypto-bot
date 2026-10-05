@@ -10,9 +10,10 @@
     "scan": "tsx src/index.ts",
     "compare": "tsx src/compare-scans.ts",
     "history": "tsx src/analyze-history.ts",
-    "test": "tsx --test src/profit.test.ts src/history.test.ts src/rolling-history.test.ts",
+    "test": "tsx --test src/profit.test.ts src/history.test.ts src/rolling-history.test.ts src/paper.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "proof:candidate": "tsx src/candidate-proof.ts"
+    "proof:candidate": "tsx src/candidate-proof.ts",
+    "paper": "tsx src/analyze-paper-persistence.ts"
   },
   "dependencies": {
     "viem": "^2.38.0"

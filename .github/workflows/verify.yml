@@ -101,6 +101,9 @@ jobs:
       - name: Analyze rolling history
         run: npm run history -- artifacts/history
 
+      - name: Analyze paper candidate persistence
+        run: npm run paper -- artifacts/history
+
       - name: Publish run summary
         run: |
           cat artifacts/summary.md >> "$GITHUB_STEP_SUMMARY"
@@ -108,6 +111,8 @@ jobs:
           cat artifacts/trend.md >> "$GITHUB_STEP_SUMMARY"
           printf '\n' >> "$GITHUB_STEP_SUMMARY"
           cat artifacts/rolling-history.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/paper-persistence.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload scan report
         uses: actions/upload-artifact@v4
@@ -121,6 +126,8 @@ jobs:
             artifacts/rolling-history.json
             artifacts/rolling-history.md
             artifacts/synthetic-candidate-proof.json
+            artifacts/paper-persistence.json
+            artifacts/paper-persistence.md
           if-no-files-found: error
           retention-days: 30
 
