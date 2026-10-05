@@ -19,5 +19,6 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npm run typecheck
+      - run: npm test
       - name: Read-only Base quote matrix
         run: npm run scan
