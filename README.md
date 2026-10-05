@@ -43,4 +43,4 @@ cp .env.example .env
 - LIVE-VERIFIED: live Base contract calls succeed
 - PROVEN: scanner calculations independently validated against authoritative quotes
 
-Do not describe V0.7 as execution-PROVEN until an atomic executor transaction can be simulated end-to-end with measured costs.
+Do not describe V0.7 as execution-PROVEN until an atomic executor transaction can be simulated end-to-end with measured costs. This milestone remains read-only.
