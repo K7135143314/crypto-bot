@@ -44,7 +44,7 @@ jobs:
             gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100"               --jq '.artifacts[]
                 | select(.expired == false)
                 | select(.name | startswith("scan-report-"))
-                | .id'               | head -n 1
+                | .id'               | sed -n '1p'
           )"
 
           if [ -z "${artifact_id}" ]; then
@@ -79,7 +79,7 @@ jobs:
             gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100"               --jq '.artifacts[]
                 | select(.expired == false)
                 | select(.name | startswith("scan-report-"))
-                | .id'               | head -n 5
+                | .id'               | sed -n '1,5p'
           )
 
           index=1

@@ -2,7 +2,7 @@
 
 Read-only DEX-to-DEX arbitrage research project, intentionally isolated from Axtrova OS.
 
-## Milestone V0.1
+## Milestone V0.7
 
 - Chain: Base mainnet (8453)
 - Pair: WETH / USDC
@@ -17,7 +17,9 @@ Read-only DEX-to-DEX arbitrage research project, intentionally isolated from Axt
 
 This repository must remain separate from Axtrova OS. Do not reuse Axtrova databases, environment variables, credentials, deployments, or application code.
 
-V0.1 is observation/simulation software only. A positive raw quote difference is **not** a trading signal. Gas, MEV, safety margin, execution atomicity, and additional Aerodrome liquidity sources must be modeled before any execution work is considered.
+V0.7 is observation/simulation software only. A positive raw quote difference is **not** a trading signal. The profitability gate now separates flash-loan premium, L2 gas reserve, a Base L1 data-fee reserve, slippage reserve, MEV reserve, and minimum net-profit floor.
+
+The L1 data-fee, slippage, and MEV values are conservative policy reserves. They are not claims that an exact atomic executor transaction has been measured. Exact executor gas, exact L1 data fee, transaction calldata size, MEV behavior, and atomic execution safety still need to be proven before any execution work is considered.
 
 ## Run
 
@@ -41,4 +43,4 @@ cp .env.example .env
 - LIVE-VERIFIED: live Base contract calls succeed
 - PROVEN: scanner calculations independently validated against authoritative quotes
 
-Do not describe V0.1 as PROVEN until those checks are complete.
+Do not describe V0.7 as execution-PROVEN until an atomic executor transaction can be simulated end-to-end with measured costs. This milestone remains read-only.

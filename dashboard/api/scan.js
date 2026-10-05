@@ -17,7 +17,9 @@ const AAVE_POOL = '0xA238Dd80C259a72e81d7e4664a9801593F98d1c5';
 const SIZES = ['100','250','500','1000','2500','5000','10000'];
 const FEES = [100,500,3000,10000];
 const GAS_RESERVE_UNITS = 800000n;
-const EXECUTION_BUFFER_BPS = 20n;
+const L1_DATA_FEE_RESERVE_USDC = parseUnits('0.05', 6);
+const SLIPPAGE_RESERVE_BPS = 10n;
+const MEV_RESERVE_BPS = 10n;
 const MIN_NET_USDC = parseUnits('1', 6);
 
 const client = createPublicClient({
@@ -132,8 +134,10 @@ export default async function handler(req,res){
       for(const x of routes){
         const gross=x.final-start;
         const flashFee=bps(start,flashBps);
-        const buffer=bps(start,EXECUTION_BUFFER_BPS);
-        const net=gross-flashFee-gasReserve-buffer;
+        const slippageReserve=bps(start,SLIPPAGE_RESERVE_BPS);
+        const mevReserve=bps(start,MEV_RESERVE_BPS);
+        const totalModeledCosts=flashFee+gasReserve+L1_DATA_FEE_RESERVE_USDC+slippageReserve+mevReserve;
+        const net=gross-totalModeledCosts;
         let decision='CANDIDATE';
         if(gross<=0n) decision='REJECT_RAW_LOSS';
         else if(gross-flashFee<=0n) decision='REJECT_FLASH_FEE';
@@ -146,8 +150,11 @@ export default async function handler(req,res){
           finalUsdc:usdc(x.final),
           grossDeltaUsdc:usdc(gross),
           flashLoanFeeUsdc:usdc(flashFee),
-          gasReserveUsdc:usdc(gasReserve),
-          executionBufferUsdc:usdc(buffer),
+          l2GasReserveUsdc:usdc(gasReserve),
+          l1DataFeeReserveUsdc:usdc(L1_DATA_FEE_RESERVE_USDC),
+          slippageReserveUsdc:usdc(slippageReserve),
+          mevReserveUsdc:usdc(mevReserve),
+          totalModeledCostsUsdc:usdc(totalModeledCosts),
           estimatedNetUsdc:usdc(net),
           decision,
           uniswapFeeTier:x.feeTier,

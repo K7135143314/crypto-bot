@@ -1,7 +1,9 @@
 export type ProfitPolicy = {
   flashLoanPremiumBps: bigint;
   gasReserveUnits: number;
-  executionBufferBps: bigint;
+  l1DataFeeReserveUsdc: bigint;
+  slippageReserveBps: bigint;
+  mevReserveBps: bigint;
   minNetProfitUsdc: bigint;
 };
 
@@ -14,8 +16,11 @@ export type ProfitDecision =
 
 export type ProfitEvaluation = {
   flashLoanFeeUsdc: bigint;
-  gasReserveUsdc: bigint;
-  executionBufferUsdc: bigint;
+  l2GasReserveUsdc: bigint;
+  l1DataFeeReserveUsdc: bigint;
+  slippageReserveUsdc: bigint;
+  mevReserveUsdc: bigint;
+  totalModeledCostsUsdc: bigint;
   estimatedNetProfitUsdc: bigint;
   decision: ProfitDecision;
 };
@@ -49,18 +54,23 @@ export function evaluateOpportunity(args: {
   } = args;
 
   const flashLoanFeeUsdc = applyBps(startUsdc, policy.flashLoanPremiumBps);
-  const gasReserveUsdc = estimateGasUsdc(
+  const l2GasReserveUsdc = estimateGasUsdc(
     gasPriceWei,
     policy.gasReserveUnits,
     ethPriceUsdcMicros,
   );
-  const executionBufferUsdc = applyBps(startUsdc, policy.executionBufferBps);
+  const l1DataFeeReserveUsdc = policy.l1DataFeeReserveUsdc;
+  const slippageReserveUsdc = applyBps(startUsdc, policy.slippageReserveBps);
+  const mevReserveUsdc = applyBps(startUsdc, policy.mevReserveBps);
 
-  const estimatedNetProfitUsdc =
-    grossProfitUsdc -
-    flashLoanFeeUsdc -
-    gasReserveUsdc -
-    executionBufferUsdc;
+  const totalModeledCostsUsdc =
+    flashLoanFeeUsdc +
+    l2GasReserveUsdc +
+    l1DataFeeReserveUsdc +
+    slippageReserveUsdc +
+    mevReserveUsdc;
+
+  const estimatedNetProfitUsdc = grossProfitUsdc - totalModeledCostsUsdc;
 
   let decision: ProfitDecision;
 
@@ -78,8 +88,11 @@ export function evaluateOpportunity(args: {
 
   return {
     flashLoanFeeUsdc,
-    gasReserveUsdc,
-    executionBufferUsdc,
+    l2GasReserveUsdc,
+    l1DataFeeReserveUsdc,
+    slippageReserveUsdc,
+    mevReserveUsdc,
+    totalModeledCostsUsdc,
     estimatedNetProfitUsdc,
     decision,
   };
