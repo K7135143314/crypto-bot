@@ -1,3 +1,4 @@
+import { mkdir, writeFile } from 'node:fs/promises';
 import { aaveV3PoolAbi } from './abis.js';
 import {
   CHAIN_ID,
@@ -54,7 +55,7 @@ async function main(): Promise<void> {
     client.getGasPrice(),
   ]);
 
-  console.log('DEX Arbitrage Scanner V0.4 — READ ONLY');
+  console.log('DEX Arbitrage Scanner V0.5 — READ ONLY');
   console.log(`Pinned Base block: ${blockNumber}`);
   console.log('Pair: WETH / USDC');
   console.log('DEXs: Aerodrome classic / Uniswap v3');
@@ -81,6 +82,7 @@ async function main(): Promise<void> {
   console.log('');
 
   let candidateCount = 0;
+  const reportRows: Array<Record<string, string | number>> = [];
 
   for (const result of rows) {
     const routeName = result.firstDex === 'aerodrome'
@@ -116,6 +118,23 @@ async function main(): Promise<void> {
     if (result.first.feeTier) console.log(`  Uniswap fee tier:       ${result.first.feeTier}`);
     if (result.second.feeTier) console.log(`  Uniswap fee tier:       ${result.second.feeTier}`);
     console.log(`  Decision:               ${decisionText(evaluation.decision)}\n`);
+
+    const uniswapFeeTier = result.first.feeTier ?? result.second.feeTier ?? 0;
+
+    reportRows.push({
+      route: routeName,
+      startUsdc: result.startUsdcText,
+      wethAfterLeg1: formatWeth(result.wethReceived),
+      finalUsdc: formatUsdc(result.finalUsdc),
+      grossDeltaUsdc: formatUsdc(result.grossProfitUsdc),
+      grossDeltaPct: Number(deltaPct.toFixed(6)),
+      flashLoanFeeUsdc: formatUsdc(evaluation.flashLoanFeeUsdc),
+      gasReserveUsdc: formatUsdc(evaluation.gasReserveUsdc),
+      executionBufferUsdc: formatUsdc(evaluation.executionBufferUsdc),
+      estimatedNetUsdc: formatUsdc(evaluation.estimatedNetProfitUsdc),
+      uniswapFeeTier,
+      decision: evaluation.decision,
+    });
   }
 
   const expectedRoutes = TRADE_SIZES_USDC.length * 2;
@@ -125,6 +144,38 @@ async function main(): Promise<void> {
   if (rows.length !== expectedRoutes) {
     throw new Error(`Incomplete quote matrix: expected ${expectedRoutes}, received ${rows.length}.`);
   }
+
+  const report = {
+    scannerVersion: '0.5.0',
+    readOnly: true,
+    generatedAt: new Date().toISOString(),
+    chain: 'Base',
+    chainId,
+    blockNumber: blockNumber.toString(),
+    pair: 'WETH/USDC',
+    dexes: ['Aerodrome classic', 'Uniswap v3'],
+    liveInputs: {
+      flashLoanPremiumBps: flashLoanPremiumBps.toString(),
+      gasPriceWei: gasPrice.toString(),
+      gasPriceGwei: Number(gasPrice) / 1e9,
+      approximateWethPriceUsdc: Number(ethPriceUsdc.toFixed(6)),
+    },
+    policy: {
+      gasReserveUnits: PROFIT_POLICY.gasReserveUnits,
+      executionBufferBps: PROFIT_POLICY.executionBufferBps.toString(),
+      minNetProfitUsdc: formatUsdc(PROFIT_POLICY.minNetProfitUsdc),
+    },
+    matrixCompleteness: {
+      completed: rows.length,
+      expected: expectedRoutes,
+    },
+    candidateCount,
+    rows: reportRows,
+  };
+
+  await mkdir('artifacts', { recursive: true });
+  await writeFile('artifacts/latest-scan.json', JSON.stringify(report, null, 2) + '\n', 'utf8');
+  console.log('Saved machine-readable report: artifacts/latest-scan.json');
 
   console.log('COST MODEL STATUS: CONSERVATIVE READ-ONLY GATE.');
   console.log('DEX quote output includes pool fee and price impact at the quoted size.');
