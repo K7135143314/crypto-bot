@@ -14,7 +14,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "proof:candidate": "tsx src/candidate-proof.ts",
     "paper": "tsx src/analyze-paper-persistence.ts",
-    "test:atomic-preflight": "tsx --test src/atomic-preflight.test.ts"
+    "test:atomic-preflight": "tsx --test src/atomic-preflight.test.ts",
+    "simulation:plan": "tsx src/simulation-plan.ts",
+    "simulation:compare": "tsx src/compare-simulation.ts"
   },
   "dependencies": {
     "viem": "^2.38.0"
