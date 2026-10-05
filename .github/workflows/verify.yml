@@ -28,6 +28,9 @@ jobs:
       - run: npm install
       - run: npm run typecheck
       - run: npm test
+      - name: Prove synthetic candidate detection
+        run: npm run proof:candidate
+
       - name: Read-only Base quote matrix
         run: npm run scan
 
@@ -117,6 +120,7 @@ jobs:
             artifacts/trend.md
             artifacts/rolling-history.json
             artifacts/rolling-history.md
+            artifacts/synthetic-candidate-proof.json
           if-no-files-found: error
           retention-days: 30
 

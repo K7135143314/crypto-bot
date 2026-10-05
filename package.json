@@ -11,7 +11,8 @@
     "compare": "tsx src/compare-scans.ts",
     "history": "tsx src/analyze-history.ts",
     "test": "tsx --test src/profit.test.ts src/history.test.ts src/rolling-history.test.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "proof:candidate": "tsx src/candidate-proof.ts"
   },
   "dependencies": {
     "viem": "^2.38.0"
