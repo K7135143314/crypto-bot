@@ -11,7 +11,9 @@ const ethPriceUsdcMicros = 2_700_000_000n;
 const policy = {
   flashLoanPremiumBps: 5n,
   gasReserveUnits: 800_000,
-  executionBufferBps: 20n,
+  l1DataFeeReserveUsdc: 50_000n,
+  slippageReserveBps: 10n,
+  mevReserveBps: 10n,
   minNetProfitUsdc: 1n * USDC,
 };
 
@@ -53,14 +55,19 @@ async function main(): Promise<void> {
       policy: {
         flashLoanPremiumBps: policy.flashLoanPremiumBps.toString(),
         gasReserveUnits: policy.gasReserveUnits,
-        executionBufferBps: policy.executionBufferBps.toString(),
+        l1DataFeeReserveUsdc: formatUsdc(policy.l1DataFeeReserveUsdc),
+        slippageReserveBps: policy.slippageReserveBps.toString(),
+        mevReserveBps: policy.mevReserveBps.toString(),
         minNetProfitUsdc: formatUsdc(policy.minNetProfitUsdc),
       },
     },
     result: {
       flashLoanFeeUsdc: formatUsdc(evaluation.flashLoanFeeUsdc),
-      gasReserveUsdc: formatUsdc(evaluation.gasReserveUsdc),
-      executionBufferUsdc: formatUsdc(evaluation.executionBufferUsdc),
+      l2GasReserveUsdc: formatUsdc(evaluation.l2GasReserveUsdc),
+      l1DataFeeReserveUsdc: formatUsdc(evaluation.l1DataFeeReserveUsdc),
+      slippageReserveUsdc: formatUsdc(evaluation.slippageReserveUsdc),
+      mevReserveUsdc: formatUsdc(evaluation.mevReserveUsdc),
+      totalModeledCostsUsdc: formatUsdc(evaluation.totalModeledCostsUsdc),
       estimatedNetProfitUsdc: formatUsdc(evaluation.estimatedNetProfitUsdc),
       decision: evaluation.decision,
     },
