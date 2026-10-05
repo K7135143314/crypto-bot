@@ -41,7 +41,6 @@ jobs:
             gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100"               --jq '.artifacts[]
                 | select(.expired == false)
                 | select(.name | startswith("scan-report-"))
-                | select(.workflow_run.id != '"${GITHUB_RUN_ID}"')
                 | .id'               | head -n 1
           )"
 
@@ -64,11 +63,48 @@ jobs:
       - name: Compare with previous scan
         run: npm run compare -- artifacts/previous-scan.json artifacts/latest-scan.json
 
+      - name: Fetch rolling history baselines
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/history
+          cp artifacts/latest-scan.json artifacts/history/current.json
+
+          mapfile -t artifact_ids < <(
+            gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100"               --jq '.artifacts[]
+                | select(.expired == false)
+                | select(.name | startswith("scan-report-"))
+                | .id'               | head -n 5
+          )
+
+          index=1
+          for artifact_id in "${artifact_ids[@]}"; do
+            zip_path="/tmp/history-${index}.zip"
+            dir_path="/tmp/history-${index}"
+            gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" > "${zip_path}"
+            mkdir -p "${dir_path}"
+            unzip -q "${zip_path}" -d "${dir_path}"
+            if [ -f "${dir_path}/latest-scan.json" ]; then
+              cp "${dir_path}/latest-scan.json" "artifacts/history/previous-${index}.json"
+            fi
+            index=$((index + 1))
+          done
+
+          echo "Rolling history sample files:"
+          ls -1 artifacts/history
+
+      - name: Analyze rolling history
+        run: npm run history -- artifacts/history
+
       - name: Publish run summary
         run: |
           cat artifacts/summary.md >> "$GITHUB_STEP_SUMMARY"
           printf '\n' >> "$GITHUB_STEP_SUMMARY"
           cat artifacts/trend.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/rolling-history.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload scan report
         uses: actions/upload-artifact@v4
@@ -79,6 +115,8 @@ jobs:
             artifacts/summary.md
             artifacts/trend.json
             artifacts/trend.md
+            artifacts/rolling-history.json
+            artifacts/rolling-history.md
           if-no-files-found: error
           retention-days: 30
 
