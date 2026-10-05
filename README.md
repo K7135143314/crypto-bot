@@ -44,3 +44,7 @@ cp .env.example .env
 - PROVEN: scanner calculations independently validated against authoritative quotes
 
 Do not describe V0.7 as execution-PROVEN until an atomic executor transaction can be simulated end-to-end with measured costs. This milestone remains read-only.
+
+## Paper candidate persistence
+
+Scheduled scans now retain enough history to measure whether any theoretical CANDIDATE remains a candidate on the next saved scan. The paper report records survival, expiration, comparability, and elapsed Base blocks. This is research evidence only; it does not place or prepare a transaction.
