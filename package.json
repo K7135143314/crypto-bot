@@ -1,6 +1,6 @@
 {
   "name": "dex-arbitrage-scanner",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "description": "Read-only Base DEX-to-DEX arbitrage scanner prototype",
@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "scan": "tsx src/index.ts",
+    "test": "tsx --test src/profit.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
