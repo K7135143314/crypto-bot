@@ -50,6 +50,8 @@ export const GAS_UNIT_SCENARIOS = (process.env.GAS_UNIT_SCENARIOS || '300000,500
 
 export const PROFIT_POLICY = {
   gasReserveUnits: Number(process.env.GAS_RESERVE_UNITS || '800000'),
-  executionBufferBps: BigInt(process.env.EXECUTION_BUFFER_BPS || '20'),
+  l1DataFeeReserveUsdc: parseUnits(process.env.L1_DATA_FEE_RESERVE_USDC || '0.05', TOKENS.USDC.decimals),
+  slippageReserveBps: BigInt(process.env.SLIPPAGE_RESERVE_BPS || '10'),
+  mevReserveBps: BigInt(process.env.MEV_RESERVE_BPS || '10'),
   minNetProfitUsdc: parseUnits(process.env.MIN_NET_PROFIT_USDC || '1', TOKENS.USDC.decimals),
 } as const;
