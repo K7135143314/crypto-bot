@@ -28,6 +28,12 @@ jobs:
       - run: npm install
       - run: npm run typecheck
       - run: npm test
+      - name: Install isolated V0.8 fork simulator
+        run: npm install --prefix simulation
+
+      - name: Run V0.8 pinned Base fork proof
+        run: npm --prefix simulation test
+
       - name: Prove synthetic candidate detection
         run: npm run proof:candidate
 
@@ -128,6 +134,7 @@ jobs:
             artifacts/synthetic-candidate-proof.json
             artifacts/paper-persistence.json
             artifacts/paper-persistence.md
+            simulation/results/atomic-fork-result.json
           if-no-files-found: error
           retention-days: 30
 
