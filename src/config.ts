@@ -1,7 +1,18 @@
 import { getAddress, type Address } from 'viem';
 
 export const CHAIN_ID = 8453;
-export const BASE_RPC_URL = process.env.BASE_RPC_URL || 'https://mainnet.base.org';
+
+const configuredRpcUrls = (process.env.BASE_RPC_URLS || process.env.BASE_RPC_URL || '')
+  .split(',')
+  .map((x) => x.trim())
+  .filter(Boolean);
+
+export const BASE_RPC_URLS = Array.from(new Set([
+  ...configuredRpcUrls,
+  'https://base-rpc.publicnode.com',
+  'https://public.1rpc.io/base',
+  'https://mainnet.base.org',
+]));
 
 export const TOKENS = {
   WETH: {
