@@ -27,6 +27,8 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npm run typecheck
+      - name: Validate dashboard JavaScript syntax
+        run: node --check dashboard/app.js
       - run: npm test
       - name: Prove synthetic candidate detection
         run: npm run proof:candidate
