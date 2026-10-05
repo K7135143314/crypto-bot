@@ -2,7 +2,7 @@ require('@nomicfoundation/hardhat-ethers');
 
 const forkUrl =
   process.env.BASE_FORK_RPC_URL ||
-  'https://base-rpc.publicnode.com';
+  'https://mainnet.base.org';
 
 const forkBlock = Number(process.env.BASE_FORK_BLOCK || '52216060');
 
