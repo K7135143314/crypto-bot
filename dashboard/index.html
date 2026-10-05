@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Arbitrage Observer — Live Monitor</title>
+<style>
+:root{color-scheme:dark;--bg:#06111c;--panel:#0b1927;--panel2:#0f2233;--line:#17384f;--text:#eef7ff;--muted:#8eabc0;--blue:#258cff;--green:#20d990;--red:#ff5a64;--amber:#ffc44d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0%,#0d2538 0,#06111c 42%,#04101a 100%);font-family:Arial,Helvetica,sans-serif;color:var(--text)}main{width:min(1600px,100%);margin:auto;padding:14px}
+.top{display:grid;grid-template-columns:1fr auto auto;gap:18px;align-items:center;padding:8px 2px 16px;border-bottom:1px solid var(--line)}h1{font-size:clamp(24px,3vw,38px);margin:2px 0}.eyebrow{font-size:11px;letter-spacing:.14em;font-weight:800;color:#73afd4}.status{display:flex;gap:8px;flex-wrap:wrap}.badge{border:1px solid;border-radius:999px;padding:8px 11px;font-weight:800;font-size:12px}.live{color:var(--green);border-color:#18875f;background:#08291f}.warn{color:var(--amber);border-color:#765a1f;background:#27200c}.meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:12px}.meta button{background:#0d2638;color:var(--text);border:1px solid #2c5c7d;border-radius:8px;padding:8px 10px;cursor:pointer}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}.card,.panel{background:linear-gradient(180deg,rgba(15,34,51,.98),rgba(8,22,34,.98));border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.16)}.card{padding:14px}.card span,.card small{display:block;color:var(--muted)}.card strong{display:block;font-size:25px;margin:4px 0}
+.grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(300px,.85fr);gap:10px}.panel{padding:13px}.panelHead{display:flex;justify-content:space-between;gap:12px;align-items:center}.panel h2{margin:3px 0 8px;font-size:18px}.delta{font-size:12px;font-weight:800}.good{color:var(--green)}.bad{color:var(--red)}
+#chart{width:100%;height:410px;background:linear-gradient(180deg,#081724,#07131e);border:1px solid #102d42;border-radius:8px}
+.legend{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:12px;padding:8px 4px 0}.sw{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}.sw.price{background:var(--green)}.sw.net{background:var(--blue)}
+.side{display:grid;gap:10px;align-content:start}.best dl{margin:12px 0 0}.best dl div{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #143147}.best dt{color:var(--muted)}.best dd{margin:0;text-align:right;font-weight:800}.red{color:var(--red)}.green{color:var(--green)}.pill{display:inline-block;padding:5px 8px;border-radius:7px;font-size:11px;font-weight:900}.reject{color:#ff8b91;border:1px solid #87373c;background:#2a1216}.candidate{color:#72efbd;border:1px solid #2b8e6b;background:#0b2d22}
+.feed{font:12px ui-monospace,Menlo,monospace;color:#bdd0de}.feed p{margin:0;padding:9px 0;border-top:1px solid #143147}.feed time{color:var(--green);margin-right:8px}
+.matrixPanel{margin-top:10px;overflow:hidden}.matrix{display:grid;grid-template-columns:180px repeat(7,minmax(80px,1fr));gap:1px;background:#17384f;border:1px solid #17384f;overflow-x:auto}.matrix>div{min-width:80px;padding:11px 8px;background:#0a1927}.mhead{text-align:center;color:#9db7c8;font-size:12px}.mlabel{font-weight:800}.cell{text-align:center;font-weight:800}.neg{background:linear-gradient(180deg,#57242a,#42191e)!important;color:#ff9ca2}.pos{background:linear-gradient(180deg,#124b38,#0b3528)!important;color:#72efbd}
+.err{display:none;margin:10px 0;padding:10px;border:1px solid #7e3338;background:#2b1115;color:#ffafb4;border-radius:8px}
+footer{margin-top:10px;border:1px solid #6b5521;background:#211b0d;color:var(--amber);padding:11px 13px;border-radius:10px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:12px}footer span{border:1px solid #5d4c26;border-radius:999px;padding:5px 8px}.note{margin-left:auto;color:#bba970;border:none!important}
+@media(max-width:980px){.top{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){main{padding:9px}.kpis{gap:7px}.card strong{font-size:19px}.panelHead{align-items:flex-start;flex-direction:column}#chart{height:310px}.matrix{grid-template-columns:150px repeat(7,84px)}.note{width:100%;margin-left:0}}
+</style>
+</head>
+<body>
+<main>
+  <header class="top">
+    <div><div class="eyebrow">BASE • WETH/USDC</div><h1>Read-Only Arbitrage Observer</h1></div>
+    <div class="status"><span class="badge live">● LIVE</span><span class="badge warn">Research only / No trading</span></div>
+    <div class="meta"><span id="block">Connecting…</span><span id="countdown">Refresh in 20s</span><button id="scanBtn">Scan now</button></div>
+  </header>
+  <div id="error" class="err"></div>
+  <section class="kpis">
+    <article class="card"><span>Candidates</span><strong id="candidates">—</strong><small>routes clearing current gates</small></article>
+    <article class="card"><span>Route Matrix</span><strong id="matrixCount">—</strong><small>live route quotes complete</small></article>
+    <article class="card"><span>Aave Premium</span><strong id="premium">—</strong><small id="premiumPct"></small></article>
+    <article class="card"><span>Base Gas</span><strong id="gas">—</strong><small>live RPC reading</small></article>
+  </section>
+  <section class="grid">
+    <article class="panel">
+      <div class="panelHead"><div><div class="eyebrow">LIVE SESSION</div><h2>Best Route — Estimated Net Profit</h2></div><div id="delta" class="delta">Building live history…</div></div>
+      <canvas id="chart"></canvas>
+      <div class="legend"><span><b class="sw price"></b>WETH reference price</span><span><b class="sw net"></b>estimated net profit</span><span id="obs">Observations: 0</span></div>
+    </article>
+    <aside class="side">
+      <article class="panel best">
+        <div class="eyebrow">BEST CURRENT ROUTE</div>
+        <h2 id="bestRoute">Waiting for live scan</h2>
+        <dl>
+          <div><dt>Start size</dt><dd id="bestSize">—</dd></div>
+          <div><dt>Estimated net</dt><dd id="bestNet">—</dd></div>
+          <div><dt>Decision</dt><dd><span id="decision" class="pill reject">—</span></dd></div>
+          <div><dt>WETH price</dt><dd id="wethPrice">—</dd></div>
+        </dl>
+      </article>
+      <article class="panel">
+        <div class="panelHead"><h2>Live Feed</h2><span class="green">●</span></div>
+        <div id="feed" class="feed"><p>Waiting for first live scan…</p></div>
+      </article>
+    </aside>
+  </section>
+  <section class="panel matrixPanel">
+    <div class="panelHead"><div><div class="eyebrow">LIVE QUOTE MATRIX</div><h2>Trade Size × Route</h2></div><span style="color:var(--muted);font-size:12px">Estimated net after current research gates (USDC)</span></div>
+    <div id="matrix" class="matrix"></div>
+  </section>
+  <footer><strong>READ-ONLY SYSTEM</strong><span>No wallet</span><span>No signing</span><span>No transactions</span><span class="note">Market data is live. “Candidate” means research/simulation candidate only.</span></footer>
+</main>
+<script>
+const sizes=[100,250,500,1000,2500,5000,10000], points=[], maxPoints=120, refreshMs=20000;
+let seconds=20, busy=false;
+const $=id=>document.getElementById(id);
+function money(v,d=4){const n=Number(v);return (n<0?'-$':'$')+Math.abs(n).toFixed(d)}
+function setText(id,v){$(id).textContent=v}
+function draw(){
+  const canvas=$('chart'), dpr=window.devicePixelRatio||1, rect=canvas.getBoundingClientRect();
+  canvas.width=Math.max(1,rect.width*dpr);canvas.height=Math.max(1,rect.height*dpr);
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  const w=rect.width,h=rect.height,pad=36;
+  ctx.clearRect(0,0,w,h);ctx.strokeStyle='#173448';ctx.lineWidth=1;
+  for(let i=0;i<5;i++){const y=pad+i*(h-pad*2)/4;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(w-pad,y);ctx.stroke()}
+  if(points.length<2){ctx.fillStyle='#8eabc0';ctx.font='13px Arial';ctx.fillText('Live chart will build as new scans arrive…',pad,55);return}
+  const nets=points.map(p=>p.net), prices=points.map(p=>p.price);
+  let nmin=Math.min(...nets,-.1),nmax=Math.max(...nets,.1);if(nmax-nmin<.01){nmax+=.01;nmin-=.01}
+  let pmin=Math.min(...prices),pmax=Math.max(...prices);if(pmax-pmin<1){pmax+=1;pmin-=1}
+  const x=i=>pad+i/(points.length-1)*(w-pad*2);
+  const yN=v=>h-pad-(v-nmin)/(nmax-nmin)*(h-pad*2);
+  const yP=v=>h-pad-(v-pmin)/(pmax-pmin)*(h-pad*2);
+  const zero=yN(0);if(zero>=pad&&zero<=h-pad){ctx.save();ctx.setLineDash([5,5]);ctx.strokeStyle='#8797a3';ctx.beginPath();ctx.moveTo(pad,zero);ctx.lineTo(w-pad,zero);ctx.stroke();ctx.restore()}
+  function line(key,color,yf,width){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();points.forEach((p,i)=>{const y=yf(p[key]);i?ctx.lineTo(x(i),y):ctx.moveTo(x(i),y)});ctx.stroke()}
+  line('price','#20d990',yP,2);line('net','#258cff',yN,3);
+  const last=points[points.length-1];ctx.fillStyle='#258cff';ctx.beginPath();ctx.arc(x(points.length-1),yN(last.net),5,0,Math.PI*2);ctx.fill();
+}
+function renderMatrix(scan){
+  const m=$('matrix');m.innerHTML='<div class="mlabel">Route</div>'+sizes.map(s=>'<div class="mhead">$'+s.toLocaleString()+'</div>').join('');
+  for(const route of ['Aerodrome → Uniswap v3','Uniswap v3 → Aerodrome']){
+    m.insertAdjacentHTML('beforeend','<div class="mlabel">'+route.replace(' v3','')+'</div>');
+    for(const size of sizes){const r=scan.rows.find(x=>x.route===route&&x.startUsdc===size);const val=r?r.estimatedNetUsdc:null;const cls=val>=0?'pos':'neg';m.insertAdjacentHTML('beforeend','<div class="cell '+cls+'">'+(r?money(val,3):'—')+'</div>')}
+  }
+}
+async function refresh(){
+  if(busy)return;busy=true;$('scanBtn').disabled=true;$('scanBtn').textContent='Scanning…';
+  try{
+    const r=await fetch('/api/scan?t='+Date.now(),{cache:'no-store'}), scan=await r.json();
+    if(!r.ok||!scan.ok)throw new Error(scan.error||'Live scan failed');
+    $('error').style.display='none';
+    setText('block','Block '+scan.blockNumber);setText('candidates',scan.candidateCount);setText('matrixCount',scan.matrixComplete+'/14');setText('premium',scan.flashLoanPremiumBps+' bps');setText('premiumPct','('+(scan.flashLoanPremiumBps/100).toFixed(2)+'%)');setText('gas',scan.gasPriceGwei.toFixed(4)+' gwei');
+    setText('bestRoute',scan.best.route);setText('bestSize','$'+scan.best.startUsdc.toLocaleString());setText('bestNet',money(scan.best.estimatedNetUsdc,6));$('bestNet').className=scan.best.estimatedNetUsdc>=0?'green':'red';
+    setText('decision',scan.best.decision);$('decision').className='pill '+(scan.best.decision==='CANDIDATE'?'candidate':'reject');setText('wethPrice','$'+scan.wethReferencePrice.toFixed(2));
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>
