@@ -24,36 +24,53 @@ export type DexQuote = {
   gasEstimate?: bigint;
 };
 
+export type MatrixRow = {
+  startUsdcText: string;
+  firstDex: 'aerodrome' | 'uniswap-v3';
+  startUsdc: bigint;
+  wethReceived: bigint;
+  finalUsdc: bigint;
+  grossProfitUsdc: bigint;
+  first: DexQuote;
+  second: DexQuote;
+};
+
 export const client = createPublicClient({
   chain: base,
-  transport: http(BASE_RPC_URL, { timeout: 15_000, retryCount: 0 }),
+  transport: http(BASE_RPC_URL, { timeout: 20_000, retryCount: 0 }),
 });
 
 type BasePublicClient = typeof client;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-const RPC_MIN_GAP_MS = Number(process.env.RPC_MIN_GAP_MS || '1200');
-let lastRpcAt = 0;
-
-async function waitForRpcSlot(): Promise<void> {
-  const elapsed = Date.now() - lastRpcAt;
-  const waitMs = Math.max(0, RPC_MIN_GAP_MS - elapsed);
-  if (waitMs > 0) await sleep(waitMs);
-  lastRpcAt = Date.now();
-}
 
 function errorSummary(error: unknown): string {
   const e = error as Error & { shortMessage?: string; details?: string };
-  return e.shortMessage || e.details || e.message?.split('\n')[0] || String(error);
+  return e.details || e.shortMessage || e.message?.split('\n')[0] || String(error);
 }
 
-export async function quoteAerodrome(
+async function withRpcRetry<T>(label: string, fn: () => Promise<T>): Promise<T> {
+  const failures: string[] = [];
+
+  for (let attempt = 1; attempt <= 4; attempt += 1) {
+    try {
+      return await fn();
+    } catch (error) {
+      failures.push(`attempt ${attempt}: ${errorSummary(error)}`);
+      if (attempt < 4) await sleep(1000 * attempt);
+    }
+  }
+
+  throw new Error(`${label} failed. Diagnostics: ${failures.join(' | ')}`);
+}
+
+export async function quoteAerodromeBatch(
   publicClient: BasePublicClient,
   tokenIn: Address,
   tokenOut: Address,
-  amountIn: bigint,
+  amountsIn: readonly bigint[],
   blockNumber: bigint,
-): Promise<DexQuote> {
+): Promise<DexQuote[]> {
   const route = [{
     from: tokenIn,
     to: tokenOut,
@@ -61,69 +78,108 @@ export async function quoteAerodrome(
     factory: CONTRACTS.aerodromePoolFactory,
   }] as const;
 
-  const failures: string[] = [];
+  const contracts = amountsIn.map((amountIn) => ({
+    address: CONTRACTS.aerodromeRouter,
+    abi: aerodromeRouterAbi,
+    functionName: 'getAmountsOut' as const,
+    args: [amountIn, route] as const,
+  }));
 
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
-    try {
-      await waitForRpcSlot();
+  const results = await withRpcRetry('Aerodrome batch quote', () =>
+    publicClient.multicall({
+      contracts,
+      allowFailure: true,
+      blockNumber,
+    }),
+  );
 
-      const amounts = await publicClient.readContract({
-        address: CONTRACTS.aerodromeRouter,
-        abi: aerodromeRouterAbi,
-        functionName: 'getAmountsOut',
-        args: [amountIn, route],
-        blockNumber,
-      });
+  return results.map((result, index) => {
+    const amountIn = amountsIn[index]!;
 
-      const amountOut = amounts[amounts.length - 1];
-      if (amountOut === undefined || amountOut <= 0n) {
-        throw new Error('Aerodrome returned no output amount');
-      }
-
-      return { dex: 'aerodrome', tokenIn, tokenOut, amountIn, amountOut };
-    } catch (error) {
-      failures.push(`attempt ${attempt}: ${errorSummary(error)}`);
-      if (attempt < 3) await sleep(700 * attempt);
+    if (result.status !== 'success') {
+      throw new Error(
+        `Aerodrome quote failed for amount ${amountIn}: ${errorSummary(result.error)}`,
+      );
     }
-  }
 
-  throw new Error(`Aerodrome quote failed. Diagnostics: ${failures.join(' | ')}`);
+    const amounts = result.result as readonly bigint[];
+    const amountOut = amounts[amounts.length - 1];
+
+    if (amountOut === undefined || amountOut <= 0n) {
+      throw new Error(`Aerodrome returned no output for amount ${amountIn}`);
+    }
+
+    return {
+      dex: 'aerodrome' as const,
+      tokenIn,
+      tokenOut,
+      amountIn,
+      amountOut,
+    };
+  });
 }
 
-export async function quoteUniswapV3(
+export async function quoteUniswapV3Batch(
   publicClient: BasePublicClient,
   tokenIn: Address,
   tokenOut: Address,
-  amountIn: bigint,
+  amountsIn: readonly bigint[],
   blockNumber: bigint,
-): Promise<DexQuote> {
-  const successful: DexQuote[] = [];
-  const failures: string[] = [];
+): Promise<DexQuote[]> {
+  const output: DexQuote[] = [];
+  const chunkSize = 2;
 
-  for (const fee of UNISWAP_V3_FEES) {
-    let completed = false;
+  for (let start = 0; start < amountsIn.length; start += chunkSize) {
+    const chunk = amountsIn.slice(start, start + chunkSize);
 
-    for (let attempt = 1; attempt <= 3 && !completed; attempt += 1) {
-      try {
-        await waitForRpcSlot();
+    const contracts = chunk.flatMap((amountIn) =>
+      UNISWAP_V3_FEES.map((fee) => ({
+        address: CONTRACTS.uniswapV3QuoterV2,
+        abi: uniswapV3QuoterV2Abi,
+        functionName: 'quoteExactInputSingle' as const,
+        args: [{
+          tokenIn,
+          tokenOut,
+          amountIn,
+          fee,
+          sqrtPriceLimitX96: 0n,
+        }] as const,
+      })),
+    );
 
-        const result = await publicClient.simulateContract({
-          address: CONTRACTS.uniswapV3QuoterV2,
-          abi: uniswapV3QuoterV2Abi,
-          functionName: 'quoteExactInputSingle',
-          args: [{
-            tokenIn,
-            tokenOut,
-            amountIn,
-            fee,
-            sqrtPriceLimitX96: 0n,
-          }],
-          blockNumber,
-        });
+    const results = await withRpcRetry('Uniswap v3 batch quote', () =>
+      publicClient.multicall({
+        contracts,
+        allowFailure: true,
+        blockNumber,
+      }),
+    );
 
-        const [amountOut, , , gasEstimate] = result.result;
+    for (let localIndex = 0; localIndex < chunk.length; localIndex += 1) {
+      const amountIn = chunk[localIndex]!;
+      const candidates: DexQuote[] = [];
+      const failures: string[] = [];
+
+      for (let feeIndex = 0; feeIndex < UNISWAP_V3_FEES.length; feeIndex += 1) {
+        const fee = UNISWAP_V3_FEES[feeIndex]!;
+        const resultIndex = localIndex * UNISWAP_V3_FEES.length + feeIndex;
+        const result = results[resultIndex];
+
+        if (!result) {
+          failures.push(`${fee}: missing result`);
+          continue;
+        }
+
+        if (result.status !== 'success') {
+          failures.push(`${fee}: ${errorSummary(result.error)}`);
+          continue;
+        }
+
+        const quote = result.result as readonly [bigint, bigint, number, bigint];
+        const [amountOut, , , gasEstimate] = quote;
+
         if (amountOut > 0n) {
-          successful.push({
+          candidates.push({
             dex: 'uniswap-v3',
             tokenIn,
             tokenOut,
@@ -133,59 +189,105 @@ export async function quoteUniswapV3(
             gasEstimate,
           });
         }
-
-        completed = true;
-      } catch (error) {
-        if (attempt === 3) {
-          failures.push(`${fee}: ${errorSummary(error)}`);
-        } else {
-          await sleep(700 * attempt);
-        }
       }
+
+      if (candidates.length === 0) {
+        throw new Error(
+          `No Uniswap v3 fee tier quoted amount ${amountIn}. Diagnostics: ${failures.join(' | ')}`,
+        );
+      }
+
+      candidates.sort((a, b) =>
+        a.amountOut > b.amountOut ? -1 : a.amountOut < b.amountOut ? 1 : 0,
+      );
+      output.push(candidates[0]!);
     }
+
+    if (start + chunkSize < amountsIn.length) await sleep(600);
   }
 
-  if (successful.length === 0) {
-    throw new Error(
-      `No Uniswap v3 fee tier returned a quote. Diagnostics: ${failures.join(' | ')}`,
-    );
-  }
-
-  successful.sort((a, b) => (a.amountOut > b.amountOut ? -1 : a.amountOut < b.amountOut ? 1 : 0));
-  return successful[0]!;
+  return output;
 }
 
-export async function quoteRoundTrip(
+export async function quoteMatrix(
   publicClient: BasePublicClient,
-  startUsdc: string,
-  firstDex: 'aerodrome' | 'uniswap-v3',
+  tradeSizesUsdc: readonly string[],
   blockNumber: bigint,
-): Promise<{
-  startUsdc: bigint;
-  wethReceived: bigint;
-  finalUsdc: bigint;
-  grossProfitUsdc: bigint;
-  first: DexQuote;
-  second: DexQuote;
-}> {
-  const start = parseUnits(startUsdc, TOKENS.USDC.decimals);
+): Promise<MatrixRow[]> {
+  const starts = tradeSizesUsdc.map((size) => parseUnits(size, TOKENS.USDC.decimals));
 
-  const first = firstDex === 'aerodrome'
-    ? await quoteAerodrome(publicClient, TOKENS.USDC.address, TOKENS.WETH.address, start, blockNumber)
-    : await quoteUniswapV3(publicClient, TOKENS.USDC.address, TOKENS.WETH.address, start, blockNumber);
+  const aerodromeFirst = await quoteAerodromeBatch(
+    publicClient,
+    TOKENS.USDC.address,
+    TOKENS.WETH.address,
+    starts,
+    blockNumber,
+  );
 
-  const second = firstDex === 'aerodrome'
-    ? await quoteUniswapV3(publicClient, TOKENS.WETH.address, TOKENS.USDC.address, first.amountOut, blockNumber)
-    : await quoteAerodrome(publicClient, TOKENS.WETH.address, TOKENS.USDC.address, first.amountOut, blockNumber);
+  await sleep(600);
 
-  return {
-    startUsdc: start,
-    wethReceived: first.amountOut,
-    finalUsdc: second.amountOut,
-    grossProfitUsdc: second.amountOut - start,
-    first,
-    second,
-  };
+  const uniswapFirst = await quoteUniswapV3Batch(
+    publicClient,
+    TOKENS.USDC.address,
+    TOKENS.WETH.address,
+    starts,
+    blockNumber,
+  );
+
+  await sleep(600);
+
+  const uniswapSecond = await quoteUniswapV3Batch(
+    publicClient,
+    TOKENS.WETH.address,
+    TOKENS.USDC.address,
+    aerodromeFirst.map((quote) => quote.amountOut),
+    blockNumber,
+  );
+
+  await sleep(600);
+
+  const aerodromeSecond = await quoteAerodromeBatch(
+    publicClient,
+    TOKENS.WETH.address,
+    TOKENS.USDC.address,
+    uniswapFirst.map((quote) => quote.amountOut),
+    blockNumber,
+  );
+
+  const rows: MatrixRow[] = [];
+
+  for (let i = 0; i < tradeSizesUsdc.length; i += 1) {
+    const startUsdcText = tradeSizesUsdc[i]!;
+    const startUsdc = starts[i]!;
+    const aeroFirst = aerodromeFirst[i]!;
+    const uniFirst = uniswapFirst[i]!;
+    const uniSecond = uniswapSecond[i]!;
+    const aeroSecond = aerodromeSecond[i]!;
+
+    rows.push({
+      startUsdcText,
+      firstDex: 'aerodrome',
+      startUsdc,
+      wethReceived: aeroFirst.amountOut,
+      finalUsdc: uniSecond.amountOut,
+      grossProfitUsdc: uniSecond.amountOut - startUsdc,
+      first: aeroFirst,
+      second: uniSecond,
+    });
+
+    rows.push({
+      startUsdcText,
+      firstDex: 'uniswap-v3',
+      startUsdc,
+      wethReceived: uniFirst.amountOut,
+      finalUsdc: aeroSecond.amountOut,
+      grossProfitUsdc: aeroSecond.amountOut - startUsdc,
+      first: uniFirst,
+      second: aeroSecond,
+    });
+  }
+
+  return rows;
 }
 
 export function formatUsdc(value: bigint): string {
