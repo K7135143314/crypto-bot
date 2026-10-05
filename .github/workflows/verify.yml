@@ -29,11 +29,15 @@ jobs:
       - run: npm test
       - name: Read-only Base quote matrix
         run: npm run scan
+      - name: Publish run summary
+        run: cat artifacts/summary.md >> "$GITHUB_STEP_SUMMARY"
       - name: Upload scan report
         uses: actions/upload-artifact@v4
         with:
           name: scan-report-${{ github.run_number }}
-          path: artifacts/latest-scan.json
+          path: |
+            artifacts/latest-scan.json
+            artifacts/summary.md
           if-no-files-found: error
           retention-days: 30
       - name: Upload candidate report when present
