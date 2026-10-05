@@ -59,6 +59,8 @@ export async function quoteAerodrome(
   return { dex: 'aerodrome', tokenIn, tokenOut, amountIn, amountOut };
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export async function quoteUniswapV3(
   publicClient: BasePublicClient,
   tokenIn: Address,
@@ -68,39 +70,54 @@ export async function quoteUniswapV3(
   const successful: DexQuote[] = [];
   const failures: string[] = [];
 
-  // Query fee tiers sequentially. Public Base RPC endpoints can throttle bursts,
-  // and a throttled request must not be misclassified as "no liquidity".
+  // Query fee tiers sequentially. Public Base RPC endpoints can throttle bursts.
+  // Retry transient RPC failures with a short backoff so throttling is not
+  // misclassified as "no liquidity".
   for (const fee of UNISWAP_V3_FEES) {
-    try {
-      const result = await publicClient.simulateContract({
-        address: CONTRACTS.uniswapV3QuoterV2,
-        abi: uniswapV3QuoterV2Abi,
-        functionName: 'quoteExactInputSingle',
-        args: [{
-          tokenIn,
-          tokenOut,
-          amountIn,
-          fee,
-          sqrtPriceLimitX96: 0n,
-        }],
-      });
+    let quoted = false;
 
-      const [amountOut, , , gasEstimate] = result.result;
-      if (amountOut > 0n) {
-        successful.push({
-          dex: 'uniswap-v3',
-          tokenIn,
-          tokenOut,
-          amountIn,
-          amountOut,
-          feeTier: fee,
-          gasEstimate,
+    for (let attempt = 1; attempt <= 3 && !quoted; attempt += 1) {
+      try {
+        const result = await publicClient.simulateContract({
+          address: CONTRACTS.uniswapV3QuoterV2,
+          abi: uniswapV3QuoterV2Abi,
+          functionName: 'quoteExactInputSingle',
+          args: [{
+            tokenIn,
+            tokenOut,
+            amountIn,
+            fee,
+            sqrtPriceLimitX96: 0n,
+          }],
         });
+
+        const [amountOut, , , gasEstimate] = result.result;
+        if (amountOut > 0n) {
+          successful.push({
+            dex: 'uniswap-v3',
+            tokenIn,
+            tokenOut,
+            amountIn,
+            amountOut,
+            feeTier: fee,
+            gasEstimate,
+          });
+        }
+
+        quoted = true;
+      } catch (error) {
+        const e = error as Error & { shortMessage?: string; details?: string };
+        const message = e.shortMessage || e.details || e.message.split('\n')[0];
+
+        if (attempt === 3) {
+          failures.push(`${fee}: ${message}`);
+        } else {
+          await sleep(350 * attempt);
+        }
       }
-    } catch (error) {
-      const message = error instanceof Error ? error.message.split('\n')[0] : String(error);
-      failures.push(`${fee}: ${message}`);
     }
+
+    await sleep(250);
   }
 
   if (successful.length === 0) {
