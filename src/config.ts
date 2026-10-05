@@ -42,3 +42,8 @@ const configuredSizes = (process.env.TRADE_SIZES_USDC || '100,250,500,1000,2500,
   .filter(Boolean);
 
 export const TRADE_SIZES_USDC = configuredSizes;
+
+export const GAS_UNIT_SCENARIOS = (process.env.GAS_UNIT_SCENARIOS || '300000,500000,800000')
+  .split(',')
+  .map((x) => Number(x.trim()))
+  .filter((x) => Number.isFinite(x) && x > 0);
