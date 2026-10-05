@@ -26,16 +26,33 @@ export type DexQuote = {
 
 export const client = createPublicClient({
   chain: base,
-  transport: http(BASE_RPC_URL, { timeout: 12_000, retryCount: 1 }),
+  transport: http(BASE_RPC_URL, { timeout: 15_000, retryCount: 0 }),
 });
 
 type BasePublicClient = typeof client;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const RPC_MIN_GAP_MS = Number(process.env.RPC_MIN_GAP_MS || '1200');
+let lastRpcAt = 0;
+
+async function waitForRpcSlot(): Promise<void> {
+  const elapsed = Date.now() - lastRpcAt;
+  const waitMs = Math.max(0, RPC_MIN_GAP_MS - elapsed);
+  if (waitMs > 0) await sleep(waitMs);
+  lastRpcAt = Date.now();
+}
+
+function errorSummary(error: unknown): string {
+  const e = error as Error & { shortMessage?: string; details?: string };
+  return e.shortMessage || e.details || e.message?.split('\n')[0] || String(error);
+}
 
 export async function quoteAerodrome(
   publicClient: BasePublicClient,
   tokenIn: Address,
   tokenOut: Address,
   amountIn: bigint,
+  blockNumber: bigint,
 ): Promise<DexQuote> {
   const route = [{
     from: tokenIn,
@@ -44,40 +61,52 @@ export async function quoteAerodrome(
     factory: CONTRACTS.aerodromePoolFactory,
   }] as const;
 
-  const amounts = await publicClient.readContract({
-    address: CONTRACTS.aerodromeRouter,
-    abi: aerodromeRouterAbi,
-    functionName: 'getAmountsOut',
-    args: [amountIn, route],
-  });
+  const failures: string[] = [];
 
-  const amountOut = amounts[amounts.length - 1];
-  if (amountOut === undefined || amountOut <= 0n) {
-    throw new Error('Aerodrome returned no output amount');
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      await waitForRpcSlot();
+
+      const amounts = await publicClient.readContract({
+        address: CONTRACTS.aerodromeRouter,
+        abi: aerodromeRouterAbi,
+        functionName: 'getAmountsOut',
+        args: [amountIn, route],
+        blockNumber,
+      });
+
+      const amountOut = amounts[amounts.length - 1];
+      if (amountOut === undefined || amountOut <= 0n) {
+        throw new Error('Aerodrome returned no output amount');
+      }
+
+      return { dex: 'aerodrome', tokenIn, tokenOut, amountIn, amountOut };
+    } catch (error) {
+      failures.push(`attempt ${attempt}: ${errorSummary(error)}`);
+      if (attempt < 3) await sleep(700 * attempt);
+    }
   }
 
-  return { dex: 'aerodrome', tokenIn, tokenOut, amountIn, amountOut };
+  throw new Error(`Aerodrome quote failed. Diagnostics: ${failures.join(' | ')}`);
 }
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function quoteUniswapV3(
   publicClient: BasePublicClient,
   tokenIn: Address,
   tokenOut: Address,
   amountIn: bigint,
+  blockNumber: bigint,
 ): Promise<DexQuote> {
   const successful: DexQuote[] = [];
   const failures: string[] = [];
 
-  // Query fee tiers sequentially. Public Base RPC endpoints can throttle bursts.
-  // Retry transient RPC failures with a short backoff so throttling is not
-  // misclassified as "no liquidity".
   for (const fee of UNISWAP_V3_FEES) {
-    let quoted = false;
+    let completed = false;
 
-    for (let attempt = 1; attempt <= 3 && !quoted; attempt += 1) {
+    for (let attempt = 1; attempt <= 3 && !completed; attempt += 1) {
       try {
+        await waitForRpcSlot();
+
         const result = await publicClient.simulateContract({
           address: CONTRACTS.uniswapV3QuoterV2,
           abi: uniswapV3QuoterV2Abi,
@@ -89,6 +118,7 @@ export async function quoteUniswapV3(
             fee,
             sqrtPriceLimitX96: 0n,
           }],
+          blockNumber,
         });
 
         const [amountOut, , , gasEstimate] = result.result;
@@ -104,20 +134,15 @@ export async function quoteUniswapV3(
           });
         }
 
-        quoted = true;
+        completed = true;
       } catch (error) {
-        const e = error as Error & { shortMessage?: string; details?: string };
-        const message = e.shortMessage || e.details || e.message.split('\n')[0];
-
         if (attempt === 3) {
-          failures.push(`${fee}: ${message}`);
+          failures.push(`${fee}: ${errorSummary(error)}`);
         } else {
-          await sleep(350 * attempt);
+          await sleep(700 * attempt);
         }
       }
     }
-
-    await sleep(250);
   }
 
   if (successful.length === 0) {
@@ -134,6 +159,7 @@ export async function quoteRoundTrip(
   publicClient: BasePublicClient,
   startUsdc: string,
   firstDex: 'aerodrome' | 'uniswap-v3',
+  blockNumber: bigint,
 ): Promise<{
   startUsdc: bigint;
   wethReceived: bigint;
@@ -145,12 +171,12 @@ export async function quoteRoundTrip(
   const start = parseUnits(startUsdc, TOKENS.USDC.decimals);
 
   const first = firstDex === 'aerodrome'
-    ? await quoteAerodrome(publicClient, TOKENS.USDC.address, TOKENS.WETH.address, start)
-    : await quoteUniswapV3(publicClient, TOKENS.USDC.address, TOKENS.WETH.address, start);
+    ? await quoteAerodrome(publicClient, TOKENS.USDC.address, TOKENS.WETH.address, start, blockNumber)
+    : await quoteUniswapV3(publicClient, TOKENS.USDC.address, TOKENS.WETH.address, start, blockNumber);
 
   const second = firstDex === 'aerodrome'
-    ? await quoteUniswapV3(publicClient, TOKENS.WETH.address, TOKENS.USDC.address, first.amountOut)
-    : await quoteAerodrome(publicClient, TOKENS.WETH.address, TOKENS.USDC.address, first.amountOut);
+    ? await quoteUniswapV3(publicClient, TOKENS.WETH.address, TOKENS.USDC.address, first.amountOut, blockNumber)
+    : await quoteAerodrome(publicClient, TOKENS.WETH.address, TOKENS.USDC.address, first.amountOut, blockNumber);
 
   return {
     startUsdc: start,
