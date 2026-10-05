@@ -46,3 +46,13 @@ export const uniswapV3QuoterV2Abi = [
     ]
   }
 ] as const;
+
+export const aaveV3PoolAbi = [
+  {
+    type: 'function',
+    name: 'FLASHLOAN_PREMIUM_TOTAL',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint128' }]
+  }
+] as const;
