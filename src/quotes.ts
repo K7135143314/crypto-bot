@@ -1,5 +1,6 @@
 import {
   createPublicClient,
+  fallback,
   formatUnits,
   http,
   parseUnits,
@@ -8,7 +9,7 @@ import {
 import { base } from 'viem/chains';
 import { aerodromeRouterAbi, uniswapV3QuoterV2Abi } from './abis.js';
 import {
-  BASE_RPC_URL,
+  BASE_RPC_URLS,
   CONTRACTS,
   TOKENS,
   UNISWAP_V3_FEES,
@@ -37,7 +38,15 @@ export type MatrixRow = {
 
 export const client = createPublicClient({
   chain: base,
-  transport: http(BASE_RPC_URL, { timeout: 20_000, retryCount: 0 }),
+  transport: fallback(
+    BASE_RPC_URLS.map((url) =>
+      http(url, {
+        timeout: 20_000,
+        retryCount: 0,
+      }),
+    ),
+    { rank: false },
+  ),
 });
 
 type BasePublicClient = typeof client;
