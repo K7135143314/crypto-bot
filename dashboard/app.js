@@ -249,43 +249,403 @@ function drawCharts() {
 
 function renderMatrix(scan) {
   const matrix = el('matrix');
+  const routes = [
+    'Aerodrome → Uniswap v3',
+    'Uniswap v3 → Aerodrome',
+  ];
 
-  matrix.innerHTML =
+  const getCell = (route, size) => {
+    const row = scan.rows.find(
+      (item) => item.route === route && item.startUsdc === size
+    );
+
+    if (!row) {
+      return { text: '—', cls: '' };
+    }
+
+    const value = row.estimatedNetUsdc;
+    const cls = value >= 0 ? 'pos' : value >= -1 ? 'near' : 'neg';
+
+    return {
+      text: money(value, 3),
+      cls,
+    };
+  };
+
+  const desktop =
+    '<div class="matrixDesktop">' +
     '<div class="mlabel">Route</div>' +
     sizes
       .map(
         (size) =>
-          '<div class="mhead">$' + size.toLocaleString() + '</div>'
-      )
-      .join('');
+          '<div class="mhead">
+function updateHistoryLabels() {
+  if (!points.length) {
+    setText('priceRange', '24h browser range: —');
+    setText('obs', 'Observations: 0 • saved locally');
+    return;
+  }
 
-  for (const route of [
-    'Aerodrome → Uniswap v3',
-    'Uniswap v3 → Aerodrome',
-  ]) {
-    matrix.insertAdjacentHTML(
-      'beforeend',
-      '<div class="mlabel">' + route.replace(' v3', '') + '</div>'
+  const prices = points.map((point) => point.price);
+
+  setText(
+    'priceRange',
+    '24h browser range: $' +
+      Math.min(...prices).toFixed(2) +
+      ' – $' +
+      Math.max(...prices).toFixed(2)
+  );
+
+  setText('obs', 'Observations: ' + points.length + ' • saved locally');
+}
+
+async function refresh() {
+  if (busy) return;
+
+  busy = true;
+  el('scanBtn').disabled = true;
+  el('scanBtn').textContent = 'Scanning…';
+
+  try {
+    const response = await fetch('/api/scan?t=' + Date.now(), {
+      cache: 'no-store',
+    });
+
+    const scan = await response.json();
+
+    if (!response.ok || !scan.ok) {
+      throw new Error(scan.error || 'Live scan failed');
+    }
+
+    el('error').style.display = 'none';
+
+    setText('block', 'Block ' + scan.blockNumber);
+    setText('candidates', scan.candidateCount);
+    setText('matrixCount', scan.matrixComplete + '/14');
+    setText('premium', scan.flashLoanPremiumBps + ' bps');
+    setText(
+      'premiumPct',
+      '(' + (scan.flashLoanPremiumBps / 100).toFixed(2) + '%)'
     );
+    setText('gas', scan.gasPriceGwei.toFixed(4) + ' gwei');
 
-    for (const size of sizes) {
-      const row = scan.rows.find(
-        (item) => item.route === route && item.startUsdc === size
+    setText('bestRoute', scan.best.route);
+    setText('bestSize', '$' + scan.best.startUsdc.toLocaleString());
+    setText('bestNet', money(scan.best.estimatedNetUsdc, 6));
+
+    el('bestNet').className =
+      scan.best.estimatedNetUsdc >= 0 ? 'green' : 'red';
+
+    setText('decision', scan.best.decision);
+
+    el('decision').className =
+      'pill ' + (scan.best.decision === 'CANDIDATE' ? 'candidate' : 'reject');
+
+    setText('wethPrice', '$' + scan.wethReferencePrice.toFixed(2));
+
+    el('candidateAlert').className =
+      'candidateAlert' + (scan.candidateCount > 0 ? ' show' : '');
+
+    points.push({
+      t: Date.now(),
+      net: scan.best.estimatedNetUsdc,
+      price: scan.wethReferencePrice,
+    });
+
+    saveHistory();
+
+    const previous = points[points.length - 2];
+    const current = points[points.length - 1];
+
+    if (previous) {
+      const netChange = current.net - previous.net;
+
+      el('delta').className = 'delta ' + (netChange >= 0 ? 'good' : 'bad');
+
+      setText(
+        'delta',
+        (netChange >= 0 ? '▲ ' : '▼ ') +
+          money(Math.abs(netChange), 4) +
+          ' since prior refresh'
       );
 
-      const value = row ? row.estimatedNetUsdc : null;
-      const cls = value >= 0 ? 'pos' : value >= -1 ? 'near' : 'neg';
+      const priceChange = current.price - previous.price;
 
-      matrix.insertAdjacentHTML(
-        'beforeend',
-        '<div class="cell ' +
-          cls +
-          '">' +
-          (row ? money(value, 3) : '—') +
-          '</div>'
+      el('priceMove').className =
+        'delta ' + (priceChange >= 0 ? 'good' : 'bad');
+
+      setText(
+        'priceMove',
+        (priceChange >= 0 ? '▲ ' : '▼ ') +
+          '$' +
+          Math.abs(priceChange).toFixed(2) +
+          ' since prior refresh'
       );
     }
+
+    updateHistoryLabels();
+    renderMatrix(scan);
+    drawCharts();
+
+    const timestamp = new Date(scan.generatedAt).toLocaleTimeString();
+
+    el('feed').innerHTML =
+      '<p><time>' +
+      timestamp +
+      '</time>14-route live scan complete</p>' +
+      '<p><time>' +
+      timestamp +
+      '</time>candidate count: ' +
+      scan.candidateCount +
+      '</p>' +
+      '<p><time>' +
+      timestamp +
+      '</time>no wallet / no signing / no transaction</p>';
+
+    seconds = 20;
+  } catch (error) {
+    el('error').style.display = 'block';
+    el('error').textContent =
+      'Live scan error: ' +
+      (error instanceof Error ? error.message : String(error));
+  } finally {
+    busy = false;
+    el('scanBtn').disabled = false;
+    el('scanBtn').textContent = 'Scan now';
   }
+}
+
+el('scanBtn').addEventListener('click', refresh);
+window.addEventListener('resize', drawCharts);
+
+loadHistory();
+
+if (points.length) {
+  updateHistoryLabels();
+  drawCharts();
+}
+
+refresh();
+
+setInterval(refresh, refreshMs);
+
+setInterval(() => {
+  seconds = seconds <= 1 ? 20 : seconds - 1;
+  setText('countdown', 'Refresh in ' + seconds + 's');
+}, 1000);
+ + size.toLocaleString() + '</div>'
+      )
+      .join('') +
+    routes
+      .map((route) => {
+        const cells = sizes
+          .map((size) => {
+            const cell = getCell(route, size);
+            return (
+              '<div class="cell ' +
+              cell.cls +
+              '">' +
+              cell.text +
+              '</div>'
+            );
+          })
+          .join('');
+
+        return (
+          '<div class="mlabel">' +
+          route.replace(' v3', '') +
+          '</div>' +
+          cells
+        );
+      })
+      .join('') +
+    '</div>';
+
+  const mobile =
+    '<div class="matrixMobile" aria-label="Trade size by route">' +
+    '<div class="mobileHead">Size</div>' +
+    '<div class="mobileHead">Aero → Uni</div>' +
+    '<div class="mobileHead">Uni → Aero</div>' +
+    sizes
+      .map((size) => {
+        const aeroToUni = getCell(routes[0], size);
+        const uniToAero = getCell(routes[1], size);
+
+        return (
+          '<div class="mobileSize">
+function updateHistoryLabels() {
+  if (!points.length) {
+    setText('priceRange', '24h browser range: —');
+    setText('obs', 'Observations: 0 • saved locally');
+    return;
+  }
+
+  const prices = points.map((point) => point.price);
+
+  setText(
+    'priceRange',
+    '24h browser range: $' +
+      Math.min(...prices).toFixed(2) +
+      ' – $' +
+      Math.max(...prices).toFixed(2)
+  );
+
+  setText('obs', 'Observations: ' + points.length + ' • saved locally');
+}
+
+async function refresh() {
+  if (busy) return;
+
+  busy = true;
+  el('scanBtn').disabled = true;
+  el('scanBtn').textContent = 'Scanning…';
+
+  try {
+    const response = await fetch('/api/scan?t=' + Date.now(), {
+      cache: 'no-store',
+    });
+
+    const scan = await response.json();
+
+    if (!response.ok || !scan.ok) {
+      throw new Error(scan.error || 'Live scan failed');
+    }
+
+    el('error').style.display = 'none';
+
+    setText('block', 'Block ' + scan.blockNumber);
+    setText('candidates', scan.candidateCount);
+    setText('matrixCount', scan.matrixComplete + '/14');
+    setText('premium', scan.flashLoanPremiumBps + ' bps');
+    setText(
+      'premiumPct',
+      '(' + (scan.flashLoanPremiumBps / 100).toFixed(2) + '%)'
+    );
+    setText('gas', scan.gasPriceGwei.toFixed(4) + ' gwei');
+
+    setText('bestRoute', scan.best.route);
+    setText('bestSize', '$' + scan.best.startUsdc.toLocaleString());
+    setText('bestNet', money(scan.best.estimatedNetUsdc, 6));
+
+    el('bestNet').className =
+      scan.best.estimatedNetUsdc >= 0 ? 'green' : 'red';
+
+    setText('decision', scan.best.decision);
+
+    el('decision').className =
+      'pill ' + (scan.best.decision === 'CANDIDATE' ? 'candidate' : 'reject');
+
+    setText('wethPrice', '$' + scan.wethReferencePrice.toFixed(2));
+
+    el('candidateAlert').className =
+      'candidateAlert' + (scan.candidateCount > 0 ? ' show' : '');
+
+    points.push({
+      t: Date.now(),
+      net: scan.best.estimatedNetUsdc,
+      price: scan.wethReferencePrice,
+    });
+
+    saveHistory();
+
+    const previous = points[points.length - 2];
+    const current = points[points.length - 1];
+
+    if (previous) {
+      const netChange = current.net - previous.net;
+
+      el('delta').className = 'delta ' + (netChange >= 0 ? 'good' : 'bad');
+
+      setText(
+        'delta',
+        (netChange >= 0 ? '▲ ' : '▼ ') +
+          money(Math.abs(netChange), 4) +
+          ' since prior refresh'
+      );
+
+      const priceChange = current.price - previous.price;
+
+      el('priceMove').className =
+        'delta ' + (priceChange >= 0 ? 'good' : 'bad');
+
+      setText(
+        'priceMove',
+        (priceChange >= 0 ? '▲ ' : '▼ ') +
+          '$' +
+          Math.abs(priceChange).toFixed(2) +
+          ' since prior refresh'
+      );
+    }
+
+    updateHistoryLabels();
+    renderMatrix(scan);
+    drawCharts();
+
+    const timestamp = new Date(scan.generatedAt).toLocaleTimeString();
+
+    el('feed').innerHTML =
+      '<p><time>' +
+      timestamp +
+      '</time>14-route live scan complete</p>' +
+      '<p><time>' +
+      timestamp +
+      '</time>candidate count: ' +
+      scan.candidateCount +
+      '</p>' +
+      '<p><time>' +
+      timestamp +
+      '</time>no wallet / no signing / no transaction</p>';
+
+    seconds = 20;
+  } catch (error) {
+    el('error').style.display = 'block';
+    el('error').textContent =
+      'Live scan error: ' +
+      (error instanceof Error ? error.message : String(error));
+  } finally {
+    busy = false;
+    el('scanBtn').disabled = false;
+    el('scanBtn').textContent = 'Scan now';
+  }
+}
+
+el('scanBtn').addEventListener('click', refresh);
+window.addEventListener('resize', drawCharts);
+
+loadHistory();
+
+if (points.length) {
+  updateHistoryLabels();
+  drawCharts();
+}
+
+refresh();
+
+setInterval(refresh, refreshMs);
+
+setInterval(() => {
+  seconds = seconds <= 1 ? 20 : seconds - 1;
+  setText('countdown', 'Refresh in ' + seconds + 's');
+}, 1000);
+ +
+          size.toLocaleString() +
+          '</div>' +
+          '<div class="cell ' +
+          aeroToUni.cls +
+          '">' +
+          aeroToUni.text +
+          '</div>' +
+          '<div class="cell ' +
+          uniToAero.cls +
+          '">' +
+          uniToAero.text +
+          '</div>'
+        );
+      })
+      .join('') +
+    '</div>';
+
+  matrix.innerHTML = desktop + mobile;
 }
 
 function updateHistoryLabels() {
