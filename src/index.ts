@@ -152,6 +152,10 @@ async function main(): Promise<void> {
     throw new Error(`Incomplete quote matrix: expected ${expectedRoutes}, received ${rows.length}.`);
   }
 
+  const bestRow = [...reportRows].sort(
+    (a, b) => Number(b.estimatedNetUsdc) - Number(a.estimatedNetUsdc),
+  )[0];
+
   const report = {
     scannerVersion: '0.5.0',
     readOnly: true,
@@ -183,6 +187,29 @@ async function main(): Promise<void> {
   await mkdir('artifacts', { recursive: true });
   await writeFile('artifacts/latest-scan.json', JSON.stringify(report, null, 2) + '\n', 'utf8');
   console.log('Saved machine-readable report: artifacts/latest-scan.json');
+
+  const summaryLines = [
+    '# Read-only arbitrage scan',
+    '',
+    `- Base block: ${blockNumber}`,
+    `- Matrix: ${rows.length}/${expectedRoutes} routes completed`,
+    `- Candidates: ${candidateCount}`,
+    `- Aave flash-loan premium: ${flashLoanPremiumBps} bps`,
+    `- Base gas price: ${(Number(gasPrice) / 1e9).toFixed(6)} gwei`,
+    `- WETH reference price: ${ethPriceUsdc.toFixed(2)}`,
+    '',
+    '## Best route in this scan',
+    '',
+    bestRow
+      ? `**${bestRow.route}** starting with **${bestRow.startUsdc}** — estimated net **${bestRow.estimatedNetUsdc}**, decision **${bestRow.decision}**.`
+      : 'No completed route was available.',
+    '',
+    '> Research-only observation. No wallet, signing, or transaction execution is enabled.',
+    '',
+  ];
+
+  await writeFile('artifacts/summary.md', summaryLines.join('\n'), 'utf8');
+  console.log('Saved human-readable summary: artifacts/summary.md');
 
   if (candidateRows.length > 0) {
     const candidateReport = {
