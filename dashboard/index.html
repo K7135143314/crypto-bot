@@ -75,16 +75,198 @@ footer{margin-top:10px;border:1px solid #6b5521;background:#211b0d;color:var(--a
   <footer><strong>READ-ONLY SYSTEM</strong><span>No wallet</span><span>No signing</span><span>No transactions</span><span class="note">Market data is live. “Candidate” means research/simulation candidate only.</span></footer>
 </main>
 <script>
-const sizes=[100,250,500,1000,2500,5000,10000], points=[], maxPoints=120, refreshMs=20000;
-let seconds=20, busy=false;
+const sizes=[100,250,500,1000,2500,5000,10000],points=[],maxPoints=120,refreshMs=20000;
+let seconds=20,busy=false;
 const $=id=>document.getElementById(id);
-function money(v,d=4){const n=Number(v);return (n<0?'-$':'$')+Math.abs(n).toFixed(d)}
-function setText(id,v){$(id).textContent=v}
+function money(v,d=4){const n=Number(v);return (n<0?'-
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.abs(priceCh).toFixed(2)+' since prior refresh');
+    }
+    const pr=points.map(p=>p.price);setText('priceRange','Session range: 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.min(...pr).toFixed(2)+' – 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.max(...pr).toFixed(2));
+    setText('obs','Observations: '+points.length);renderMatrix(scan);drawCharts();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>:'
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.abs(priceCh).toFixed(2)+' since prior refresh');
+    }
+    const pr=points.map(p=>p.price);setText('priceRange','Session range: 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.min(...pr).toFixed(2)+' – 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.max(...pr).toFixed(2));
+    setText('obs','Observations: '+points.length);renderMatrix(scan);drawCharts();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>)+Math.abs(n).toFixed(d)}
+function setText(id,v){const el=$(id);if(el)el.textContent=v}
 function canvasSetup(id){
   const canvas=$(id),dpr=window.devicePixelRatio||1,rect=canvas.getBoundingClientRect();
   canvas.width=Math.max(1,rect.width*dpr);canvas.height=Math.max(1,rect.height*dpr);
   const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
-  return {canvas,ctx,w:rect.width,h:rect.height,padL:52,padR:18,padT:22,padB:34};
+  return {ctx,w:rect.width,h:rect.height,padL:52,padR:18,padT:22,padB:34};
 }
 function drawGrid(ctx,w,h,padL,padR,padT,padB){
   ctx.clearRect(0,0,w,h);ctx.strokeStyle='#173448';ctx.lineWidth=1;
@@ -113,34 +295,774 @@ function drawPrice(){
   ctx.strokeStyle='#20d990';ctx.lineWidth=2.5;ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(x(i),y(p.price)):ctx.moveTo(x(i),y(p.price)));ctx.stroke();
   const last=points[points.length-1];ctx.fillStyle='#20d990';ctx.beginPath();ctx.arc(x(points.length-1),y(last.price),4.5,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#8eabc0';ctx.font='11px Arial';ctx.fillText(timeLabel(points[0].t),padL,h-10);const rt=timeLabel(last.t);ctx.fillText(rt,w-padR-ctx.measureText(rt).width,h-10);
-  ctx.fillStyle='#8eabc0';ctx.fillText('$'+min.toFixed(2),4,h-padB+4);ctx.fillText('$'+max.toFixed(2),4,padT+4);
+  ctx.fillStyle='#8eabc0';ctx.fillText('
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
 }
-function drawCharts(){drawProfit();drawPrice();}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.abs(priceCh).toFixed(2)+' since prior refresh');
+    }
+    const pr=points.map(p=>p.price);setText('priceRange','Session range: 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.min(...pr).toFixed(2)+' – 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.max(...pr).toFixed(2));
+    setText('obs','Observations: '+points.length);renderMatrix(scan);drawCharts();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+min.toFixed(2),4,h-padB+4);ctx.fillText('
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.abs(priceCh).toFixed(2)+' since prior refresh');
+    }
+    const pr=points.map(p=>p.price);setText('priceRange','Session range: 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.min(...pr).toFixed(2)+' – 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.max(...pr).toFixed(2));
+    setText('obs','Observations: '+points.length);renderMatrix(scan);drawCharts();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+max.toFixed(2),4,padT+4);
+}
+function drawCharts(){drawProfit();drawPrice()}
 function renderMatrix(scan){
-  const m=$('matrix');m.innerHTML='<div class="mlabel">Route</div>'+sizes.map(s=>'<div class="mhead">$'+s.toLocaleString()+'</div>').join('');
+  const m=$('matrix');m.innerHTML='<div class="mlabel">Route</div>'+sizes.map(s=>'<div class="mhead">
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.abs(priceCh).toFixed(2)+' since prior refresh');
+    }
+    const pr=points.map(p=>p.price);setText('priceRange','Session range: 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.min(...pr).toFixed(2)+' – 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.max(...pr).toFixed(2));
+    setText('obs','Observations: '+points.length);renderMatrix(scan);drawCharts();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+s.toLocaleString()+'</div>').join('');
   for(const route of ['Aerodrome → Uniswap v3','Uniswap v3 → Aerodrome']){
     m.insertAdjacentHTML('beforeend','<div class="mlabel">'+route.replace(' v3','')+'</div>');
-    for(const size of sizes){const r=scan.rows.find(x=>x.route===route&&x.startUsdc===size);const val=r?r.estimatedNetUsdc:null;const cls=val>=0?'pos':val>=-1?'near':'neg';m.insertAdjacentHTML('beforeend','<div class="cell '+cls+'">'+(r?money(val,3):'—')+'</div>')}
+    for(const size of sizes){
+      const r=scan.rows.find(x=>x.route===route&&x.startUsdc===size),val=r?r.estimatedNetUsdc:null;
+      const cls=val>=0?'pos':val>=-1?'near':'neg';
+      m.insertAdjacentHTML('beforeend','<div class="cell '+cls+'">'+(r?money(val,3):'—')+'</div>');
+    }
   }
 }
 async function refresh(){
   if(busy)return;busy=true;$('scanBtn').disabled=true;$('scanBtn').textContent='Scanning…';
   try{
-    const r=await fetch('/api/scan?t='+Date.now(),{cache:'no-store'}), scan=await r.json();
+    const r=await fetch('/api/scan?t='+Date.now(),{cache:'no-store'}),scan=await r.json();
     if(!r.ok||!scan.ok)throw new Error(scan.error||'Live scan failed');
     $('error').style.display='none';
-    setText('block','Block '+scan.blockNumber);setText('candidates',scan.candidateCount);setText('matrixCount',scan.matrixComplete+'/14');setText('premium',scan.flashLoanPremiumBps+' bps');setText('premiumPct','('+(scan.flashLoanPremiumBps/100).toFixed(2)+'%)');setText('gas',scan.gasPriceGwei.toFixed(4)+' gwei');
-    setText('bestRoute',scan.best.route);setText('bestSize','$'+scan.best.startUsdc.toLocaleString());setText('bestNet',money(scan.best.estimatedNetUsdc,6));$('bestNet').className=scan.best.estimatedNetUsdc>=0?'green':'red';
+    setText('block','Block '+scan.blockNumber);setText('candidates',scan.candidateCount);setText('matrixCount',scan.matrixComplete+'/14');
+    setText('premium',scan.flashLoanPremiumBps+' bps');setText('premiumPct','('+(scan.flashLoanPremiumBps/100).toFixed(2)+'%)');setText('gas',scan.gasPriceGwei.toFixed(4)+' gwei');
+    setText('bestRoute',scan.best.route);setText('bestSize','
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.abs(priceCh).toFixed(2)+' since prior refresh');
+    }
+    const pr=points.map(p=>p.price);setText('priceRange','Session range: 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.min(...pr).toFixed(2)+' – 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.max(...pr).toFixed(2));
+    setText('obs','Observations: '+points.length);renderMatrix(scan);drawCharts();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.best.startUsdc.toLocaleString());setText('bestNet',money(scan.best.estimatedNetUsdc,6));$('bestNet').className=scan.best.estimatedNetUsdc>=0?'green':'red';
     setText('decision',scan.best.decision);$('decision').className='pill '+(scan.best.decision==='CANDIDATE'?'candidate':'reject');setText('wethPrice','
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.abs(priceCh).toFixed(2)+' since prior refresh');
+    }
+    const pr=points.map(p=>p.price);setText('priceRange','Session range: 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.min(...pr).toFixed(2)+' – 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.max(...pr).toFixed(2));
+    setText('obs','Observations: '+points.length);renderMatrix(scan);drawCharts();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
     points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
     const prev=points[points.length-2],cur=points[points.length-1];
     if(prev){
       const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh');
       const priceCh=cur.price-prev.price;$('priceMove').className='delta '+(priceCh>=0?'good':'bad');setText('priceMove',(priceCh>=0?'▲ ':'▼ ')+'
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
     const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
     seconds=20;
   }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
   finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.abs(priceCh).toFixed(2)+' since prior refresh');
+    }
+    const pr=points.map(p=>p.price);setText('priceRange','Session range: 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.min(...pr).toFixed(2)+' – 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.max(...pr).toFixed(2));
+    setText('obs','Observations: '+points.length);renderMatrix(scan);drawCharts();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.abs(priceCh).toFixed(2)+' since prior refresh');
+    }
+    const pr=points.map(p=>p.price);setText('priceRange','Session range: 
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.abs(priceCh).toFixed(2)+' since prior refresh');
+    }
+    const pr=points.map(p=>p.price);setText('priceRange','Session range: 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.min(...pr).toFixed(2)+' – 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.max(...pr).toFixed(2));
+    setText('obs','Observations: '+points.length);renderMatrix(scan);drawCharts();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.min(...pr).toFixed(2)+' – 
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.abs(priceCh).toFixed(2)+' since prior refresh');
+    }
+    const pr=points.map(p=>p.price);setText('priceRange','Session range: 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.min(...pr).toFixed(2)+' – 
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.max(...pr).toFixed(2));
+    setText('obs','Observations: '+points.length);renderMatrix(scan);drawCharts();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+scan.wethReferencePrice.toFixed(2));
+    $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
+    points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});if(points.length>maxPoints)points.shift();
+    const prev=points[points.length-2],cur=points[points.length-1];if(prev){const ch=cur.net-prev.net;$('delta').className='delta '+(ch>=0?'good':'bad');setText('delta',(ch>=0?'▲ ':'▼ ')+money(Math.abs(ch),4)+' since prior refresh')}
+    setText('obs','Observations: '+points.length);renderMatrix(scan);draw();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){$('error').style.display='block';$('error').textContent='Live scan error: '+e.message}
+  finally{busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now'}
+}
+$('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',draw);
+refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
+</script>
+</body>
+</html>+Math.max(...pr).toFixed(2));
+    setText('obs','Observations: '+points.length);renderMatrix(scan);drawCharts();
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();$('feed').innerHTML='<p><time>'+ts+'</time>14-route live scan complete</p><p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p><p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(e){
+    $('error').style.display='block';$('error').textContent='Live scan error: '+(e instanceof Error?e.message:String(e));
+  }finally{
+    busy=false;$('scanBtn').disabled=false;$('scanBtn').textContent='Scan now';
+  }
 }
 $('scanBtn').addEventListener('click',refresh);window.addEventListener('resize',drawCharts);
 refresh();setInterval(refresh,refreshMs);setInterval(()=>{seconds=seconds<=1?20:seconds-1;setText('countdown','Refresh in '+seconds+'s')},1000);
