@@ -30,6 +30,24 @@ jobs:
       - name: Validate dashboard JavaScript syntax
         run: node --check dashboard/app.js
       - run: npm test
+      - name: Generate V0.8 pinned scanner plan
+        env:
+          BASE_FORK_BLOCK: '52216060'
+          BASE_RPC_URL: https://mainnet.base.org
+        run: npm run simulation:plan
+
+      - name: Install isolated V0.8 fork simulator
+        run: npm install --prefix simulation
+
+      - name: Run V0.8 pinned Base fork proof
+        env:
+          BASE_FORK_BLOCK: '52216060'
+          BASE_FORK_RPC_URL: https://mainnet.base.org
+        run: npm --prefix simulation test
+
+      - name: Compare scanner estimate with atomic fork
+        run: npm run simulation:compare
+
       - name: Prove synthetic candidate detection
         run: npm run proof:candidate
 
@@ -130,6 +148,9 @@ jobs:
             artifacts/synthetic-candidate-proof.json
             artifacts/paper-persistence.json
             artifacts/paper-persistence.md
+            simulation/results/scanner-plan.json
+            simulation/results/atomic-fork-result.json
+            simulation/results/scanner-vs-fork.json
           if-no-files-found: error
           retention-days: 30
 
