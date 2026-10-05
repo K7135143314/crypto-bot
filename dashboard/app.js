@@ -1,13 +1,41 @@
 const sizes=[100,250,500,1000,2500,5000,10000];
 const points=[];
-const maxPoints=120;
 const refreshMs=20000;
+const historyKey='cryptoBotDashboardHistoryV1';
+const historyWindowMs=24*60*60*1000;
+const maxPoints=4500;
 let seconds=20;
 let busy=false;
 
 const $=(id)=>document.getElementById(id);
 const money=(v,d=4)=>{const n=Number(v);return (n<0?'-$':'$')+Math.abs(n).toFixed(d)};
 const setText=(id,v)=>{const el=$(id);if(el)el.textContent=v};
+
+function loadHistory(){
+  try{
+    const raw=localStorage.getItem(historyKey);
+    if(!raw)return;
+    const parsed=JSON.parse(raw);
+    const cutoff=Date.now()-historyWindowMs;
+    const clean=Array.isArray(parsed)
+      ? parsed.filter((p)=>p&&Number.isFinite(p.t)&&Number.isFinite(p.net)&&Number.isFinite(p.price)&&p.t>=cutoff)
+      : [];
+    points.push(...clean.slice(-maxPoints));
+  }catch(error){
+    console.warn('Could not restore local chart history',error);
+  }
+}
+
+function saveHistory(){
+  try{
+    const cutoff=Date.now()-historyWindowMs;
+    while(points.length&&points[0].t<cutoff)points.shift();
+    if(points.length>maxPoints)points.splice(0,points.length-maxPoints);
+    localStorage.setItem(historyKey,JSON.stringify(points));
+  }catch(error){
+    console.warn('Could not save local chart history',error);
+  }
+}
 
 function canvasSetup(id){
   const canvas=$(id);
@@ -171,7 +199,7 @@ async function refresh(){
     $('candidateAlert').className='candidateAlert'+(scan.candidateCount>0?' show':'');
 
     points.push({t:Date.now(),net:scan.best.estimatedNetUsdc,price:scan.wethReferencePrice});
-    if(points.length>maxPoints)points.shift();
+    saveHistory();
 
     const prev=points[points.length-2];
     const cur=points[points.length-1];
@@ -185,8 +213,197 @@ async function refresh(){
     }
 
     const prices=points.map((p)=>p.price);
-    setText('priceRange','Session range: $'+Math.min(...prices).toFixed(2)+' – $'+Math.max(...prices).toFixed(2));
-    setText('obs','Observations: '+points.length);
+    setText('priceRange','24h browser range: 
+    renderMatrix(scan);
+    drawCharts();
+
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();
+    $('feed').innerHTML=
+      '<p><time>'+ts+'</time>14-route live scan complete</p>'+
+      '<p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p>'+
+      '<p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(error){
+    $('error').style.display='block';
+    $('error').textContent='Live scan error: '+(error instanceof Error?error.message:String(error));
+  }finally{
+    busy=false;
+    $('scanBtn').disabled=false;
+    $('scanBtn').textContent='Scan now';
+  }
+}
+
+$('scanBtn').addEventListener('click',refresh);
+window.addEventListener('resize',drawCharts);
+loadHistory();
+if(points.length){
+  drawCharts();
+  const prices=points.map((p)=>p.price);
+  setText('priceRange','24h browser range: 
+setInterval(refresh,refreshMs);
+setInterval(()=>{
+  seconds=seconds<=1?20:seconds-1;
+  setText('countdown','Refresh in '+seconds+'s');
+},1000);
++Math.min(...prices).toFixed(2)+' – 
+    renderMatrix(scan);
+    drawCharts();
+
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();
+    $('feed').innerHTML=
+      '<p><time>'+ts+'</time>14-route live scan complete</p>'+
+      '<p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p>'+
+      '<p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(error){
+    $('error').style.display='block';
+    $('error').textContent='Live scan error: '+(error instanceof Error?error.message:String(error));
+  }finally{
+    busy=false;
+    $('scanBtn').disabled=false;
+    $('scanBtn').textContent='Scan now';
+  }
+}
+
+$('scanBtn').addEventListener('click',refresh);
+window.addEventListener('resize',drawCharts);
+refresh();
+setInterval(refresh,refreshMs);
+setInterval(()=>{
+  seconds=seconds<=1?20:seconds-1;
+  setText('countdown','Refresh in '+seconds+'s');
+},1000);
++Math.max(...prices).toFixed(2));
+    setText('obs','Observations: '+points.length+' • saved locally');
+    renderMatrix(scan);
+    drawCharts();
+
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();
+    $('feed').innerHTML=
+      '<p><time>'+ts+'</time>14-route live scan complete</p>'+
+      '<p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p>'+
+      '<p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(error){
+    $('error').style.display='block';
+    $('error').textContent='Live scan error: '+(error instanceof Error?error.message:String(error));
+  }finally{
+    busy=false;
+    $('scanBtn').disabled=false;
+    $('scanBtn').textContent='Scan now';
+  }
+}
+
+$('scanBtn').addEventListener('click',refresh);
+window.addEventListener('resize',drawCharts);
+refresh();
+setInterval(refresh,refreshMs);
+setInterval(()=>{
+  seconds=seconds<=1?20:seconds-1;
+  setText('countdown','Refresh in '+seconds+'s');
+},1000);
++Math.min(...prices).toFixed(2)+' – 
+setInterval(refresh,refreshMs);
+setInterval(()=>{
+  seconds=seconds<=1?20:seconds-1;
+  setText('countdown','Refresh in '+seconds+'s');
+},1000);
++Math.min(...prices).toFixed(2)+' – 
+    renderMatrix(scan);
+    drawCharts();
+
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();
+    $('feed').innerHTML=
+      '<p><time>'+ts+'</time>14-route live scan complete</p>'+
+      '<p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p>'+
+      '<p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(error){
+    $('error').style.display='block';
+    $('error').textContent='Live scan error: '+(error instanceof Error?error.message:String(error));
+  }finally{
+    busy=false;
+    $('scanBtn').disabled=false;
+    $('scanBtn').textContent='Scan now';
+  }
+}
+
+$('scanBtn').addEventListener('click',refresh);
+window.addEventListener('resize',drawCharts);
+refresh();
+setInterval(refresh,refreshMs);
+setInterval(()=>{
+  seconds=seconds<=1?20:seconds-1;
+  setText('countdown','Refresh in '+seconds+'s');
+},1000);
++Math.max(...prices).toFixed(2));
+    setText('obs','Observations: '+points.length+' • saved locally');
+    renderMatrix(scan);
+    drawCharts();
+
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();
+    $('feed').innerHTML=
+      '<p><time>'+ts+'</time>14-route live scan complete</p>'+
+      '<p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p>'+
+      '<p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(error){
+    $('error').style.display='block';
+    $('error').textContent='Live scan error: '+(error instanceof Error?error.message:String(error));
+  }finally{
+    busy=false;
+    $('scanBtn').disabled=false;
+    $('scanBtn').textContent='Scan now';
+  }
+}
+
+$('scanBtn').addEventListener('click',refresh);
+window.addEventListener('resize',drawCharts);
+refresh();
+setInterval(refresh,refreshMs);
+setInterval(()=>{
+  seconds=seconds<=1?20:seconds-1;
+  setText('countdown','Refresh in '+seconds+'s');
+},1000);
++Math.max(...prices).toFixed(2));
+  setText('obs','Observations: '+points.length+' • saved locally');
+}
+refresh();
+setInterval(refresh,refreshMs);
+setInterval(()=>{
+  seconds=seconds<=1?20:seconds-1;
+  setText('countdown','Refresh in '+seconds+'s');
+},1000);
++Math.min(...prices).toFixed(2)+' – 
+    renderMatrix(scan);
+    drawCharts();
+
+    const ts=new Date(scan.generatedAt).toLocaleTimeString();
+    $('feed').innerHTML=
+      '<p><time>'+ts+'</time>14-route live scan complete</p>'+
+      '<p><time>'+ts+'</time>candidate count: '+scan.candidateCount+'</p>'+
+      '<p><time>'+ts+'</time>no wallet / no signing / no transaction</p>';
+    seconds=20;
+  }catch(error){
+    $('error').style.display='block';
+    $('error').textContent='Live scan error: '+(error instanceof Error?error.message:String(error));
+  }finally{
+    busy=false;
+    $('scanBtn').disabled=false;
+    $('scanBtn').textContent='Scan now';
+  }
+}
+
+$('scanBtn').addEventListener('click',refresh);
+window.addEventListener('resize',drawCharts);
+refresh();
+setInterval(refresh,refreshMs);
+setInterval(()=>{
+  seconds=seconds<=1?20:seconds-1;
+  setText('countdown','Refresh in '+seconds+'s');
+},1000);
++Math.max(...prices).toFixed(2));
+    setText('obs','Observations: '+points.length+' • saved locally');
     renderMatrix(scan);
     drawCharts();
 
