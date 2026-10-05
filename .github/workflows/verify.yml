@@ -36,3 +36,10 @@ jobs:
           path: artifacts/latest-scan.json
           if-no-files-found: error
           retention-days: 30
+      - name: Upload candidate report when present
+        uses: actions/upload-artifact@v4
+        with:
+          name: candidate-report-${{ github.run_number }}
+          path: artifacts/candidates.json
+          if-no-files-found: ignore
+          retention-days: 30
