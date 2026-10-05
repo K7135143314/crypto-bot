@@ -1,9 +1,26 @@
 import { aaveV3PoolAbi } from './abis.js';
-import { CHAIN_ID, CONTRACTS, TRADE_SIZES_USDC } from './config.js';
+import {
+  CHAIN_ID,
+  CONTRACTS,
+  GAS_UNIT_SCENARIOS,
+  TRADE_SIZES_USDC,
+} from './config.js';
 import { client, formatUsdc, formatWeth, quoteMatrix } from './quotes.js';
 
 function applyBps(amount: bigint, bps: bigint): bigint {
   return (amount * bps) / 10_000n;
+}
+
+function estimateEthPriceUsdc(rows: Awaited<ReturnType<typeof quoteMatrix>>): number {
+  const anchor = rows.find(
+    (row) => row.firstDex === 'uniswap-v3' && row.startUsdcText === TRADE_SIZES_USDC[0],
+  );
+
+  if (!anchor) return 0;
+
+  const startUsdc = Number(anchor.startUsdc) / 1e6;
+  const weth = Number(anchor.wethReceived) / 1e18;
+  return weth > 0 ? startUsdc / weth : 0;
 }
 
 async function main(): Promise<void> {
@@ -14,21 +31,37 @@ async function main(): Promise<void> {
     throw new Error(`Wrong chain: expected Base ${CHAIN_ID}, got ${chainId}`);
   }
 
-  const flashLoanPremiumBps = await client.readContract({
-    address: CONTRACTS.aaveV3Pool,
-    abi: aaveV3PoolAbi,
-    functionName: 'FLASHLOAN_PREMIUM_TOTAL',
-    blockNumber,
-  });
+  const [flashLoanPremiumBps, gasPrice] = await Promise.all([
+    client.readContract({
+      address: CONTRACTS.aaveV3Pool,
+      abi: aaveV3PoolAbi,
+      functionName: 'FLASHLOAN_PREMIUM_TOTAL',
+      blockNumber,
+    }),
+    client.getGasPrice(),
+  ]);
 
-  console.log('DEX Arbitrage Scanner V0.2 — READ ONLY');
+  console.log('DEX Arbitrage Scanner V0.3 — READ ONLY');
   console.log(`Pinned Base block: ${blockNumber}`);
   console.log('Pair: WETH / USDC');
   console.log('DEXs: Aerodrome classic / Uniswap v3');
   console.log(`Aave V3 hypothetical flash-loan premium: ${flashLoanPremiumBps} bps (${Number(flashLoanPremiumBps) / 100}%)`);
+  console.log(`Live Base gas price: ${(Number(gasPrice) / 1e9).toFixed(6)} gwei`);
   console.log('No wallet. No signing. No transactions.\n');
 
   const rows = await quoteMatrix(client, TRADE_SIZES_USDC, blockNumber);
+  const ethPriceUsdc = estimateEthPriceUsdc(rows);
+
+  console.log(`Approximate WETH reference price from live quote: $${ethPriceUsdc.toFixed(2)}`);
+  console.log('L2 execution-only gas scenarios (not full Base transaction cost):');
+
+  for (const units of GAS_UNIT_SCENARIOS) {
+    const gasEth = (Number(gasPrice) * units) / 1e18;
+    const gasUsdc = gasEth * ethPriceUsdc;
+    console.log(`  ${units.toLocaleString()} gas -> about $${gasUsdc.toFixed(6)} USDC`);
+  }
+
+  console.log('');
 
   for (const result of rows) {
     const routeName = result.firstDex === 'aerodrome'
@@ -47,7 +80,7 @@ async function main(): Promise<void> {
     } else if (afterFlashLoan <= 0n) {
       decision = 'REJECT — flash-loan premium removes the raw profit';
     } else {
-      decision = 'WATCH ONLY — positive before gas/MEV/safety costs';
+      decision = 'WATCH ONLY — positive before full gas/MEV/safety costs';
     }
 
     console.log(`${routeName} | start $${result.startUsdcText}`);
@@ -72,7 +105,9 @@ async function main(): Promise<void> {
   console.log('COST MODEL STATUS: PARTIAL.');
   console.log('DEX quote output already includes pool fee and price impact at the quoted size.');
   console.log('Aave flash-loan premium is read live on-chain and shown hypothetically.');
-  console.log('Gas, MEV/execution risk, and a safety buffer are not yet proven.');
+  console.log('Gas price is live, but gas-unit scenarios are illustrative only.');
+  console.log('Exact Base transaction cost requires an actual executor transaction to simulate.');
+  console.log('MEV/execution risk and a safety buffer are not yet proven.');
   console.log('Therefore WATCH ONLY is not permission to trade.');
 }
 
