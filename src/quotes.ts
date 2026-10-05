@@ -66,43 +66,47 @@ export async function quoteUniswapV3(
   amountIn: bigint,
 ): Promise<DexQuote> {
   const successful: DexQuote[] = [];
+  const failures: string[] = [];
 
-  await Promise.all(
-    UNISWAP_V3_FEES.map(async (fee) => {
-      try {
-        const result = await publicClient.simulateContract({
-          address: CONTRACTS.uniswapV3QuoterV2,
-          abi: uniswapV3QuoterV2Abi,
-          functionName: 'quoteExactInputSingle',
-          args: [{
-            tokenIn,
-            tokenOut,
-            amountIn,
-            fee,
-            sqrtPriceLimitX96: 0n,
-          }],
+  // Query fee tiers sequentially. Public Base RPC endpoints can throttle bursts,
+  // and a throttled request must not be misclassified as "no liquidity".
+  for (const fee of UNISWAP_V3_FEES) {
+    try {
+      const result = await publicClient.simulateContract({
+        address: CONTRACTS.uniswapV3QuoterV2,
+        abi: uniswapV3QuoterV2Abi,
+        functionName: 'quoteExactInputSingle',
+        args: [{
+          tokenIn,
+          tokenOut,
+          amountIn,
+          fee,
+          sqrtPriceLimitX96: 0n,
+        }],
+      });
+
+      const [amountOut, , , gasEstimate] = result.result;
+      if (amountOut > 0n) {
+        successful.push({
+          dex: 'uniswap-v3',
+          tokenIn,
+          tokenOut,
+          amountIn,
+          amountOut,
+          feeTier: fee,
+          gasEstimate,
         });
-
-        const [amountOut, , , gasEstimate] = result.result;
-        if (amountOut > 0n) {
-          successful.push({
-            dex: 'uniswap-v3',
-            tokenIn,
-            tokenOut,
-            amountIn,
-            amountOut,
-            feeTier: fee,
-            gasEstimate,
-          });
-        }
-      } catch {
-        // Missing pools / non-viable fee tiers are expected. Ignore and compare successes.
       }
-    }),
-  );
+    } catch (error) {
+      const message = error instanceof Error ? error.message.split('\n')[0] : String(error);
+      failures.push(`${fee}: ${message}`);
+    }
+  }
 
   if (successful.length === 0) {
-    throw new Error('No Uniswap v3 WETH/USDC fee tier returned a quote');
+    throw new Error(
+      `No Uniswap v3 fee tier returned a quote. Diagnostics: ${failures.join(' | ')}`,
+    );
   }
 
   successful.sort((a, b) => (a.amountOut > b.amountOut ? -1 : a.amountOut < b.amountOut ? 1 : 0));
