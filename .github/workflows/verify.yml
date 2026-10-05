@@ -22,3 +22,10 @@ jobs:
       - run: npm test
       - name: Read-only Base quote matrix
         run: npm run scan
+      - name: Upload scan report
+        uses: actions/upload-artifact@v4
+        with:
+          name: scan-report-${{ github.run_number }}
+          path: artifacts/latest-scan.json
+          if-no-files-found: error
+          retention-days: 30
