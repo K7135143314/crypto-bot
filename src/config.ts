@@ -1,4 +1,4 @@
-import { getAddress, type Address } from 'viem';
+import { getAddress, parseUnits, type Address } from 'viem';
 
 export const CHAIN_ID = 8453;
 
@@ -47,3 +47,9 @@ export const GAS_UNIT_SCENARIOS = (process.env.GAS_UNIT_SCENARIOS || '300000,500
   .split(',')
   .map((x) => Number(x.trim()))
   .filter((x) => Number.isFinite(x) && x > 0);
+
+export const PROFIT_POLICY = {
+  gasReserveUnits: Number(process.env.GAS_RESERVE_UNITS || '800000'),
+  executionBufferBps: BigInt(process.env.EXECUTION_BUFFER_BPS || '20'),
+  minNetProfitUsdc: parseUnits(process.env.MIN_NET_PROFIT_USDC || '1', TOKENS.USDC.decimals),
+} as const;
