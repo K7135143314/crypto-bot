@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: read-only-scanner
@@ -29,8 +30,46 @@ jobs:
       - run: npm test
       - name: Read-only Base quote matrix
         run: npm run scan
+
+      - name: Fetch previous scan baseline
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          artifact_id="$(
+            gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100"               --jq '.artifacts[]
+                | select(.expired == false)
+                | select(.name | startswith("scan-report-"))
+                | select(.workflow_run.id != '"${GITHUB_RUN_ID}"')
+                | .id'               | head -n 1
+          )"
+
+          if [ -z "${artifact_id}" ]; then
+            echo "No previous scan artifact found; trend will start with NO_BASELINE."
+            exit 0
+          fi
+
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" > /tmp/previous-scan.zip
+          mkdir -p /tmp/previous-scan
+          unzip -q /tmp/previous-scan.zip -d /tmp/previous-scan
+
+          if [ -f /tmp/previous-scan/latest-scan.json ]; then
+            cp /tmp/previous-scan/latest-scan.json artifacts/previous-scan.json
+            echo "Previous scan baseline restored."
+          else
+            echo "Previous artifact did not contain latest-scan.json; trend will use NO_BASELINE."
+          fi
+
+      - name: Compare with previous scan
+        run: npm run compare -- artifacts/previous-scan.json artifacts/latest-scan.json
+
       - name: Publish run summary
-        run: cat artifacts/summary.md >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          cat artifacts/summary.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/trend.md >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload scan report
         uses: actions/upload-artifact@v4
         with:
@@ -38,8 +77,11 @@ jobs:
           path: |
             artifacts/latest-scan.json
             artifacts/summary.md
+            artifacts/trend.json
+            artifacts/trend.md
           if-no-files-found: error
           retention-days: 30
+
       - name: Upload candidate report when present
         uses: actions/upload-artifact@v4
         with:
