@@ -4,7 +4,6 @@ import {
   http,
   parseUnits,
   type Address,
-  type PublicClient,
 } from 'viem';
 import { base } from 'viem/chains';
 import { aerodromeRouterAbi, uniswapV3QuoterV2Abi } from './abis.js';
@@ -30,8 +29,10 @@ export const client = createPublicClient({
   transport: http(BASE_RPC_URL, { timeout: 12_000, retryCount: 1 }),
 });
 
+type BasePublicClient = typeof client;
+
 export async function quoteAerodrome(
-  publicClient: PublicClient,
+  publicClient: BasePublicClient,
   tokenIn: Address,
   tokenOut: Address,
   amountIn: bigint,
@@ -59,7 +60,7 @@ export async function quoteAerodrome(
 }
 
 export async function quoteUniswapV3(
-  publicClient: PublicClient,
+  publicClient: BasePublicClient,
   tokenIn: Address,
   tokenOut: Address,
   amountIn: bigint,
@@ -109,7 +110,7 @@ export async function quoteUniswapV3(
 }
 
 export async function quoteRoundTrip(
-  publicClient: PublicClient,
+  publicClient: BasePublicClient,
   startUsdc: string,
   firstDex: 'aerodrome' | 'uniswap-v3',
 ): Promise<{
