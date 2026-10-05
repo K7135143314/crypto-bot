@@ -83,6 +83,7 @@ async function main(): Promise<void> {
 
   let candidateCount = 0;
   const reportRows: Array<Record<string, string | number>> = [];
+  const candidateRows: Array<Record<string, string | number>> = [];
 
   for (const result of rows) {
     const routeName = result.firstDex === 'aerodrome'
@@ -121,7 +122,7 @@ async function main(): Promise<void> {
 
     const uniswapFeeTier = result.first.feeTier ?? result.second.feeTier ?? 0;
 
-    reportRows.push({
+    const reportRow = {
       route: routeName,
       startUsdc: result.startUsdcText,
       wethAfterLeg1: formatWeth(result.wethReceived),
@@ -134,7 +135,13 @@ async function main(): Promise<void> {
       estimatedNetUsdc: formatUsdc(evaluation.estimatedNetProfitUsdc),
       uniswapFeeTier,
       decision: evaluation.decision,
-    });
+    };
+
+    reportRows.push(reportRow);
+
+    if (evaluation.decision === 'CANDIDATE') {
+      candidateRows.push(reportRow);
+    }
   }
 
   const expectedRoutes = TRADE_SIZES_USDC.length * 2;
@@ -176,6 +183,33 @@ async function main(): Promise<void> {
   await mkdir('artifacts', { recursive: true });
   await writeFile('artifacts/latest-scan.json', JSON.stringify(report, null, 2) + '\n', 'utf8');
   console.log('Saved machine-readable report: artifacts/latest-scan.json');
+
+  if (candidateRows.length > 0) {
+    const candidateReport = {
+      generatedAt: report.generatedAt,
+      blockNumber: report.blockNumber,
+      readOnly: true,
+      candidateCount: candidateRows.length,
+      candidates: candidateRows,
+      note: 'Research/simulation candidates only. No wallet, signing, or transactions are enabled.',
+    };
+
+    await writeFile(
+      'artifacts/candidates.json',
+      JSON.stringify(candidateReport, null, 2) + '\n',
+      'utf8',
+    );
+
+    console.log('Saved candidate-only report: artifacts/candidates.json');
+
+    if (process.env.GITHUB_ACTIONS === 'true') {
+      console.log(
+        `::warning title=Read-only arbitrage candidate detected::${candidateRows.length} route(s) cleared the configured research gates. Review the candidate artifact before any further simulation.`,
+      );
+    }
+  } else {
+    console.log('No candidate-only report created because no route cleared the configured gates.');
+  }
 
   console.log('COST MODEL STATUS: CONSERVATIVE READ-ONLY GATE.');
   console.log('DEX quote output includes pool fee and price impact at the quoted size.');
