@@ -13,7 +13,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: read-only-scanner-${{ github.ref }}
+  group: read-only-scanner
   cancel-in-progress: false
 
 jobs:
