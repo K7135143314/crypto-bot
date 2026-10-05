@@ -31,6 +31,7 @@ export const CONTRACTS = {
   aerodromeRouter: getAddress('0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43') as Address,
   aerodromePoolFactory: getAddress('0x420DD381b31aEf6683db6B902084cB0FFECe40Da') as Address,
   uniswapV3QuoterV2: getAddress('0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a') as Address,
+  aaveV3Pool: getAddress('0xA238Dd80C259a72e81d7e4664a9801593F98d1c5') as Address,
 } as const;
 
 export const UNISWAP_V3_FEES = [100, 500, 3000, 10000] as const;
