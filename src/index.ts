@@ -29,7 +29,7 @@ function decisionText(decision: ReturnType<typeof evaluateOpportunity>['decision
     case 'REJECT_FLASH_FEE':
       return 'REJECT — flash-loan premium removes the raw profit';
     case 'REJECT_COSTS':
-      return 'REJECT — modeled gas reserve / execution buffer removes the profit';
+      return 'REJECT — modeled execution costs remove the profit';
     case 'REJECT_MIN_PROFIT':
       return 'REJECT — estimated net profit is below the configured minimum';
     case 'CANDIDATE':
@@ -61,8 +61,10 @@ async function main(): Promise<void> {
   console.log('DEXs: Aerodrome classic / Uniswap v3');
   console.log(`Aave V3 hypothetical flash-loan premium: ${flashLoanPremiumBps} bps (${Number(flashLoanPremiumBps) / 100}%)`);
   console.log(`Live Base gas price: ${(Number(gasPrice) / 1e9).toFixed(6)} gwei`);
-  console.log(`Policy execution buffer: ${PROFIT_POLICY.executionBufferBps} bps (${Number(PROFIT_POLICY.executionBufferBps) / 100}%)`);
-  console.log(`Policy gas reserve: ${PROFIT_POLICY.gasReserveUnits.toLocaleString()} gas units`);
+  console.log(`Policy L2 gas reserve: ${PROFIT_POLICY.gasReserveUnits.toLocaleString()} gas units`);
+  console.log(`Policy Base L1 data-fee reserve: ${formatUsdc(PROFIT_POLICY.l1DataFeeReserveUsdc)}`);
+  console.log(`Policy slippage reserve: ${PROFIT_POLICY.slippageReserveBps} bps`);
+  console.log(`Policy MEV reserve: ${PROFIT_POLICY.mevReserveBps} bps`);
   console.log(`Minimum estimated net profit: $${formatUsdc(PROFIT_POLICY.minNetProfitUsdc)}`);
   console.log('No wallet. No signing. No transactions.\n');
 
@@ -101,7 +103,9 @@ async function main(): Promise<void> {
       policy: {
         flashLoanPremiumBps,
         gasReserveUnits: PROFIT_POLICY.gasReserveUnits,
-        executionBufferBps: PROFIT_POLICY.executionBufferBps,
+        l1DataFeeReserveUsdc: PROFIT_POLICY.l1DataFeeReserveUsdc,
+        slippageReserveBps: PROFIT_POLICY.slippageReserveBps,
+        mevReserveBps: PROFIT_POLICY.mevReserveBps,
         minNetProfitUsdc: PROFIT_POLICY.minNetProfitUsdc,
       },
     });
@@ -113,8 +117,11 @@ async function main(): Promise<void> {
     console.log(`  Final USDC:             $${formatUsdc(result.finalUsdc)}`);
     console.log(`  Gross delta:            $${formatUsdc(result.grossProfitUsdc)} (${deltaPct.toFixed(4)}%)`);
     console.log(`  Flash-loan fee:         $${formatUsdc(evaluation.flashLoanFeeUsdc)}`);
-    console.log(`  Gas reserve estimate:   $${formatUsdc(evaluation.gasReserveUsdc)}`);
-    console.log(`  Execution buffer:       $${formatUsdc(evaluation.executionBufferUsdc)}`);
+    console.log(`  L2 gas reserve:         ${formatUsdc(evaluation.l2GasReserveUsdc)}`);
+    console.log(`  L1 data-fee reserve:    ${formatUsdc(evaluation.l1DataFeeReserveUsdc)}`);
+    console.log(`  Slippage reserve:       ${formatUsdc(evaluation.slippageReserveUsdc)}`);
+    console.log(`  MEV reserve:            ${formatUsdc(evaluation.mevReserveUsdc)}`);
+    console.log(`  Total modeled costs:    ${formatUsdc(evaluation.totalModeledCostsUsdc)}`);
     console.log(`  Estimated net:          $${formatUsdc(evaluation.estimatedNetProfitUsdc)}`);
     if (result.first.feeTier) console.log(`  Uniswap fee tier:       ${result.first.feeTier}`);
     if (result.second.feeTier) console.log(`  Uniswap fee tier:       ${result.second.feeTier}`);
@@ -130,8 +137,11 @@ async function main(): Promise<void> {
       grossDeltaUsdc: formatUsdc(result.grossProfitUsdc),
       grossDeltaPct: Number(deltaPct.toFixed(6)),
       flashLoanFeeUsdc: formatUsdc(evaluation.flashLoanFeeUsdc),
-      gasReserveUsdc: formatUsdc(evaluation.gasReserveUsdc),
-      executionBufferUsdc: formatUsdc(evaluation.executionBufferUsdc),
+      l2GasReserveUsdc: formatUsdc(evaluation.l2GasReserveUsdc),
+      l1DataFeeReserveUsdc: formatUsdc(evaluation.l1DataFeeReserveUsdc),
+      slippageReserveUsdc: formatUsdc(evaluation.slippageReserveUsdc),
+      mevReserveUsdc: formatUsdc(evaluation.mevReserveUsdc),
+      totalModeledCostsUsdc: formatUsdc(evaluation.totalModeledCostsUsdc),
       estimatedNetUsdc: formatUsdc(evaluation.estimatedNetProfitUsdc),
       uniswapFeeTier,
       decision: evaluation.decision,
@@ -157,7 +167,7 @@ async function main(): Promise<void> {
   )[0];
 
   const report = {
-    scannerVersion: '0.5.0',
+    scannerVersion: '0.7.0',
     readOnly: true,
     generatedAt: new Date().toISOString(),
     chain: 'Base',
@@ -173,7 +183,9 @@ async function main(): Promise<void> {
     },
     policy: {
       gasReserveUnits: PROFIT_POLICY.gasReserveUnits,
-      executionBufferBps: PROFIT_POLICY.executionBufferBps.toString(),
+      l1DataFeeReserveUsdc: formatUsdc(PROFIT_POLICY.l1DataFeeReserveUsdc),
+      slippageReserveBps: PROFIT_POLICY.slippageReserveBps.toString(),
+      mevReserveBps: PROFIT_POLICY.mevReserveBps.toString(),
       minNetProfitUsdc: formatUsdc(PROFIT_POLICY.minNetProfitUsdc),
     },
     matrixCompleteness: {
@@ -241,8 +253,9 @@ async function main(): Promise<void> {
   console.log('COST MODEL STATUS: CONSERVATIVE READ-ONLY GATE.');
   console.log('DEX quote output includes pool fee and price impact at the quoted size.');
   console.log('Aave flash-loan premium and gas price are read live on-chain.');
-  console.log('Gas reserve units, execution buffer, and minimum profit are configurable policy values.');
-  console.log('Exact full transaction cost, MEV behavior, and executable safety are not yet proven.');
+  console.log('L2 gas, Base L1 data-fee reserve, slippage reserve, MEV reserve, and minimum profit are modeled separately.');
+  console.log('The L1 data fee, slippage, and MEV amounts are conservative policy reserves, not measured executor transaction costs.');
+  console.log('Exact atomic executor gas, exact L1 data fee, mempool/MEV behavior, and executable safety are not yet proven.');
   console.log('CANDIDATE means research/simulation candidate only — not permission to trade.');
 }
 
