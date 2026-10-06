@@ -7,6 +7,7 @@ const maxPoints = 4500;
 
 let seconds = 20;
 let busy = false;
+let scoutBusy = false;
 
 const el = (id) => document.getElementById(id);
 
@@ -354,6 +355,105 @@ function updateHistoryLabels() {
   setText('obs', 'Observations: ' + points.length + ' • saved locally');
 }
 
+function compactUsd(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return '—';
+  return '$' + new Intl.NumberFormat(undefined, {
+    notation: 'compact',
+    maximumFractionDigits: 1,
+  }).format(n);
+}
+
+function renderScoutList(items) {
+  const list = el('scoutList');
+  if (!list) return;
+  list.replaceChildren();
+
+  if (!Array.isArray(items) || items.length === 0) {
+    const p = document.createElement('p');
+    p.textContent = 'No eligible cross-DEX comparisons available right now.';
+    list.appendChild(p);
+    return;
+  }
+
+  items.forEach((item, index) => {
+    const row = document.createElement('div');
+    row.className = 'scoutRow';
+
+    const rank = document.createElement('span');
+    rank.className = 'scoutRank';
+    rank.textContent = '#' + (index + 1);
+
+    const route = document.createElement('span');
+    route.className = 'scoutRoute';
+    route.textContent = item.buyDex + ' → ' + item.sellDex;
+
+    const spread = document.createElement('strong');
+    spread.textContent = Number(item.indicatedSpreadBps).toFixed(2) + ' bps';
+
+    const status = document.createElement('span');
+    status.className = 'pill ' + (item.status === 'SHORTLIST' ? 'candidate' : 'watch');
+    status.textContent = item.status;
+
+    row.append(rank, route, spread, status);
+    list.appendChild(row);
+  });
+}
+
+async function refreshScout() {
+  if (scoutBusy) return;
+  scoutBusy = true;
+
+  try {
+    const response = await fetch('/api/scout?t=' + Date.now(), {
+      cache: 'no-store',
+    });
+    const scout = await response.json();
+
+    if (!response.ok || !scout.ok) {
+      throw new Error(scout.error || 'Opportunity scout failed');
+    }
+
+    const best = scout.best;
+    setText('scoutPools', scout.eligiblePoolCount);
+    setText('scoutUpdated', new Date(scout.generatedAt).toLocaleTimeString());
+
+    if (best) {
+      setText('scoutBestRoute', best.buyDex + ' → ' + best.sellDex);
+      setText('scoutSpread', Number(best.indicatedSpreadBps).toFixed(2) + ' bps');
+      setText('scoutLiquidity', compactUsd(best.minLiquidityUsd));
+      setText('scoutVolume', compactUsd(best.minVolume24hUsd));
+      setText('scoutStatus', best.status);
+      el('scoutStatus').className =
+        'pill ' + (best.status === 'SHORTLIST' ? 'candidate' : 'watch');
+    } else {
+      setText('scoutBestRoute', 'No cross-DEX lead');
+      setText('scoutSpread', '—');
+      setText('scoutLiquidity', '—');
+      setText('scoutVolume', '—');
+      setText('scoutStatus', 'NO LEAD');
+      el('scoutStatus').className = 'pill watch';
+    }
+
+    renderScoutList(scout.opportunities);
+  } catch (error) {
+    setText('scoutStatus', 'SCOUT ERROR');
+    const status = el('scoutStatus');
+    if (status) status.className = 'pill reject';
+    const list = el('scoutList');
+    if (list) {
+      list.replaceChildren();
+      const p = document.createElement('p');
+      p.textContent =
+        'Scout unavailable: ' +
+        (error instanceof Error ? error.message : String(error));
+      list.appendChild(p);
+    }
+  } finally {
+    scoutBusy = false;
+  }
+}
+
 async function refresh() {
   if (busy) return;
 
@@ -481,8 +581,10 @@ if (points.length) {
 }
 
 refresh();
+refreshScout();
 
 setInterval(refresh, refreshMs);
+setInterval(refreshScout, 60000);
 
 setInterval(() => {
   seconds = seconds <= 1 ? 20 : seconds - 1;
