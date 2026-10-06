@@ -580,7 +580,8 @@ async function refreshScout() {
     if (list) {
       list.replaceChildren();
       const p = document.createElement('p');
-      p.textContent = 'Scout unavailable: ' +
+      p.textContent =
+        'Scout unavailable: ' +
         (error instanceof Error ? error.message : String(error));
       list.appendChild(p);
     }
