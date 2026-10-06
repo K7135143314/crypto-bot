@@ -7,6 +7,7 @@ const maxPoints = 4500;
 
 let seconds = 20;
 let busy = false;
+let scoutBusy = false;
 
 const el = (id) => document.getElementById(id);
 
@@ -352,6 +353,240 @@ function updateHistoryLabels() {
   );
 
   setText('obs', 'Observations: ' + points.length + ' • saved locally');
+}
+
+function compactUsd(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return '—';
+  return '
+  if (busy) return;
+
+  busy = true;
+  el('scanBtn').disabled = true;
+  el('scanBtn').textContent = 'Scanning…';
+
+  try {
+    const response = await fetch('/api/scan?t=' + Date.now(), {
+      cache: 'no-store',
+    });
+
+    const scan = await response.json();
+
+    if (!response.ok || !scan.ok) {
+      throw new Error(scan.error || 'Live scan failed');
+    }
+
+    el('error').style.display = 'none';
+
+    setText('block', 'Block ' + scan.blockNumber);
+    setText('candidates', scan.candidateCount);
+    setText('matrixCount', scan.matrixComplete + '/14');
+    setText('premium', scan.flashLoanPremiumBps + ' bps');
+    setText(
+      'premiumPct',
+      '(' + (scan.flashLoanPremiumBps / 100).toFixed(2) + '%)'
+    );
+    setText('gas', scan.gasPriceGwei.toFixed(4) + ' gwei');
+
+    setText('bestRoute', scan.best.route);
+    setText('bestSize', '$' + scan.best.startUsdc.toLocaleString());
+    setText('bestNet', money(scan.best.estimatedNetUsdc, 6));
+
+    el('bestNet').className =
+      scan.best.estimatedNetUsdc >= 0 ? 'green' : 'red';
+
+    setText('decision', scan.best.decision);
+
+    el('decision').className =
+      'pill ' + (scan.best.decision === 'CANDIDATE' ? 'candidate' : 'reject');
+
+    setText('wethPrice', '$' + scan.wethReferencePrice.toFixed(2));
+
+    el('candidateAlert').className =
+      'candidateAlert' + (scan.candidateCount > 0 ? ' show' : '');
+
+    points.push({
+      t: Date.now(),
+      net: scan.best.estimatedNetUsdc,
+      price: scan.wethReferencePrice,
+    });
+
+    saveHistory();
+
+    const previous = points[points.length - 2];
+    const current = points[points.length - 1];
+
+    if (previous) {
+      const netChange = current.net - previous.net;
+
+      el('delta').className = 'delta ' + (netChange >= 0 ? 'good' : 'bad');
+
+      setText(
+        'delta',
+        (netChange >= 0 ? '▲ ' : '▼ ') +
+          money(Math.abs(netChange), 4) +
+          ' since prior refresh'
+      );
+
+      const priceChange = current.price - previous.price;
+
+      el('priceMove').className =
+        'delta ' + (priceChange >= 0 ? 'good' : 'bad');
+
+      setText(
+        'priceMove',
+        (priceChange >= 0 ? '▲ ' : '▼ ') +
+          '$' +
+          Math.abs(priceChange).toFixed(2) +
+          ' since prior refresh'
+      );
+    }
+
+    updateHistoryLabels();
+    renderMatrix(scan);
+    drawCharts();
+
+    const timestamp = new Date(scan.generatedAt).toLocaleTimeString();
+
+    el('feed').innerHTML =
+      '<p><time>' +
+      timestamp +
+      '</time>14-route live scan complete</p>' +
+      '<p><time>' +
+      timestamp +
+      '</time>candidate count: ' +
+      scan.candidateCount +
+      '</p>' +
+      '<p><time>' +
+      timestamp +
+      '</time>no wallet / no signing / no transaction</p>';
+
+    seconds = 20;
+  } catch (error) {
+    el('error').style.display = 'block';
+    el('error').textContent =
+      'Live scan error: ' +
+      (error instanceof Error ? error.message : String(error));
+  } finally {
+    busy = false;
+    el('scanBtn').disabled = false;
+    el('scanBtn').textContent = 'Scan now';
+  }
+}
+
+el('scanBtn').addEventListener('click', refresh);
+window.addEventListener('resize', drawCharts);
+
+loadHistory();
+
+if (points.length) {
+  updateHistoryLabels();
+  drawCharts();
+}
+
+refresh();
+refreshScout();
+
+setInterval(refresh, refreshMs);
+setInterval(refreshScout, 60000);
+
+setInterval(() => {
+  seconds = seconds <= 1 ? 20 : seconds - 1;
+  setText('countdown', 'Refresh in ' + seconds + 's');
+}, 1000);
+ + new Intl.NumberFormat(undefined, {
+    notation: 'compact',
+    maximumFractionDigits: 1,
+  }).format(n);
+}
+
+function renderScoutList(items) {
+  const list = el('scoutList');
+  if (!list) return;
+  list.replaceChildren();
+
+  if (!Array.isArray(items) || items.length === 0) {
+    const p = document.createElement('p');
+    p.textContent = 'No eligible cross-DEX comparisons available right now.';
+    list.appendChild(p);
+    return;
+  }
+
+  items.forEach((item, index) => {
+    const row = document.createElement('div');
+    row.className = 'scoutRow';
+
+    const rank = document.createElement('span');
+    rank.className = 'scoutRank';
+    rank.textContent = '#' + (index + 1);
+
+    const route = document.createElement('span');
+    route.className = 'scoutRoute';
+    route.textContent = item.buyDex + ' → ' + item.sellDex;
+
+    const spread = document.createElement('strong');
+    spread.textContent = Number(item.indicatedSpreadBps).toFixed(2) + ' bps';
+
+    const status = document.createElement('span');
+    status.className = 'pill ' + (item.status === 'SHORTLIST' ? 'candidate' : 'watch');
+    status.textContent = item.status;
+
+    row.append(rank, route, spread, status);
+    list.appendChild(row);
+  });
+}
+
+async function refreshScout() {
+  if (scoutBusy) return;
+  scoutBusy = true;
+
+  try {
+    const response = await fetch('/api/scout?t=' + Date.now(), {
+      cache: 'no-store',
+    });
+    const scout = await response.json();
+
+    if (!response.ok || !scout.ok) {
+      throw new Error(scout.error || 'Opportunity scout failed');
+    }
+
+    const best = scout.best;
+    setText('scoutPools', scout.eligiblePoolCount);
+    setText('scoutUpdated', new Date(scout.generatedAt).toLocaleTimeString());
+
+    if (best) {
+      setText('scoutBestRoute', best.buyDex + ' → ' + best.sellDex);
+      setText('scoutSpread', Number(best.indicatedSpreadBps).toFixed(2) + ' bps');
+      setText('scoutLiquidity', compactUsd(best.minLiquidityUsd));
+      setText('scoutVolume', compactUsd(best.minVolume24hUsd));
+      setText('scoutStatus', best.status);
+      el('scoutStatus').className =
+        'pill ' + (best.status === 'SHORTLIST' ? 'candidate' : 'watch');
+    } else {
+      setText('scoutBestRoute', 'No cross-DEX lead');
+      setText('scoutSpread', '—');
+      setText('scoutLiquidity', '—');
+      setText('scoutVolume', '—');
+      setText('scoutStatus', 'NO LEAD');
+      el('scoutStatus').className = 'pill watch';
+    }
+
+    renderScoutList(scout.opportunities);
+  } catch (error) {
+    setText('scoutStatus', 'SCOUT ERROR');
+    const status = el('scoutStatus');
+    if (status) status.className = 'pill reject';
+    const list = el('scoutList');
+    if (list) {
+      list.replaceChildren();
+      const p = document.createElement('p');
+      p.textContent = 'Scout unavailable: ' +
+        (error instanceof Error ? error.message : String(error));
+      list.appendChild(p);
+    }
+  } finally {
+    scoutBusy = false;
+  }
 }
 
 async function refresh() {
