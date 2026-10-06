@@ -1,0 +1,39 @@
+name: Opportunity scout
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '7 * * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: opportunity-scout
+  cancel-in-progress: false
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - name: Run scout tests
+        run: npm test
+      - name: Run read-only opportunity scout
+        run: npm run scout
+      - name: Publish scout summary
+        run: cat artifacts/opportunity-scout.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload scout report
+        uses: actions/upload-artifact@v4
+        with:
+          name: opportunity-scout-${{ github.run_number }}
+          path: |
+            artifacts/opportunity-scout.json
+            artifacts/opportunity-scout.md
+          if-no-files-found: error
+          retention-days: 30
