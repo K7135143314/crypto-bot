@@ -358,143 +358,7 @@ function updateHistoryLabels() {
 function compactUsd(value) {
   const n = Number(value);
   if (!Number.isFinite(n)) return '—';
-  return '
-  if (busy) return;
-
-  busy = true;
-  el('scanBtn').disabled = true;
-  el('scanBtn').textContent = 'Scanning…';
-
-  try {
-    const response = await fetch('/api/scan?t=' + Date.now(), {
-      cache: 'no-store',
-    });
-
-    const scan = await response.json();
-
-    if (!response.ok || !scan.ok) {
-      throw new Error(scan.error || 'Live scan failed');
-    }
-
-    el('error').style.display = 'none';
-
-    setText('block', 'Block ' + scan.blockNumber);
-    setText('candidates', scan.candidateCount);
-    setText('matrixCount', scan.matrixComplete + '/14');
-    setText('premium', scan.flashLoanPremiumBps + ' bps');
-    setText(
-      'premiumPct',
-      '(' + (scan.flashLoanPremiumBps / 100).toFixed(2) + '%)'
-    );
-    setText('gas', scan.gasPriceGwei.toFixed(4) + ' gwei');
-
-    setText('bestRoute', scan.best.route);
-    setText('bestSize', '$' + scan.best.startUsdc.toLocaleString());
-    setText('bestNet', money(scan.best.estimatedNetUsdc, 6));
-
-    el('bestNet').className =
-      scan.best.estimatedNetUsdc >= 0 ? 'green' : 'red';
-
-    setText('decision', scan.best.decision);
-
-    el('decision').className =
-      'pill ' + (scan.best.decision === 'CANDIDATE' ? 'candidate' : 'reject');
-
-    setText('wethPrice', '$' + scan.wethReferencePrice.toFixed(2));
-
-    el('candidateAlert').className =
-      'candidateAlert' + (scan.candidateCount > 0 ? ' show' : '');
-
-    points.push({
-      t: Date.now(),
-      net: scan.best.estimatedNetUsdc,
-      price: scan.wethReferencePrice,
-    });
-
-    saveHistory();
-
-    const previous = points[points.length - 2];
-    const current = points[points.length - 1];
-
-    if (previous) {
-      const netChange = current.net - previous.net;
-
-      el('delta').className = 'delta ' + (netChange >= 0 ? 'good' : 'bad');
-
-      setText(
-        'delta',
-        (netChange >= 0 ? '▲ ' : '▼ ') +
-          money(Math.abs(netChange), 4) +
-          ' since prior refresh'
-      );
-
-      const priceChange = current.price - previous.price;
-
-      el('priceMove').className =
-        'delta ' + (priceChange >= 0 ? 'good' : 'bad');
-
-      setText(
-        'priceMove',
-        (priceChange >= 0 ? '▲ ' : '▼ ') +
-          '$' +
-          Math.abs(priceChange).toFixed(2) +
-          ' since prior refresh'
-      );
-    }
-
-    updateHistoryLabels();
-    renderMatrix(scan);
-    drawCharts();
-
-    const timestamp = new Date(scan.generatedAt).toLocaleTimeString();
-
-    el('feed').innerHTML =
-      '<p><time>' +
-      timestamp +
-      '</time>14-route live scan complete</p>' +
-      '<p><time>' +
-      timestamp +
-      '</time>candidate count: ' +
-      scan.candidateCount +
-      '</p>' +
-      '<p><time>' +
-      timestamp +
-      '</time>no wallet / no signing / no transaction</p>';
-
-    seconds = 20;
-  } catch (error) {
-    el('error').style.display = 'block';
-    el('error').textContent =
-      'Live scan error: ' +
-      (error instanceof Error ? error.message : String(error));
-  } finally {
-    busy = false;
-    el('scanBtn').disabled = false;
-    el('scanBtn').textContent = 'Scan now';
-  }
-}
-
-el('scanBtn').addEventListener('click', refresh);
-window.addEventListener('resize', drawCharts);
-
-loadHistory();
-
-if (points.length) {
-  updateHistoryLabels();
-  drawCharts();
-}
-
-refresh();
-refreshScout();
-
-setInterval(refresh, refreshMs);
-setInterval(refreshScout, 60000);
-
-setInterval(() => {
-  seconds = seconds <= 1 ? 20 : seconds - 1;
-  setText('countdown', 'Refresh in ' + seconds + 's');
-}, 1000);
- + new Intl.NumberFormat(undefined, {
+  return '$' + new Intl.NumberFormat(undefined, {
     notation: 'compact',
     maximumFractionDigits: 1,
   }).format(n);
@@ -717,8 +581,10 @@ if (points.length) {
 }
 
 refresh();
+refreshScout();
 
 setInterval(refresh, refreshMs);
+setInterval(refreshScout, 60000);
 
 setInterval(() => {
   seconds = seconds <= 1 ? 20 : seconds - 1;
