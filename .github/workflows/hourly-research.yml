@@ -1,0 +1,129 @@
+name: Hourly research collector
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: hourly-research-collector
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - name: Read-only Base quote matrix
+        run: npm run scan
+
+      - name: Fetch previous research scan baseline
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          artifact_id="$(
+            gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
+              --jq '.artifacts[]
+                | select(.expired == false)
+                | select(.name | startswith("research-scan-report-"))
+                | .id' \
+              | sed -n '1p'
+          )"
+
+          if [ -z "${artifact_id}" ]; then
+            echo "No previous research scan artifact found; trend starts fresh."
+            exit 0
+          fi
+
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" > /tmp/previous-scan.zip
+          mkdir -p /tmp/previous-scan
+          unzip -q /tmp/previous-scan.zip -d /tmp/previous-scan
+
+          if [ -f /tmp/previous-scan/latest-scan.json ]; then
+            cp /tmp/previous-scan/latest-scan.json artifacts/previous-scan.json
+          fi
+
+      - name: Compare with previous research scan
+        run: npm run compare -- artifacts/previous-scan.json artifacts/latest-scan.json
+
+      - name: Fetch rolling research history
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/history
+          cp artifacts/latest-scan.json artifacts/history/current.json
+
+          mapfile -t artifact_ids < <(
+            gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
+              --jq '.artifacts[]
+                | select(.expired == false)
+                | select(.name | startswith("research-scan-report-"))
+                | .id' \
+              | sed -n '1,24p'
+          )
+
+          index=1
+          for artifact_id in "${artifact_ids[@]}"; do
+            zip_path="/tmp/history-${index}.zip"
+            dir_path="/tmp/history-${index}"
+            gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" > "${zip_path}"
+            mkdir -p "${dir_path}"
+            unzip -q "${zip_path}" -d "${dir_path}"
+            if [ -f "${dir_path}/latest-scan.json" ]; then
+              cp "${dir_path}/latest-scan.json" "artifacts/history/previous-${index}.json"
+            fi
+            index=$((index + 1))
+          done
+
+      - name: Analyze rolling history
+        run: npm run history -- artifacts/history
+
+      - name: Analyze paper candidate persistence
+        run: npm run paper -- artifacts/history
+
+      - name: Publish research summary
+        run: |
+          cat artifacts/summary.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/trend.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/rolling-history.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/paper-persistence.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload research scan report
+        uses: actions/upload-artifact@v4
+        with:
+          name: research-scan-report-${{ github.run_number }}
+          path: |
+            artifacts/latest-scan.json
+            artifacts/summary.md
+            artifacts/trend.json
+            artifacts/trend.md
+            artifacts/rolling-history.json
+            artifacts/rolling-history.md
+            artifacts/paper-persistence.json
+            artifacts/paper-persistence.md
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload candidate report when present
+        uses: actions/upload-artifact@v4
+        with:
+          name: research-candidate-report-${{ github.run_number }}
+          path: artifacts/candidates.json
+          if-no-files-found: ignore
+          retention-days: 30
