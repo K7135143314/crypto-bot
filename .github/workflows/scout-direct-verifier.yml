@@ -1,0 +1,39 @@
+name: Scout direct verifier
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '12 * * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scout-direct-verifier
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - name: Run verifier unit tests
+        run: npm test
+      - name: Verify scout leads directly on-chain
+        run: npm run verify:scout
+      - name: Publish handoff summary
+        run: cat artifacts/scout-verification.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload handoff report
+        uses: actions/upload-artifact@v4
+        with:
+          name: scout-verification-${{ github.run_number }}
+          path: |
+            artifacts/scout-verification.json
+            artifacts/scout-verification.md
+          if-no-files-found: error
+          retention-days: 30
