@@ -10,13 +10,14 @@
     "scan": "tsx src/index.ts",
     "compare": "tsx src/compare-scans.ts",
     "history": "tsx src/analyze-history.ts",
-    "test": "tsx --test src/profit.test.ts src/history.test.ts src/rolling-history.test.ts src/paper.test.ts src/atomic-preflight.test.ts",
+    "test": "tsx --test src/profit.test.ts src/history.test.ts src/rolling-history.test.ts src/paper.test.ts src/atomic-preflight.test.ts src/scout.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "proof:candidate": "tsx src/candidate-proof.ts",
     "paper": "tsx src/analyze-paper-persistence.ts",
     "test:atomic-preflight": "tsx --test src/atomic-preflight.test.ts",
     "simulation:plan": "tsx src/simulation-plan.ts",
-    "simulation:compare": "tsx src/compare-simulation.ts"
+    "simulation:compare": "tsx src/compare-simulation.ts",
+    "scout": "tsx src/scout-cli.ts"
   },
   "dependencies": {
     "viem": "^2.38.0"
