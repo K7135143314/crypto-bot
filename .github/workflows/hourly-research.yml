@@ -1,21 +1,20 @@
-name: Verify scanner
+name: Hourly research collector
 
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
 
 permissions:
   contents: read
   actions: read
 
 concurrency:
-  group: read-only-scanner
+  group: hourly-research-collector
   cancel-in-progress: false
 
 jobs:
-  typecheck-and-live-read:
+  collect:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -24,49 +23,26 @@ jobs:
         with:
           node-version: 22
       - run: npm install
-      - run: npm run typecheck
-      - name: Validate dashboard JavaScript syntax
-        run: node --check dashboard/app.js
-      - run: npm test
-      - name: Generate V0.8 pinned scanner plan
-        env:
-          BASE_FORK_BLOCK: '52216060'
-          BASE_RPC_URL: https://mainnet.base.org
-        run: npm run simulation:plan
-
-      - name: Install isolated V0.8 fork simulator
-        run: npm install --prefix simulation
-
-      - name: Run V0.8 pinned Base fork proof
-        env:
-          BASE_FORK_BLOCK: '52216060'
-          BASE_FORK_RPC_URL: https://mainnet.base.org
-        run: npm --prefix simulation test
-
-      - name: Compare scanner estimate with atomic fork
-        run: npm run simulation:compare
-
-      - name: Prove synthetic candidate detection
-        run: npm run proof:candidate
-
       - name: Read-only Base quote matrix
         run: npm run scan
 
-      - name: Fetch previous scan baseline
+      - name: Fetch previous research scan baseline
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           artifact_id="$(
-            gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100"               --jq '.artifacts[]
+            gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
+              --jq '.artifacts[]
                 | select(.expired == false)
-                | select(.name | startswith("scan-report-"))
-                | .id'               | sed -n '1p'
+                | select(.name | startswith("research-scan-report-"))
+                | .id' \
+              | sed -n '1p'
           )"
 
           if [ -z "${artifact_id}" ]; then
-            echo "No previous scan artifact found; trend will start with NO_BASELINE."
+            echo "No previous research scan artifact found; trend starts fresh."
             exit 0
           fi
 
@@ -76,15 +52,12 @@ jobs:
 
           if [ -f /tmp/previous-scan/latest-scan.json ]; then
             cp /tmp/previous-scan/latest-scan.json artifacts/previous-scan.json
-            echo "Previous scan baseline restored."
-          else
-            echo "Previous artifact did not contain latest-scan.json; trend will use NO_BASELINE."
           fi
 
-      - name: Compare with previous scan
+      - name: Compare with previous research scan
         run: npm run compare -- artifacts/previous-scan.json artifacts/latest-scan.json
 
-      - name: Fetch rolling history baselines
+      - name: Fetch rolling research history
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -94,10 +67,12 @@ jobs:
           cp artifacts/latest-scan.json artifacts/history/current.json
 
           mapfile -t artifact_ids < <(
-            gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100"               --jq '.artifacts[]
+            gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
+              --jq '.artifacts[]
                 | select(.expired == false)
-                | select(.name | startswith("scan-report-"))
-                | .id'               | sed -n '1,5p'
+                | select(.name | startswith("research-scan-report-"))
+                | .id' \
+              | sed -n '1,24p'
           )
 
           index=1
@@ -113,16 +88,13 @@ jobs:
             index=$((index + 1))
           done
 
-          echo "Rolling history sample files:"
-          ls -1 artifacts/history
-
       - name: Analyze rolling history
         run: npm run history -- artifacts/history
 
       - name: Analyze paper candidate persistence
         run: npm run paper -- artifacts/history
 
-      - name: Publish run summary
+      - name: Publish research summary
         run: |
           cat artifacts/summary.md >> "$GITHUB_STEP_SUMMARY"
           printf '\n' >> "$GITHUB_STEP_SUMMARY"
@@ -132,10 +104,10 @@ jobs:
           printf '\n' >> "$GITHUB_STEP_SUMMARY"
           cat artifacts/paper-persistence.md >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload scan report
+      - name: Upload research scan report
         uses: actions/upload-artifact@v4
         with:
-          name: scan-report-${{ github.run_number }}
+          name: research-scan-report-${{ github.run_number }}
           path: |
             artifacts/latest-scan.json
             artifacts/summary.md
@@ -143,19 +115,15 @@ jobs:
             artifacts/trend.md
             artifacts/rolling-history.json
             artifacts/rolling-history.md
-            artifacts/synthetic-candidate-proof.json
             artifacts/paper-persistence.json
             artifacts/paper-persistence.md
-            simulation/results/scanner-plan.json
-            simulation/results/atomic-fork-result.json
-            simulation/results/scanner-vs-fork.json
           if-no-files-found: error
           retention-days: 30
 
       - name: Upload candidate report when present
         uses: actions/upload-artifact@v4
         with:
-          name: candidate-report-${{ github.run_number }}
+          name: research-candidate-report-${{ github.run_number }}
           path: artifacts/candidates.json
           if-no-files-found: ignore
           retention-days: 30
