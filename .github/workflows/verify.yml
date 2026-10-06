@@ -26,7 +26,9 @@ jobs:
       - run: npm install
       - run: npm run typecheck
       - name: Validate dashboard JavaScript syntax
-        run: node --check dashboard/app.js
+        run: |
+          node --check dashboard/app.js
+          node --check dashboard/api/scout.js
       - run: npm test
       - name: Generate V0.8 pinned scanner plan
         env:
