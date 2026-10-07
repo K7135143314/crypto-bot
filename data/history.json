@@ -3,7 +3,7 @@
   "source": "hourly-research-collector",
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-07T05:28:04.753Z",
+  "updatedAt": "2026-10-07T05:50:56.874Z",
   "observations": [
     {
       "generatedAt": "2026-10-05T22:04:00.000Z",
@@ -24,6 +24,24 @@
       "bestNetUsdc": -0.485995,
       "wethReferencePrice": null,
       "gasPriceGwei": null
+    },
+    {
+      "generatedAt": "2026-10-06T05:15:11.430Z",
+      "bestNetUsdc": -0.553312,
+      "wethReferencePrice": 2703.562779844958,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
+      "generatedAt": "2026-10-06T05:15:21.249Z",
+      "bestNetUsdc": -0.548345,
+      "wethReferencePrice": 2703.428206620106,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
+      "generatedAt": "2026-10-06T05:15:41.211Z",
+      "bestNetUsdc": -0.54604,
+      "wethReferencePrice": 2703.401632875678,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-06T05:18:10.664Z",
@@ -3050,10 +3068,28 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T09:54:53.539Z",
+      "bestNetUsdc": -0.492227,
+      "wethReferencePrice": 2706.8588300100782,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
+      "generatedAt": "2026-10-06T09:54:58.159Z",
+      "bestNetUsdc": -0.492227,
+      "wethReferencePrice": 2706.8588300100782,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-06T09:55:10.716Z",
       "bestNetUsdc": -0.486424,
       "wethReferencePrice": 2707.0162370543444,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-06T09:55:18.291Z",
+      "bestNetUsdc": -0.491162,
+      "wethReferencePrice": 2706.8877393808175,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-06T09:55:30.777Z",
@@ -3062,16 +3098,34 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T09:55:38.018Z",
+      "bestNetUsdc": -0.523089,
+      "wethReferencePrice": 2713.992610400608,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-06T09:55:50.893Z",
       "bestNetUsdc": -0.45935,
       "wethReferencePrice": 2715.7227976427403,
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T09:55:57.961Z",
+      "bestNetUsdc": -0.475859,
+      "wethReferencePrice": 2715.270890691119,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-06T09:56:10.723Z",
       "bestNetUsdc": -0.560701,
       "wethReferencePrice": 2712.956386902878,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-06T09:56:17.930Z",
+      "bestNetUsdc": -0.603451,
+      "wethReferencePrice": 2711.789790242838,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-06T09:56:30.995Z",
@@ -3122,10 +3176,28 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T09:58:51.351Z",
+      "bestNetUsdc": -0.603217,
+      "wethReferencePrice": 2710.607502776073,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
+      "generatedAt": "2026-10-06T09:58:57.900Z",
+      "bestNetUsdc": -0.603217,
+      "wethReferencePrice": 2710.607502776073,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-06T09:59:10.726Z",
       "bestNetUsdc": -0.578703,
       "wethReferencePrice": 2709.941296968846,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-06T09:59:17.941Z",
+      "bestNetUsdc": -0.574057,
+      "wethReferencePrice": 2709.815061555615,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-06T09:59:30.801Z",
@@ -3134,10 +3206,22 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T09:59:37.927Z",
+      "bestNetUsdc": -0.570355,
+      "wethReferencePrice": 2709.6237341627316,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-06T09:59:50.605Z",
       "bestNetUsdc": -0.606535,
       "wethReferencePrice": 2710.606880067611,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-06T09:59:58.290Z",
+      "bestNetUsdc": -0.600741,
+      "wethReferencePrice": 2710.449380526913,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-06T10:00:10.726Z",
@@ -3146,10 +3230,22 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T10:00:17.964Z",
+      "bestNetUsdc": -0.584582,
+      "wethReferencePrice": 2710.0102407023915,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-06T10:00:33.789Z",
       "bestNetUsdc": -0.592407,
       "wethReferencePrice": 2712.0422284833976,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-06T10:00:37.935Z",
+      "bestNetUsdc": -0.587268,
+      "wethReferencePrice": 2712.164985060926,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-06T10:00:50.753Z",
@@ -3158,10 +3254,22 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T10:00:57.865Z",
+      "bestNetUsdc": -0.594479,
+      "wethReferencePrice": 2712.0083906946097,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-06T10:01:10.989Z",
       "bestNetUsdc": -0.617418,
       "wethReferencePrice": 2711.384426177906,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-06T10:01:18.410Z",
+      "bestNetUsdc": -0.626024,
+      "wethReferencePrice": 2711.1503429007043,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-06T10:01:30.714Z",
@@ -4352,10 +4460,28 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T11:07:27.566Z",
+      "bestNetUsdc": -0.563519,
+      "wethReferencePrice": 2713.549649212055,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-06T11:07:30.951Z",
       "bestNetUsdc": -0.564029,
       "wethReferencePrice": 2713.548223435325,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-06T11:07:35.015Z",
+      "bestNetUsdc": -0.564134,
+      "wethReferencePrice": 2713.547855109836,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
+      "generatedAt": "2026-10-06T11:07:38.290Z",
+      "bestNetUsdc": -0.564134,
+      "wethReferencePrice": 2713.547855109836,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-06T11:07:50.814Z",
@@ -4364,10 +4490,22 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T11:07:58.355Z",
+      "bestNetUsdc": -0.586705,
+      "wethReferencePrice": 2712.9168060675693,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-06T11:08:11.158Z",
       "bestNetUsdc": -0.586878,
       "wethReferencePrice": 2712.9290390877727,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-06T11:08:18.262Z",
+      "bestNetUsdc": -0.590238,
+      "wethReferencePrice": 2712.8376104588724,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-06T11:08:30.742Z",
@@ -4376,10 +4514,22 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T11:08:38.398Z",
+      "bestNetUsdc": -0.608319,
+      "wethReferencePrice": 2712.348068453876,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-06T11:08:50.912Z",
       "bestNetUsdc": -0.608431,
       "wethReferencePrice": 2712.330927078041,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-06T11:08:58.365Z",
+      "bestNetUsdc": -0.608417,
+      "wethReferencePrice": 2712.294211232562,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-06T11:09:10.643Z",
@@ -4388,16 +4538,34 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T11:09:18.341Z",
+      "bestNetUsdc": -0.604068,
+      "wethReferencePrice": 2712.47248216723,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-06T11:09:30.767Z",
       "bestNetUsdc": -0.617015,
       "wethReferencePrice": 2712.1227192723036,
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T11:09:38.508Z",
+      "bestNetUsdc": -0.617174,
+      "wethReferencePrice": 2712.1183898844247,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-06T11:09:50.797Z",
       "bestNetUsdc": -0.60397,
       "wethReferencePrice": 2711.268224438129,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-06T11:09:58.369Z",
+      "bestNetUsdc": -0.60394,
+      "wethReferencePrice": 2711.268224438129,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-06T11:10:10.665Z",
@@ -15218,10 +15386,22 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-07T04:17:28.359Z",
+      "bestNetUsdc": -0.475534,
+      "wethReferencePrice": 2608.428618224726,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-07T04:17:32.457Z",
       "bestNetUsdc": -0.475534,
       "wethReferencePrice": 2608.428618224726,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-07T04:17:48.250Z",
+      "bestNetUsdc": -0.46653,
+      "wethReferencePrice": 2608.193425248048,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-07T04:17:52.220Z",
@@ -15230,16 +15410,34 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-07T04:18:08.320Z",
+      "bestNetUsdc": -0.484603,
+      "wethReferencePrice": 2608.6655735796567,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-07T04:18:10.574Z",
       "bestNetUsdc": -0.484479,
       "wethReferencePrice": 2608.662335118571,
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-07T04:18:28.178Z",
+      "bestNetUsdc": -0.454202,
+      "wethReferencePrice": 2607.8739049366263,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-07T04:18:30.188Z",
       "bestNetUsdc": -0.45411,
       "wethReferencePrice": 2607.8739049366263,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-07T04:18:48.857Z",
+      "bestNetUsdc": -0.448945,
+      "wethReferencePrice": 2607.7499522597086,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-07T04:18:50.168Z",
@@ -15690,16 +15888,40 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-07T04:42:55.461Z",
+      "bestNetUsdc": -0.426614,
+      "wethReferencePrice": 2607.4751387297238,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
+      "generatedAt": "2026-10-07T04:43:08.801Z",
+      "bestNetUsdc": -0.410988,
+      "wethReferencePrice": 2607.0673399871534,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-07T04:43:10.826Z",
       "bestNetUsdc": -0.410988,
       "wethReferencePrice": 2607.0673399871534,
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-07T04:43:29.080Z",
+      "bestNetUsdc": -0.393335,
+      "wethReferencePrice": 2606.6189596583954,
+      "source": "legacy-browser-localStorage-phone"
+    },
+    {
       "generatedAt": "2026-10-07T04:43:30.961Z",
       "bestNetUsdc": -0.393335,
       "wethReferencePrice": 2606.6189596583954,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-07T04:43:48.848Z",
+      "bestNetUsdc": -0.402403,
+      "wethReferencePrice": 2606.8579260891424,
+      "source": "legacy-browser-localStorage-phone"
     },
     {
       "generatedAt": "2026-10-07T04:43:50.107Z",
@@ -16318,6 +16540,12 @@
       "bestNetUsdc": -0.610584,
       "wethReferencePrice": 2613.5785780064452,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-07T05:48:18.380Z",
+      "bestNetUsdc": -0.450103,
+      "wethReferencePrice": 2618.196829904741,
+      "source": "legacy-browser-localStorage-phone"
     }
   ],
   "migration": {
@@ -16325,5 +16553,13 @@
     "exportedAt": "2026-10-07T05:19:02.260Z",
     "migratedAt": "2026-10-07T05:28:04.753Z",
     "legacyObservationCount": 2714
+  },
+  "phoneMigration": {
+    "source": "legacy-browser-localStorage-phone",
+    "latestExportedAt": "2026-10-07T05:48:45.925Z",
+    "migratedAt": "2026-10-07T05:50:56.874Z",
+    "suppliedObservationCount": 38,
+    "newObservationsAdded": 38,
+    "duplicatesSkipped": 0
   }
 }
