@@ -103,7 +103,7 @@ jobs:
           git show origin/observer-data:data/history.json > artifacts/central/history.json
 
       - name: Update centralized observer history
-        run: npm run central-history -- artifacts/central/history.json artifacts/latest-scan.json artifacts/central/history.next.json
+        run: npm run central-history -- artifacts/central/history.json artifacts/latest-scan.json artifacts/central/history.next.json artifacts/history
 
       - name: Publish centralized observer history
         shell: bash

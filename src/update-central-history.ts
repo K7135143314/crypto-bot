@@ -1,4 +1,5 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 type ScanRow = {
   route: string;
@@ -41,6 +42,7 @@ type CentralHistory = {
 const historyPath = process.argv[2] || 'data/history.json';
 const scanPath = process.argv[3] || 'artifacts/latest-scan.json';
 const outputPath = process.argv[4] || 'artifacts/central-history.json';
+const backfillDir = process.argv[5];
 
 function bestRow(report: ScanReport): ScanRow {
   const row = [...report.rows].sort(
@@ -51,17 +53,10 @@ function bestRow(report: ScanReport): ScanRow {
   return row;
 }
 
-async function main(): Promise<void> {
-  const [historyRaw, scanRaw] = await Promise.all([
-    readFile(historyPath, 'utf8'),
-    readFile(scanPath, 'utf8'),
-  ]);
-
-  const history = JSON.parse(historyRaw) as CentralHistory;
-  const scan = JSON.parse(scanRaw) as ScanReport;
+function observationFromScan(scan: ScanReport): Observation {
   const best = bestRow(scan);
 
-  const observation: Observation = {
+  return {
     generatedAt: scan.generatedAt,
     blockNumber: scan.blockNumber,
     candidateCount: scan.candidateCount,
@@ -77,6 +72,48 @@ async function main(): Promise<void> {
         ? Number(scan.liveInputs?.gasPriceGwei)
         : null,
   };
+}
+
+async function readBackfillScans(directory: string | undefined): Promise<ScanReport[]> {
+  if (!directory) return [];
+
+  const files = (await readdir(directory))
+    .filter((name) => name.endsWith('.json'))
+    .sort();
+
+  const scans: ScanReport[] = [];
+
+  for (const file of files) {
+    try {
+      const scan = JSON.parse(
+        await readFile(join(directory, file), 'utf8'),
+      ) as ScanReport;
+
+      if (
+        typeof scan.generatedAt === 'string' &&
+        typeof scan.blockNumber === 'string' &&
+        Array.isArray(scan.rows)
+      ) {
+        scans.push(scan);
+      }
+    } catch (error) {
+      console.warn(`Skipping invalid backfill file ${file}`, error);
+    }
+  }
+
+  return scans;
+}
+
+async function main(): Promise<void> {
+  const [historyRaw, scanRaw, backfillScans] = await Promise.all([
+    readFile(historyPath, 'utf8'),
+    readFile(scanPath, 'utf8'),
+    readBackfillScans(backfillDir),
+  ]);
+
+  const history = JSON.parse(historyRaw) as CentralHistory;
+  const scan = JSON.parse(scanRaw) as ScanReport;
+  const observation = observationFromScan(scan);
 
   const retentionDays = 30;
   const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
@@ -84,6 +121,13 @@ async function main(): Promise<void> {
   const byTimestamp = new Map<string, Observation>();
 
   for (const item of history.observations || []) {
+    if (Date.parse(item.generatedAt) >= cutoff) {
+      byTimestamp.set(item.generatedAt, item);
+    }
+  }
+
+  for (const historicalScan of backfillScans) {
+    const item = observationFromScan(historicalScan);
     if (Date.parse(item.generatedAt) >= cutoff) {
       byTimestamp.set(item.generatedAt, item);
     }
@@ -106,7 +150,7 @@ async function main(): Promise<void> {
 
   await writeFile(outputPath, JSON.stringify(next, null, 2) + '\n', 'utf8');
   console.log(
-    `Central history updated: ${observations.length} observation(s), latest ${observation.generatedAt}`,
+    `Central history updated: ${observations.length} observation(s), including ${backfillScans.length} backfill scan file(s), latest ${observation.generatedAt}`,
   );
 }
 
