@@ -551,8 +551,8 @@ function renderMatrix(scan) {
 
 function updateHistoryLabels() {
   if (!points.length) {
-    setText('priceRange', '24h browser range: —');
-    setText('obs', 'Observations: 0 • saved locally');
+    setText('priceRange', 'Central history range: —');
+    setText('obs', 'Central observations: 0 • shared across devices');
     return;
   }
 
@@ -560,13 +560,13 @@ function updateHistoryLabels() {
 
   setText(
     'priceRange',
-    '24h browser range: $' +
+    'Central history range: $' +
       Math.min(...prices).toFixed(2) +
       ' – $' +
       Math.max(...prices).toFixed(2)
   );
 
-  setText('obs', 'Observations: ' + points.length + ' • saved locally');
+  setText('obs', 'Central observations: ' + points.length + ' • shared across devices');
 }
 
 function updateHourlyLabels() {
@@ -576,7 +576,7 @@ function updateHourlyLabels() {
 
   if (summary.length === 0) {
     setText('hourlyBest', 'Building hourly history…');
-    setText('hourlyCoverage', '30-day browser rollup • Central Time');
+    setText('hourlyCoverage', '30-day central rollup • Central Time');
     setText('hourlyPositive', 'No hourly average yet');
     return;
   }
@@ -596,7 +596,7 @@ function updateHourlyLabels() {
 
   setText(
     'hourlyCoverage',
-    '30-day browser rollup • ' +
+    '30-day central rollup • ' +
       totalSamples.toLocaleString() +
       ' scans • ' +
       summary.length +
@@ -654,6 +654,50 @@ function renderScoutList(items) {
     row.append(rank, route, spread, status);
     list.appendChild(row);
   });
+}
+
+async function refreshCentralHistory() {
+  try {
+    const response = await fetch('/api/history?t=' + Date.now(), {
+      cache: 'no-store',
+    });
+    const history = await response.json();
+
+    if (!response.ok || !history.ok || !Array.isArray(history.observations)) {
+      throw new Error(history.error || 'Central history unavailable');
+    }
+
+    const centralPoints = history.observations
+      .map((item) => ({
+        t: Date.parse(item.generatedAt),
+        net: Number(item.bestNetUsdc),
+        price: Number(item.wethReferencePrice),
+      }))
+      .filter(
+        (point) =>
+          Number.isFinite(point.t) &&
+          Number.isFinite(point.net) &&
+          Number.isFinite(point.price)
+      );
+
+    points.splice(0, points.length, ...centralPoints);
+    hourlyBuckets.splice(0, hourlyBuckets.length);
+    centralPoints.forEach((point) => recordHourlyObservation(point.t, point.net));
+
+    updateHistoryLabels();
+    updateHourlyLabels();
+    drawCharts();
+
+    setText(
+      'obs',
+      'Central observations: ' +
+        centralPoints.length.toLocaleString() +
+        ' • shared across devices'
+    );
+  } catch (error) {
+    console.warn('Could not load centralized dashboard history', error);
+    setText('obs', 'Central history unavailable');
+  }
 }
 
 async function refreshScout() {
@@ -762,21 +806,10 @@ async function refresh() {
       ? generatedTime
       : Date.now();
 
-    points.push({
-      t: observationTime,
-      net: scan.best.estimatedNetUsdc,
-      price: scan.wethReferencePrice,
-    });
-
-    recordHourlyObservation(observationTime, scan.best.estimatedNetUsdc);
-    saveHistory();
-    saveHourlyHistory();
-
-    const previous = points[points.length - 2];
-    const current = points[points.length - 1];
+    const previous = points[points.length - 1];
 
     if (previous) {
-      const netChange = current.net - previous.net;
+      const netChange = scan.best.estimatedNetUsdc - previous.net;
 
       el('delta').className = 'delta ' + (netChange >= 0 ? 'good' : 'bad');
 
@@ -784,10 +817,10 @@ async function refresh() {
         'delta',
         (netChange >= 0 ? '▲ ' : '▼ ') +
           money(Math.abs(netChange), 4) +
-          ' since prior refresh'
+          ' vs latest central observation'
       );
 
-      const priceChange = current.price - previous.price;
+      const priceChange = scan.wethReferencePrice - previous.price;
 
       el('priceMove').className =
         'delta ' + (priceChange >= 0 ? 'good' : 'bad');
@@ -797,14 +830,11 @@ async function refresh() {
         (priceChange >= 0 ? '▲ ' : '▼ ') +
           '$' +
           Math.abs(priceChange).toFixed(2) +
-          ' since prior refresh'
+          ' vs latest central observation'
       );
     }
 
-    updateHistoryLabels();
-    updateHourlyLabels();
     renderMatrix(scan);
-    drawCharts();
 
     const timestamp = new Date(scan.generatedAt).toLocaleTimeString();
 
@@ -837,22 +867,12 @@ async function refresh() {
 el('scanBtn').addEventListener('click', refresh);
 window.addEventListener('resize', drawCharts);
 
-loadHistory();
-loadHourlyHistory();
-
-if (hourlyBuckets.length === 0 && points.length) {
-  points.forEach((point) => recordHourlyObservation(point.t, point.net));
-  saveHourlyHistory();
-}
-
-updateHistoryLabels();
-updateHourlyLabels();
-drawCharts();
-
+refreshCentralHistory();
 refresh();
 refreshScout();
 
 setInterval(refresh, refreshMs);
+setInterval(refreshCentralHistory, 60000);
 setInterval(refreshScout, 60000);
 
 setInterval(() => {
