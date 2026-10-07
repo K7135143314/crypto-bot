@@ -114,6 +114,22 @@
     <div id="scoutList" class="scoutList"><p>Waiting for scout data…</p></div>
   </section>
 
+  <section class="panel intelligencePanel" aria-label="Opportunity Intelligence">
+    <div class="panelHead">
+      <div><div class="eyebrow">OPPORTUNITY INTELLIGENCE</div><h2>Scout → On-chain Verification</h2></div>
+      <span id="intelligenceStatus" class="pill watch">Waiting for verification history</span>
+    </div>
+    <div class="intelligenceGrid">
+      <div><span>Verifier runs (30 days)</span><strong id="intelligenceRuns">—</strong></div>
+      <div><span>Verified candidates</span><strong id="intelligenceCandidates">—</strong></div>
+      <div><span>Verified rejects</span><strong id="intelligenceRejects">—</strong></div>
+      <div><span>Unsupported / errors</span><strong id="intelligenceUnsupported">—</strong></div>
+    </div>
+    <p id="intelligenceUpdated" class="scoutNote">The scheduled verifier has not yet saved its first central report.</p>
+    <div id="intelligenceList" class="intelligenceList"><p class="subtle">Waiting for verified Scout outcomes. No historical results will be fabricated.</p></div>
+    <p class="scoutNote">Spread (bps) is only a discovery signal. Estimated net is shown only when supported pools were actually quoted on-chain. Results are research estimates, not live trades. Unsupported means NOT VERIFIED, not a losing trade.</p>
+  </section>
+
   <section class="panel matrixPanel">
     <div class="panelHead">
       <div><div class="eyebrow">LIVE QUOTE MATRIX</div><h2>Trade Size × Route</h2></div>
