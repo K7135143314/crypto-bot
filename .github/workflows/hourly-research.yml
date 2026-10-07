@@ -6,7 +6,7 @@ on:
     - cron: '17 * * * *'
 
 permissions:
-  contents: read
+  contents: write
   actions: read
 
 concurrency:
@@ -93,6 +93,34 @@ jobs:
 
       - name: Analyze paper candidate persistence
         run: npm run paper -- artifacts/history
+
+      - name: Fetch centralized observer history
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin observer-data
+          mkdir -p artifacts/central
+          git show origin/observer-data:data/history.json > artifacts/central/history.json
+
+      - name: Update centralized observer history
+        run: npm run central-history -- artifacts/central/history.json artifacts/latest-scan.json artifacts/central/history.next.json
+
+      - name: Publish centralized observer history
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin observer-data
+          git switch --detach origin/observer-data
+          cp "$GITHUB_WORKSPACE/artifacts/central/history.next.json" data/history.json
+          git add data/history.json
+          if git diff --cached --quiet; then
+            echo "Central history already up to date."
+            exit 0
+          fi
+          git commit -m "Update centralized observer history"
+          git push origin HEAD:observer-data
 
       - name: Publish research summary
         run: |
