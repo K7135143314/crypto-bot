@@ -5,6 +5,11 @@ const historyKey = 'cryptoBotDashboardHistoryV1';
 const historyWindowMs = 24 * 60 * 60 * 1000;
 const maxPoints = 4500;
 
+const hourlyHistoryKey = 'cryptoBotDashboardHourlyV1';
+const hourlyHistoryWindowMs = 30 * 24 * 60 * 60 * 1000;
+const centralTimeZone = 'America/Chicago';
+const hourlyBuckets = [];
+
 let seconds = 20;
 let busy = false;
 let scoutBusy = false;
@@ -61,6 +66,135 @@ function saveHistory() {
   } catch (error) {
     console.warn('Could not save local chart history', error);
   }
+}
+
+function centralDateHour(timestamp) {
+  const values = {};
+
+  new Intl.DateTimeFormat('en-US', {
+    timeZone: centralTimeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    hourCycle: 'h23',
+  })
+    .formatToParts(new Date(timestamp))
+    .forEach((part) => {
+      if (part.type !== 'literal') values[part.type] = part.value;
+    });
+
+  return {
+    date: values.year + '-' + values.month + '-' + values.day,
+    hour: Number(values.hour),
+  };
+}
+
+function loadHourlyHistory() {
+  try {
+    const raw = localStorage.getItem(hourlyHistoryKey);
+    if (!raw) return;
+
+    const parsed = JSON.parse(raw);
+    const cutoff = Date.now() - hourlyHistoryWindowMs;
+
+    if (!Array.isArray(parsed)) return;
+
+    const clean = parsed.filter((bucket) =>
+      bucket &&
+      typeof bucket.key === 'string' &&
+      Number.isFinite(bucket.t) &&
+      Number.isFinite(bucket.hour) &&
+      bucket.hour >= 0 &&
+      bucket.hour <= 23 &&
+      Number.isFinite(bucket.count) &&
+      bucket.count > 0 &&
+      Number.isFinite(bucket.sumNet) &&
+      Number.isFinite(bucket.bestNet) &&
+      Number.isFinite(bucket.positiveCount) &&
+      bucket.t >= cutoff
+    );
+
+    hourlyBuckets.push(...clean);
+  } catch (error) {
+    console.warn('Could not restore hourly chart history', error);
+  }
+}
+
+function saveHourlyHistory() {
+  try {
+    const cutoff = Date.now() - hourlyHistoryWindowMs;
+
+    for (let i = hourlyBuckets.length - 1; i >= 0; i -= 1) {
+      if (hourlyBuckets[i].t < cutoff) hourlyBuckets.splice(i, 1);
+    }
+
+    localStorage.setItem(hourlyHistoryKey, JSON.stringify(hourlyBuckets));
+  } catch (error) {
+    console.warn('Could not save hourly chart history', error);
+  }
+}
+
+function recordHourlyObservation(timestamp, net) {
+  if (!Number.isFinite(timestamp) || !Number.isFinite(net)) return;
+
+  const central = centralDateHour(timestamp);
+  if (!Number.isFinite(central.hour)) return;
+
+  const key = central.date + '|' + central.hour;
+  let bucket = hourlyBuckets.find((item) => item.key === key);
+
+  if (!bucket) {
+    bucket = {
+      key,
+      t: timestamp,
+      hour: central.hour,
+      count: 0,
+      sumNet: 0,
+      bestNet: net,
+      positiveCount: 0,
+    };
+    hourlyBuckets.push(bucket);
+  }
+
+  bucket.t = Math.max(bucket.t, timestamp);
+  bucket.count += 1;
+  bucket.sumNet += net;
+  bucket.bestNet = Math.max(bucket.bestNet, net);
+  if (net >= 0) bucket.positiveCount += 1;
+}
+
+function hourlySummary() {
+  const summary = Array.from({ length: 24 }, (_, hour) => ({
+    hour,
+    count: 0,
+    sumNet: 0,
+    bestNet: -Infinity,
+    positiveCount: 0,
+    averageNet: null,
+  }));
+
+  hourlyBuckets.forEach((bucket) => {
+    const target = summary[bucket.hour];
+    if (!target) return;
+
+    target.count += bucket.count;
+    target.sumNet += bucket.sumNet;
+    target.bestNet = Math.max(target.bestNet, bucket.bestNet);
+    target.positiveCount += bucket.positiveCount;
+  });
+
+  summary.forEach((item) => {
+    if (item.count > 0) item.averageNet = item.sumNet / item.count;
+  });
+
+  return summary;
+}
+
+function hourLabel(hour) {
+  const normalized = ((hour % 24) + 24) % 24;
+  const display = normalized % 12 || 12;
+  return display + (normalized < 12 ? ' AM' : ' PM');
 }
 
 function canvasSetup(id) {
@@ -243,9 +377,89 @@ function drawPrice() {
   );
 }
 
+function drawHourlyProfit() {
+  const s = canvasSetup('hourlyChart');
+  drawGrid(s.ctx, s.w, s.h, s.padL, s.padR, s.padT, s.padB);
+
+  const summary = hourlySummary();
+  const populated = summary.filter(
+    (item) => item.count > 0 && Number.isFinite(item.averageNet)
+  );
+
+  if (populated.length === 0) {
+    s.ctx.fillStyle = '#8eabc0';
+    s.ctx.font = '13px Arial';
+    s.ctx.fillText(
+      'Central-Time hourly averages will build as scans arrive…',
+      s.padL,
+      48
+    );
+    return;
+  }
+
+  const values = populated.map((item) => item.averageNet);
+  let min = Math.min(...values, 0);
+  let max = Math.max(...values, 0);
+  const spread = Math.max(0.05, max - min);
+  const margin = spread * 0.18;
+  min -= margin;
+  max += margin;
+
+  const plotW = s.w - s.padL - s.padR;
+  const step = plotW / 24;
+  const barW = Math.max(3, step * 0.68);
+
+  const y = (value) =>
+    s.h -
+    s.padB -
+    ((value - min) / (max - min)) * (s.h - s.padT - s.padB);
+
+  const zeroY = y(0);
+
+  s.ctx.save();
+  s.ctx.setLineDash([6, 5]);
+  s.ctx.strokeStyle = '#b8c1c8';
+  s.ctx.lineWidth = 1.3;
+  s.ctx.beginPath();
+  s.ctx.moveTo(s.padL, zeroY);
+  s.ctx.lineTo(s.w - s.padR, zeroY);
+  s.ctx.stroke();
+  s.ctx.restore();
+
+  s.ctx.fillStyle = '#9fb1be';
+  s.ctx.font = '11px Arial';
+  s.ctx.fillText('$0.00', 6, zeroY + 4);
+
+  summary.forEach((item) => {
+    if (!Number.isFinite(item.averageNet)) return;
+
+    const x = s.padL + item.hour * step + (step - barW) / 2;
+    const valueY = y(item.averageNet);
+    const top = Math.min(valueY, zeroY);
+    const height = Math.max(2, Math.abs(zeroY - valueY));
+
+    s.ctx.fillStyle = item.averageNet >= 0 ? '#20d990' : '#258cff';
+    s.ctx.fillRect(x, top, barW, height);
+  });
+
+  s.ctx.fillStyle = '#8eabc0';
+  s.ctx.font = '10px Arial';
+
+  for (let hour = 0; hour < 24; hour += 3) {
+    const label = hour === 0 ? '12a' : hour < 12 ? hour + 'a' : hour === 12 ? '12p' : hour - 12 + 'p';
+    const x = s.padL + hour * step + step / 2;
+    s.ctx.fillText(
+      label,
+      x - s.ctx.measureText(label).width / 2,
+      s.h - 10
+    );
+  }
+}
+
 function drawCharts() {
   drawProfit();
   drawPrice();
+  drawHourlyProfit();
 }
 
 function renderMatrix(scan) {
@@ -353,6 +567,48 @@ function updateHistoryLabels() {
   );
 
   setText('obs', 'Observations: ' + points.length + ' • saved locally');
+}
+
+function updateHourlyLabels() {
+  const summary = hourlySummary().filter(
+    (item) => item.count > 0 && Number.isFinite(item.averageNet)
+  );
+
+  if (summary.length === 0) {
+    setText('hourlyBest', 'Building hourly history…');
+    setText('hourlyCoverage', '30-day browser rollup • Central Time');
+    setText('hourlyPositive', 'No hourly average yet');
+    return;
+  }
+
+  const best = [...summary].sort((a, b) => b.averageNet - a.averageNet)[0];
+  const totalSamples = summary.reduce((sum, item) => sum + item.count, 0);
+  const positiveHours = summary.filter((item) => item.averageNet >= 0).length;
+
+  setText(
+    'hourlyBest',
+    'Best observed: ' +
+      hourLabel(best.hour) +
+      ' CT • ' +
+      money(best.averageNet, 3) +
+      ' avg'
+  );
+
+  setText(
+    'hourlyCoverage',
+    '30-day browser rollup • ' +
+      totalSamples.toLocaleString() +
+      ' scans • ' +
+      summary.length +
+      '/24 hours covered'
+  );
+
+  setText(
+    'hourlyPositive',
+    positiveHours > 0
+      ? positiveHours + ' hour(s) average at or above $0'
+      : 'No hour averages at or above $0 yet'
+  );
 }
 
 function compactUsd(value) {
@@ -501,13 +757,20 @@ async function refresh() {
     el('candidateAlert').className =
       'candidateAlert' + (scan.candidateCount > 0 ? ' show' : '');
 
+    const generatedTime = Date.parse(scan.generatedAt);
+    const observationTime = Number.isFinite(generatedTime)
+      ? generatedTime
+      : Date.now();
+
     points.push({
-      t: Date.now(),
+      t: observationTime,
       net: scan.best.estimatedNetUsdc,
       price: scan.wethReferencePrice,
     });
 
+    recordHourlyObservation(observationTime, scan.best.estimatedNetUsdc);
     saveHistory();
+    saveHourlyHistory();
 
     const previous = points[points.length - 2];
     const current = points[points.length - 1];
@@ -539,6 +802,7 @@ async function refresh() {
     }
 
     updateHistoryLabels();
+    updateHourlyLabels();
     renderMatrix(scan);
     drawCharts();
 
@@ -574,11 +838,16 @@ el('scanBtn').addEventListener('click', refresh);
 window.addEventListener('resize', drawCharts);
 
 loadHistory();
+loadHourlyHistory();
 
-if (points.length) {
-  updateHistoryLabels();
-  drawCharts();
+if (hourlyBuckets.length === 0 && points.length) {
+  points.forEach((point) => recordHourlyObservation(point.t, point.net));
+  saveHourlyHistory();
 }
+
+updateHistoryLabels();
+updateHourlyLabels();
+drawCharts();
 
 refresh();
 refreshScout();
