@@ -26,6 +26,86 @@ function setText(id, value) {
   if (node) node.textContent = value;
 }
 
+function readLegacyHistoryForExport() {
+  const result = {
+    exportedAt: new Date().toISOString(),
+    source: 'legacy-browser-localStorage',
+    origin: window.location.origin,
+    historyKey,
+    hourlyHistoryKey,
+    observations: [],
+    hourlyBuckets: [],
+  };
+
+  try {
+    const raw = localStorage.getItem(historyKey);
+    const parsed = raw ? JSON.parse(raw) : [];
+    if (Array.isArray(parsed)) {
+      result.observations = parsed.filter(
+        (point) =>
+          point &&
+          Number.isFinite(point.t) &&
+          Number.isFinite(point.net) &&
+          Number.isFinite(point.price)
+      );
+    }
+  } catch (error) {
+    console.warn('Could not read legacy observation history', error);
+  }
+
+  try {
+    const raw = localStorage.getItem(hourlyHistoryKey);
+    const parsed = raw ? JSON.parse(raw) : [];
+    if (Array.isArray(parsed)) result.hourlyBuckets = parsed;
+  } catch (error) {
+    console.warn('Could not read legacy hourly history', error);
+  }
+
+  return result;
+}
+
+function updateLegacyExportControl() {
+  const button = el('legacyExportBtn');
+  const note = el('legacyExportNote');
+  if (!button || !note) return;
+
+  const legacy = readLegacyHistoryForExport();
+  const count = legacy.observations.length;
+
+  if (count > 0) {
+    button.hidden = false;
+    note.hidden = false;
+    note.textContent =
+      count.toLocaleString() + ' old browser observations available to recover';
+  } else {
+    button.hidden = true;
+    note.hidden = true;
+  }
+}
+
+function exportLegacyHistory() {
+  const legacy = readLegacyHistoryForExport();
+
+  if (!legacy.observations.length) {
+    alert('No old browser observations were found on this device.');
+    return;
+  }
+
+  const blob = new Blob([JSON.stringify(legacy, null, 2)], {
+    type: 'application/json',
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+  link.href = url;
+  link.download = 'arbitrage-legacy-history-' + stamp + '.json';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 function loadHistory() {
   try {
     const raw = localStorage.getItem(historyKey);
@@ -903,7 +983,10 @@ async function refresh() {
 }
 
 el('scanBtn').addEventListener('click', refresh);
+el('legacyExportBtn')?.addEventListener('click', exportLegacyHistory);
 window.addEventListener('resize', drawCharts);
+
+updateLegacyExportControl();
 
 refreshCentralHistory();
 refresh();
