@@ -3,7 +3,7 @@
   "source": "hourly-research-collector",
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-07T05:50:56.874Z",
+  "updatedAt": "2026-10-07T08:46:02.438Z",
   "observations": [
     {
       "generatedAt": "2026-10-05T22:04:00.000Z",
@@ -9506,6 +9506,16 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T17:15:10.119Z",
+      "blockNumber": "52258778",
+      "candidateCount": 0,
+      "bestRoute": "Uniswap v3 -> Aerodrome",
+      "bestStartUsdc": 100,
+      "bestNetUsdc": -0.367517,
+      "wethReferencePrice": 2695.778789,
+      "gasPriceGwei": 0.006
+    },
+    {
       "generatedAt": "2026-10-06T17:16:03.533Z",
       "bestNetUsdc": -0.36399,
       "wethReferencePrice": 2695.6885797547075,
@@ -11210,6 +11220,16 @@
       "source": "legacy-browser-localStorage"
     },
     {
+      "generatedAt": "2026-10-06T21:42:45.032Z",
+      "blockNumber": "52266805",
+      "candidateCount": 0,
+      "bestRoute": "Aerodrome -> Uniswap v3",
+      "bestStartUsdc": 100,
+      "bestNetUsdc": -0.524813,
+      "wethReferencePrice": 2697.087421,
+      "gasPriceGwei": 0.006
+    },
+    {
       "generatedAt": "2026-10-06T21:43:03.499Z",
       "bestNetUsdc": -0.527438,
       "wethReferencePrice": 2696.9842087797847,
@@ -12816,6 +12836,16 @@
       "bestNetUsdc": -0.342796,
       "wethReferencePrice": 2684.719582145077,
       "source": "legacy-browser-localStorage"
+    },
+    {
+      "generatedAt": "2026-10-07T01:36:43.419Z",
+      "blockNumber": "52273824",
+      "candidateCount": 0,
+      "bestRoute": "Uniswap v3 -> Aerodrome",
+      "bestStartUsdc": 100,
+      "bestNetUsdc": -0.340769,
+      "wethReferencePrice": 2684.665161,
+      "gasPriceGwei": 0.006
     },
     {
       "generatedAt": "2026-10-07T01:36:50.455Z",
@@ -16546,20 +16576,16 @@
       "bestNetUsdc": -0.450103,
       "wethReferencePrice": 2618.196829904741,
       "source": "legacy-browser-localStorage-phone"
+    },
+    {
+      "generatedAt": "2026-10-07T08:45:56.609Z",
+      "blockNumber": "52286701",
+      "candidateCount": 0,
+      "bestRoute": "Uniswap v3 -> Aerodrome",
+      "bestStartUsdc": 100,
+      "bestNetUsdc": -0.357103,
+      "wethReferencePrice": 2612.164543,
+      "gasPriceGwei": 0.006
     }
-  ],
-  "migration": {
-    "source": "legacy-browser-localStorage",
-    "exportedAt": "2026-10-07T05:19:02.260Z",
-    "migratedAt": "2026-10-07T05:28:04.753Z",
-    "legacyObservationCount": 2714
-  },
-  "phoneMigration": {
-    "source": "legacy-browser-localStorage-phone",
-    "latestExportedAt": "2026-10-07T05:48:45.925Z",
-    "migratedAt": "2026-10-07T05:50:56.874Z",
-    "suppliedObservationCount": 38,
-    "newObservationsAdded": 38,
-    "duplicatesSkipped": 0
-  }
+  ]
 }
