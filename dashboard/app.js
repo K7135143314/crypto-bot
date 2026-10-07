@@ -245,10 +245,10 @@ function drawProfit() {
   const s = canvasSetup('profitChart');
   drawGrid(s.ctx, s.w, s.h, s.padL, s.padR, s.padT, s.padB);
 
-  if (points.length < 2) {
+  if (!points.length) {
     s.ctx.fillStyle = '#8eabc0';
     s.ctx.font = '13px Arial';
-    s.ctx.fillText('Profit line will build as new scans arrive…', s.padL, 48);
+    s.ctx.fillText('Waiting for the first central observation…', s.padL, 48);
     return;
   }
 
@@ -261,7 +261,9 @@ function drawProfit() {
   max += margin;
 
   const x = (i) =>
-    s.padL + (i / (points.length - 1)) * (s.w - s.padL - s.padR);
+    points.length === 1
+      ? s.padL + (s.w - s.padL - s.padR) / 2
+      : s.padL + (i / (points.length - 1)) * (s.w - s.padL - s.padR);
 
   const y = (value) =>
     s.h -
@@ -311,24 +313,34 @@ function drawProfit() {
   s.ctx.fill();
 
   s.ctx.fillStyle = '#8eabc0';
-  s.ctx.fillText(timeLabel(points[0].t), s.padL, s.h - 10);
 
-  const rightLabel = timeLabel(last.t);
-  s.ctx.fillText(
-    rightLabel,
-    s.w - s.padR - s.ctx.measureText(rightLabel).width,
-    s.h - 10
-  );
+  if (points.length === 1) {
+    const onlyLabel = timeLabel(last.t);
+    s.ctx.fillText(
+      onlyLabel,
+      s.padL + (s.w - s.padL - s.padR) / 2 - s.ctx.measureText(onlyLabel).width / 2,
+      s.h - 10
+    );
+  } else {
+    s.ctx.fillText(timeLabel(points[0].t), s.padL, s.h - 10);
+
+    const rightLabel = timeLabel(last.t);
+    s.ctx.fillText(
+      rightLabel,
+      s.w - s.padR - s.ctx.measureText(rightLabel).width,
+      s.h - 10
+    );
+  }
 }
 
 function drawPrice() {
   const s = canvasSetup('priceChart');
   drawGrid(s.ctx, s.w, s.h, s.padL, s.padR, s.padT, s.padB);
 
-  if (points.length < 2) {
+  if (!points.length) {
     s.ctx.fillStyle = '#8eabc0';
     s.ctx.font = '13px Arial';
-    s.ctx.fillText('WETH price line will build as new scans arrive…', s.padL, 48);
+    s.ctx.fillText('Waiting for the first central WETH observation…', s.padL, 48);
     return;
   }
 
@@ -341,7 +353,9 @@ function drawPrice() {
   max += margin;
 
   const x = (i) =>
-    s.padL + (i / (points.length - 1)) * (s.w - s.padL - s.padR);
+    points.length === 1
+      ? s.padL + (s.w - s.padL - s.padR) / 2
+      : s.padL + (i / (points.length - 1)) * (s.w - s.padL - s.padR);
 
   const y = (value) =>
     s.h -
@@ -367,14 +381,24 @@ function drawPrice() {
 
   s.ctx.fillStyle = '#8eabc0';
   s.ctx.font = '11px Arial';
-  s.ctx.fillText(timeLabel(points[0].t), s.padL, s.h - 10);
 
-  const rightLabel = timeLabel(last.t);
-  s.ctx.fillText(
-    rightLabel,
-    s.w - s.padR - s.ctx.measureText(rightLabel).width,
-    s.h - 10
-  );
+  if (points.length === 1) {
+    const onlyLabel = timeLabel(last.t);
+    s.ctx.fillText(
+      onlyLabel,
+      s.padL + (s.w - s.padL - s.padR) / 2 - s.ctx.measureText(onlyLabel).width / 2,
+      s.h - 10
+    );
+  } else {
+    s.ctx.fillText(timeLabel(points[0].t), s.padL, s.h - 10);
+
+    const rightLabel = timeLabel(last.t);
+    s.ctx.fillText(
+      rightLabel,
+      s.w - s.padR - s.ctx.measureText(rightLabel).width,
+      s.h - 10
+    );
+  }
 }
 
 function drawHourlyProfit() {
