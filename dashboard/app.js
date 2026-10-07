@@ -337,14 +337,16 @@ function drawPrice() {
   const s = canvasSetup('priceChart');
   drawGrid(s.ctx, s.w, s.h, s.padL, s.padR, s.padT, s.padB);
 
-  if (!points.length) {
+  const pricePoints = points.filter((point) => Number.isFinite(point.price));
+
+  if (!pricePoints.length) {
     s.ctx.fillStyle = '#8eabc0';
     s.ctx.font = '13px Arial';
     s.ctx.fillText('Waiting for the first central WETH observation…', s.padL, 48);
     return;
   }
 
-  const prices = points.map((point) => point.price);
+  const prices = pricePoints.map((point) => point.price);
   let min = Math.min(...prices);
   let max = Math.max(...prices);
 
@@ -353,9 +355,9 @@ function drawPrice() {
   max += margin;
 
   const x = (i) =>
-    points.length === 1
+    pricePoints.length === 1
       ? s.padL + (s.w - s.padL - s.padR) / 2
-      : s.padL + (i / (points.length - 1)) * (s.w - s.padL - s.padR);
+      : s.padL + (i / (pricePoints.length - 1)) * (s.w - s.padL - s.padR);
 
   const y = (value) =>
     s.h -
@@ -366,23 +368,23 @@ function drawPrice() {
   s.ctx.lineWidth = 2.5;
   s.ctx.beginPath();
 
-  points.forEach((point, i) => {
+  pricePoints.forEach((point, i) => {
     if (i === 0) s.ctx.moveTo(x(i), y(point.price));
     else s.ctx.lineTo(x(i), y(point.price));
   });
 
   s.ctx.stroke();
 
-  const last = points[points.length - 1];
+  const last = pricePoints[pricePoints.length - 1];
   s.ctx.fillStyle = '#20d990';
   s.ctx.beginPath();
-  s.ctx.arc(x(points.length - 1), y(last.price), 4.5, 0, Math.PI * 2);
+  s.ctx.arc(x(pricePoints.length - 1), y(last.price), 4.5, 0, Math.PI * 2);
   s.ctx.fill();
 
   s.ctx.fillStyle = '#8eabc0';
   s.ctx.font = '11px Arial';
 
-  if (points.length === 1) {
+  if (pricePoints.length === 1) {
     const onlyLabel = timeLabel(last.t);
     s.ctx.fillText(
       onlyLabel,
@@ -390,7 +392,7 @@ function drawPrice() {
       s.h - 10
     );
   } else {
-    s.ctx.fillText(timeLabel(points[0].t), s.padL, s.h - 10);
+    s.ctx.fillText(timeLabel(pricePoints[0].t), s.padL, s.h - 10);
 
     const rightLabel = timeLabel(last.t);
     s.ctx.fillText(
@@ -580,17 +582,26 @@ function updateHistoryLabels() {
     return;
   }
 
-  const prices = points.map((point) => point.price);
+  const prices = points
+    .map((point) => point.price)
+    .filter((price) => Number.isFinite(price));
 
   setText(
     'priceRange',
-    'Central history range: $' +
-      Math.min(...prices).toFixed(2) +
-      ' – $' +
-      Math.max(...prices).toFixed(2)
+    prices.length
+      ? 'Central history range: $' +
+          Math.min(...prices).toFixed(2) +
+          ' – $' +
+          Math.max(...prices).toFixed(2)
+      : 'Central history range: no saved WETH prices yet'
   );
 
-  setText('obs', 'Central observations: ' + points.length + ' • shared across devices');
+  setText(
+    'obs',
+    'Central observations: ' +
+      points.length +
+      ' • shared across devices'
+  );
 }
 
 function updateHourlyLabels() {
@@ -695,13 +706,16 @@ async function refreshCentralHistory() {
       .map((item) => ({
         t: Date.parse(item.generatedAt),
         net: Number(item.bestNetUsdc),
-        price: Number(item.wethReferencePrice),
+        price:
+          item.wethReferencePrice === null ||
+          item.wethReferencePrice === undefined
+            ? null
+            : Number(item.wethReferencePrice),
       }))
       .filter(
         (point) =>
           Number.isFinite(point.t) &&
-          Number.isFinite(point.net) &&
-          Number.isFinite(point.price)
+          Number.isFinite(point.net)
       );
 
     points.splice(0, points.length, ...centralPoints);
