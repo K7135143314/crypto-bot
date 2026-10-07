@@ -6,7 +6,7 @@ on:
     - cron: '12 * * * *'
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: scout-direct-verifier
@@ -26,6 +26,32 @@ jobs:
         run: npm test
       - name: Verify scout leads directly on-chain
         run: npm run verify:scout
+      - name: Save verifier outcomes to central history
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p artifacts/central
+          for attempt in 1 2 3; do
+            git fetch origin observer-data
+            git show origin/observer-data:data/intelligence.json > artifacts/central/intelligence.json
+            npm run intelligence-history -- artifacts/central/intelligence.json artifacts/scout-verification.json artifacts/central/intelligence.next.json
+            git switch --detach origin/observer-data
+            cp "$GITHUB_WORKSPACE/artifacts/central/intelligence.next.json" data/intelligence.json
+            git add data/intelligence.json
+            git commit -m "Update Opportunity Intelligence history" || true
+            if git push origin HEAD:observer-data; then
+              echo "Central Opportunity Intelligence saved."
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Failed to save central intelligence after three attempts" >&2
+              exit 1
+            fi
+            git switch --detach "$GITHUB_SHA"
+            sleep 2
+          done
       - name: Publish handoff summary
         run: cat artifacts/scout-verification.md >> "$GITHUB_STEP_SUMMARY"
       - name: Upload handoff report
