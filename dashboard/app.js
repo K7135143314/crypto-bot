@@ -771,6 +771,97 @@ function renderScoutList(items) {
   });
 }
 
+
+function centralTimeStamp(value) {
+  const date = new Date(value);
+  return Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Chicago', month: 'short', day: 'numeric',
+    hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+  }).format(date) : 'Unknown time';
+}
+
+async function refreshIntelligence() {
+  try {
+    const response = await fetch('/api/intelligence?t=' + Date.now(), { cache: 'no-store' });
+    const data = await response.json();
+    if (!response.ok || !data.ok || !Array.isArray(data.runs)) {
+      throw new Error(data.error || 'Central verifier history unavailable');
+    }
+    const runs = data.runs;
+    const results = runs.flatMap((run) =>
+      (run.results || []).map((result) => ({ ...result, generatedAt: run.generatedAt }))
+    );
+    const candidates = results.filter((r) => r.status === 'VERIFIED_CANDIDATE').length;
+    const rejects = results.filter((r) => r.status === 'VERIFIED_REJECT').length;
+    const unsupported = results.length - candidates - rejects;
+    setText('intelligenceRuns', runs.length.toLocaleString());
+    setText('intelligenceCandidates', candidates.toLocaleString());
+    setText('intelligenceRejects', rejects.toLocaleString());
+    setText('intelligenceUnsupported', unsupported.toLocaleString());
+
+    const latest = runs[runs.length - 1];
+    const stale = latest && Date.now() - Date.parse(latest.generatedAt) > 2 * 3600 * 1000;
+    setText('intelligenceUpdated', latest
+      ? 'Last verifier: ' + centralTimeStamp(latest.generatedAt) + ' • Base block ' +
+        latest.pinnedBlock + ' • Up to five Scout leads per run'
+      : 'Waiting for first centrally saved verifier run.');
+    const badge = el('intelligenceStatus');
+    if (badge) {
+      badge.className = 'pill ' + (candidates && !stale ? 'candidate' : 'watch');
+      badge.textContent = !latest ? 'COLLECTING' : stale ? 'STALE HISTORY' : 'READ-ONLY';
+    }
+
+    const list = el('intelligenceList');
+    if (!list) return;
+    list.replaceChildren();
+    if (!results.length) {
+      const p = document.createElement('p');
+      p.className = 'subtle';
+      p.textContent = 'No saved verifier results yet. No outcomes have been invented.';
+      list.appendChild(p);
+      return;
+    }
+
+    results.slice(-8).reverse().forEach((item) => {
+      const row = document.createElement('div');
+      row.className = 'intelligenceRow';
+      const description = document.createElement('div');
+      const route = document.createElement('div');
+      route.className = 'intelligenceRoute';
+      route.textContent = item.scoutRoute || 'Unknown route';
+      const reason = document.createElement('div');
+      reason.className = 'intelligenceReason';
+      reason.textContent = centralTimeStamp(item.generatedAt) + ' • ' + (item.reason || '');
+      description.append(route, reason);
+
+      const spread = document.createElement('span');
+      spread.className = 'intelligenceValue';
+      spread.textContent = Number(item.scoutSpreadBps).toFixed(2) + ' bps';
+
+      const net = document.createElement('span');
+      net.className = 'intelligenceValue';
+      const verified = ['VERIFIED_REJECT', 'VERIFIED_CANDIDATE'].includes(item.status);
+      net.textContent = verified && item.bestEstimatedNetUsdc != null
+        ? money(Number(item.bestEstimatedNetUsdc), 4) +
+          (item.bestTradeSizeUsdc ? ' / $' + item.bestTradeSizeUsdc : '')
+        : 'Not verified';
+
+      const pill = document.createElement('span');
+      pill.className = 'pill ' + (item.status === 'VERIFIED_CANDIDATE'
+        ? 'candidate' : item.status === 'VERIFIED_REJECT' ? 'reject' : 'watch');
+      pill.textContent = item.status === 'VERIFIED_CANDIDATE' ? 'CANDIDATE'
+        : item.status === 'VERIFIED_REJECT' ? 'REJECT' : 'UNVERIFIED';
+      pill.title = item.status;
+      row.append(description, spread, net, pill);
+      list.appendChild(row);
+    });
+  } catch (error) {
+    const pill = el('intelligenceStatus');
+    if (pill) { pill.className = 'pill reject'; pill.textContent = 'DATA ERROR'; }
+    setText('intelligenceUpdated', 'Unable to load verifier history: ' + String(error));
+  }
+}
+
 async function refreshCentralHistory() {
   try {
     const response = await fetch('/api/history?t=' + Date.now(), {
@@ -989,11 +1080,13 @@ window.addEventListener('resize', drawCharts);
 updateLegacyExportControl();
 
 refreshCentralHistory();
+refreshIntelligence();
 refresh();
 refreshScout();
 
 setInterval(refresh, refreshMs);
 setInterval(refreshCentralHistory, 60000);
+setInterval(refreshIntelligence, 60000);
 setInterval(refreshScout, 60000);
 
 setInterval(() => {
