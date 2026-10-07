@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "source": "hourly-research-collector",
+  "timezone": "America/Chicago",
+  "retentionDays": 30,
+  "updatedAt": null,
+  "observations": []
+}
