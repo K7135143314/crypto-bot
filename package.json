@@ -19,7 +19,8 @@
     "simulation:compare": "tsx src/compare-simulation.ts",
     "scout": "tsx src/scout-cli.ts",
     "verify:scout": "tsx src/scout-verifier-cli.ts",
-    "central-history": "tsx src/update-central-history.ts"
+    "central-history": "tsx src/update-central-history.ts",
+    "intelligence-history": "tsx src/update-intelligence-history.ts"
   },
   "dependencies": {
     "viem": "^2.38.0"
