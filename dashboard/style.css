@@ -79,3 +79,15 @@ footer span{border:1px solid #5d4c26;border-radius:999px;padding:5px 8px}
 @media(max-width:980px){.top{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.scoutGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:600px){main{padding:9px}.scoutGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.scoutRow{grid-template-columns:30px minmax(0,1fr) auto}.scoutRow .pill{grid-column:2/4;justify-self:start}.kpis{gap:7px}.card strong{font-size:19px}.panelHead{align-items:flex-start;flex-direction:column}.profitCanvas{height:280px}.priceCanvas{height:160px}.hourlyCanvas{height:200px}.matrixDesktop{display:none}.matrixMobile{display:grid;grid-template-columns:72px minmax(0,1fr) minmax(0,1fr);gap:1px;width:100%;background:#17384f;border:1px solid #17384f;border-radius:8px;overflow:hidden}.matrixMobile>div{min-width:0;padding:10px 6px;background:#0a1927}.mobileHead{text-align:center;color:#9db7c8;font-size:11px;font-weight:800;line-height:1.2}.mobileSize{display:flex;align-items:center;font-size:12px;font-weight:800}.matrixMobile .cell{font-size:12px;padding:10px 4px}.note{width:100%;margin-left:0}}
 @media(max-width:380px){.matrixMobile{grid-template-columns:62px minmax(0,1fr) minmax(0,1fr)}.mobileHead{font-size:10px}.matrixMobile .cell{font-size:11px}}
+
+.intelligencePanel{margin-top:10px}
+.intelligenceGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.intelligenceGrid>div{background:#081724;border:1px solid #143147;border-radius:8px;padding:10px;min-width:0}
+.intelligenceGrid span{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}
+.intelligenceGrid strong{font-size:20px;font-variant-numeric:tabular-nums}
+.intelligenceList{display:grid;gap:7px}
+.intelligenceRow{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,.7fr) minmax(0,.9fr) auto;gap:8px;align-items:start;padding:10px;background:#081724;border:1px solid #143147;border-radius:8px;font-size:12px}
+.intelligenceRoute{font-weight:800;overflow-wrap:anywhere}
+.intelligenceReason{color:var(--muted);font-size:11px;margin-top:5px;overflow-wrap:anywhere}
+.intelligenceValue{font-weight:800;font-variant-numeric:tabular-nums}
+@media(max-width:700px){.intelligenceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.intelligenceRow{grid-template-columns:minmax(0,1fr) auto;gap:8px}.intelligenceRow .intelligenceValue{grid-column:1/2}.intelligenceRow .pill{grid-column:2/3;grid-row:1/3;align-self:center}}
