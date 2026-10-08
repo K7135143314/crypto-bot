@@ -1,0 +1,63 @@
+name: Six-market observation collector
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '27 * * * *'
+permissions:
+  contents: write
+concurrency:
+  group: six-market-observer
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Read-only six-market history update
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin observer-data
+          mkdir -p artifacts/central
+          git show origin/observer-data:data/markets.json > artifacts/central/markets.json
+          node src/collect-six-markets.mjs artifacts/central/markets.json artifacts/central/markets.next.json
+      - name: Publish centralized market history with retry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3; do
+            git fetch origin observer-data
+            git show origin/observer-data:data/markets.json > artifacts/central/markets.json
+            node src/collect-six-markets.mjs artifacts/central/markets.json artifacts/central/markets.next.json
+            git switch --detach origin/observer-data
+            cp "$GITHUB_WORKSPACE/artifacts/central/markets.next.json" data/markets.json
+            git add data/markets.json
+            if git diff --cached --quiet; then
+              echo "Six-market history is already current"
+              break
+            fi
+            git commit -m "Update six-market observer history"
+            if git push origin HEAD:observer-data; then
+              echo "Six-market observation saved centrally"
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Could not publish market history" >&2
+              exit 1
+            fi
+            git switch --detach "$GITHUB_SHA"
+            sleep 2
+          done
+      - name: Upload saved market report
+        uses: actions/upload-artifact@v4
+        with:
+          name: six-market-observation-${{ github.run_number }}
+          path: artifacts/central/markets.next.json
+          retention-days: 30
+          if-no-files-found: error
