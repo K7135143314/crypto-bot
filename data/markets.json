@@ -2,6 +2,97 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": null,
-  "runs": []
+  "updatedAt": "2026-10-08T04:45:21.131Z",
+  "runs": [
+    {
+      "generatedAt": "2026-10-08T04:45:20.582Z",
+      "source": "scheduled-six-market-collector",
+      "markets": [
+        {
+          "market": "WETH/USDC",
+          "status": "DISCOVERY_ONLY",
+          "sourceCoverage": "TWO_TOKEN_SEARCH",
+          "eligiblePools": 13,
+          "eligibleDexes": 4,
+          "indicatedSpreadBps": 29.6359,
+          "buyDex": "pancakeswap",
+          "sellDex": "uniswap",
+          "buyPool": "0x72ab388e2e2f6facef59e3c3fa2c4e29011c2d38",
+          "sellPool": "0x88a43bbdf9d098eec7bceda4e2494615dfd9bb9c",
+          "verifiedCandidates": 0,
+          "verification": "NOT_VERIFIED"
+        },
+        {
+          "market": "AERO/USDC",
+          "status": "DISCOVERY_ONLY",
+          "sourceCoverage": "TWO_TOKEN_SEARCH",
+          "eligiblePools": 5,
+          "eligibleDexes": 2,
+          "indicatedSpreadBps": 95.6196,
+          "buyDex": "uniswap",
+          "sellDex": "aerodrome",
+          "buyPool": "0xe5b5f522e98b5a2baae212d4da66b865b781db97",
+          "sellPool": "0xbe00ff35af70e8415d0eb605a286d8a45466a4c1",
+          "verifiedCandidates": 0,
+          "verification": "NOT_VERIFIED"
+        },
+        {
+          "market": "cbBTC/USDC",
+          "status": "DISCOVERY_ONLY",
+          "sourceCoverage": "TWO_TOKEN_SEARCH",
+          "eligiblePools": 9,
+          "eligibleDexes": 3,
+          "indicatedSpreadBps": 20.0492,
+          "buyDex": "aerodrome",
+          "sellDex": "uniswap",
+          "buyPool": "0x4e962bb3889bf030368f56810a9c96b83cb3e778",
+          "sellPool": "0xec558e484cc9f2210714e345298fdc53b253c27d",
+          "verifiedCandidates": 0,
+          "verification": "NOT_VERIFIED"
+        },
+        {
+          "market": "VIRTUAL/WETH",
+          "status": "DISCOVERY_ONLY",
+          "sourceCoverage": "TWO_TOKEN_SEARCH",
+          "eligiblePools": 6,
+          "eligibleDexes": 2,
+          "indicatedSpreadBps": 67.981,
+          "buyDex": "uniswap",
+          "sellDex": "aerodrome",
+          "buyPool": "0x9c087eb773291e50cf6c6a90ef0f4500e349b903",
+          "sellPool": "0x21594b992f68495dd28d605834b58889d0a727c7",
+          "verifiedCandidates": 0,
+          "verification": "NOT_VERIFIED"
+        },
+        {
+          "market": "WETH/USDT",
+          "status": "NO_ELIGIBLE_POOLS_IN_SOURCE",
+          "sourceCoverage": "TWO_TOKEN_SEARCH",
+          "eligiblePools": 0,
+          "eligibleDexes": 0,
+          "indicatedSpreadBps": null,
+          "buyDex": null,
+          "sellDex": null,
+          "buyPool": null,
+          "sellPool": null,
+          "verifiedCandidates": 0,
+          "verification": "NOT_VERIFIED"
+        },
+        {
+          "market": "USDC/USDT",
+          "status": "DISCOVERY_ONLY",
+          "sourceCoverage": "TWO_TOKEN_SEARCH",
+          "eligiblePools": 2,
+          "eligibleDexes": 2,
+          "indicatedSpreadBps": 1.0009,
+          "buyDex": "uniswap",
+          "sellDex": "quickswap",
+          "buyPool": "0xd56da2b74ba826f19015e6b7dd9dae1903e85da1",
+          "sellPool": "0xd30b9fa98713425c0302593d7f8f094be31e9710",
+          "verifiedCandidates": 0,
+          "verification": "NOT_VERIFIED"
+        }
+      ]
+    }
+  ]
 }
