@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-08T02:39:57.324Z",
+  "updatedAt": "2026-10-08T10:26:31.879Z",
   "runs": [
     {
       "generatedAt": "2026-10-07T10:09:35.396Z",
@@ -198,6 +198,52 @@
           "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
           "pinnedBlock": "52318924",
           "exactPoolMatch": false
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-08T10:26:30.805Z",
+      "pinnedBlock": "52332921",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "quickswap -> uniswap",
+          "scoutSpreadBps": 31.2642,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "pancakeswap -> uniswap",
+          "scoutSpreadBps": 28.0858,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "aerodrome -> uniswap",
+          "scoutSpreadBps": 27.8897,
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
+          "pinnedBlock": "52332921",
+          "exactPoolMatch": false
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "aerodrome -> uniswap",
+          "scoutSpreadBps": 27.3406,
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
+          "pinnedBlock": "52332921",
+          "exactPoolMatch": false
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "quickswap -> uniswap",
+          "scoutSpreadBps": 26.6078,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
         }
       ]
     }
