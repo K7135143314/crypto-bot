@@ -1,0 +1,11 @@
+import {readFile,mkdir,writeFile} from 'node:fs/promises';
+import {dirname} from 'node:path';
+import {mergeVerificationHistory} from '../dashboard/lib/verification-history.js';
+const [historyPath,reportPath,outputPath]=process.argv.slice(2);
+if(!historyPath||!reportPath||!outputPath)throw Error('Expected current history, report, and output paths');
+const previous=JSON.parse(await readFile(historyPath,'utf8'));
+const report=JSON.parse(await readFile(reportPath,'utf8'));
+const next=mergeVerificationHistory(previous,report);
+await mkdir(dirname(outputPath),{recursive:true});
+await writeFile(outputPath,JSON.stringify(next,null,2)+'\n');
+console.log('Central read-only verification history: '+next.runs.length+' saved runs');
