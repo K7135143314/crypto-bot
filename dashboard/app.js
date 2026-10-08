@@ -1080,6 +1080,19 @@ function escapeMarketText(value) {
   }[char]));
 }
 
+async function refreshMarketHistory() {
+  try {
+    const response = await fetch('/api/market-history?t=' + Date.now(), { cache:'no-store' });
+    const data = await response.json();
+    if (!response.ok || !data.ok || !Array.isArray(data.runs)) throw new Error(data.error || 'History unavailable');
+    const latest = data.runs[data.runs.length - 1];
+    setText('marketHistoryStatus', data.runs.length === 0
+      ? 'Central history ready; awaiting first scheduled six-market scan'
+      : data.runs.length + ' centrally saved six-market snapshots · last ' +
+        new Date(latest.generatedAt).toLocaleString() + ' · all opportunities unverified');
+  } catch (error) { setText('marketHistoryStatus', 'Central market history unavailable: '+String(error)); }
+}
+
 async function refreshMarketWatch() {
   const node = el('marketWatchList');
   if (!node) return;
@@ -1126,12 +1139,14 @@ refreshIntelligence();
 refresh();
 refreshScout();
 refreshMarketWatch();
+refreshMarketHistory();
 
 setInterval(refresh, refreshMs);
 setInterval(refreshCentralHistory, 60000);
 setInterval(refreshIntelligence, 60000);
 setInterval(refreshScout, 60000);
 setInterval(refreshMarketWatch, 60000);
+setInterval(refreshMarketHistory, 60000);
 
 setInterval(() => {
   seconds = seconds <= 1 ? 20 : seconds - 1;
