@@ -52,10 +52,12 @@ export type ExactPoolMatch = {
   feeTier?: number;
 };
 
-async function resolveExactPool(
+export async function resolveExactPool(
   dex: SupportedDex,
   scoutPairAddress: string,
   blockNumber: bigint,
+  tokenA: Address = TOKENS.WETH.address,
+  tokenB: Address = TOKENS.USDC.address,
 ): Promise<ExactPoolMatch | null> {
   const scoutAddress = getAddress(scoutPairAddress);
 
@@ -64,7 +66,7 @@ async function resolveExactPool(
       address: CONTRACTS.aerodromePoolFactory,
       abi: aerodromeFactoryAbi,
       functionName: 'getPool',
-      args: [TOKENS.WETH.address, TOKENS.USDC.address, false],
+      args: [tokenA, tokenB, false],
       blockNumber,
     });
 
@@ -78,7 +80,7 @@ async function resolveExactPool(
       address: UNISWAP_V3_FACTORY,
       abi: uniswapFactoryAbi,
       functionName: 'getPool',
-      args: [TOKENS.WETH.address, TOKENS.USDC.address, fee],
+      args: [tokenA, tokenB, fee],
       blockNumber,
     });
 
@@ -118,7 +120,7 @@ async function quoteAerodrome(
   return amountOut;
 }
 
-async function quoteUniswap(
+export async function quoteUniswap(
   tokenIn: Address,
   tokenOut: Address,
   amountIn: bigint,
@@ -144,7 +146,7 @@ async function quoteUniswap(
   return amountOut;
 }
 
-async function quoteDex(
+export async function quoteDex(
   pool: ExactPoolMatch,
   tokenIn: Address,
   tokenOut: Address,
