@@ -1,12 +1,18 @@
 name: Six-market quote verifier
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/six-market-verifier.yml
+      - src/six-market-verifier.ts
+      - src/scout-verifier.ts
   schedule:
     - cron: '42 * * * *'
 permissions:
   contents: write
 concurrency:
-  group: six-market-quote-verifier
+  group: six-market-snapshot-writes
   cancel-in-progress: false
 jobs:
   verify:
