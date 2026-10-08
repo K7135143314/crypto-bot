@@ -1,12 +1,18 @@
 name: Six-market observation collector
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/six-market-collector.yml
+      - dashboard/lib/market-watch.js
+      - src/collect-six-markets.mjs
   schedule:
     - cron: '27 * * * *'
 permissions:
   contents: write
 concurrency:
-  group: six-market-observer
+  group: six-market-snapshot-writes
   cancel-in-progress: false
 jobs:
   collect:
