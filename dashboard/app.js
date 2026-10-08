@@ -1128,6 +1128,61 @@ async function refreshMarketWatch() {
   }
 }
 
+async function refreshSixVerification(){
+ const node=el('sixVerifierResults');
+ if(!node)return;
+ try{
+  const response=await fetch('/api/verification-history?t='+Date.now(),{cache:'no-store'});
+  const data=await response.json();
+  if(!response.ok||!data.ok||!Array.isArray(data.runs))throw Error(data.error||'Unavailable');
+  if(!data.runs.length){setText('sixVerifierStatus','Waiting for first centrally saved quote verification');node.textContent='No results recorded yet.';return;}
+  const last=data.runs[data.runs.length-1];
+  setText('sixVerifierStatus',data.runs.length+' saved verifier runs · Last quote: '+new Date(last.generatedAt).toLocaleString()+' · Base block '+last.pinnedBlock);
+  node.replaceChildren();
+  for(const outcome of last.results||[]){
+   const item=document.createElement('div');
+   item.className='intelligenceRow';
+   const heading=document.createElement('div');
+   heading.className='intelligenceRoute';
+   heading.textContent=outcome.market+' · '+(outcome.buyDex||'—')+' → '+(outcome.sellDex||'—');
+   const value=document.createElement('div');
+   value.className='intelligenceValue';
+   value.textContent=outcome.bestEstimatedNetUsdc===null?'—':'
+el('legacyExportBtn')?.addEventListener('click', exportLegacyHistory);
+window.addEventListener('resize', drawCharts);
+
+updateLegacyExportControl();
+
+refreshCentralHistory();
+refreshIntelligence();
+refresh();
+refreshScout();
+refreshMarketWatch();
+refreshMarketHistory();
+refreshSixVerification();
+
+setInterval(refresh, refreshMs);
+setInterval(refreshCentralHistory, 60000);
+setInterval(refreshIntelligence, 60000);
+setInterval(refreshScout, 60000);
+setInterval(refreshMarketWatch, 60000);
+setInterval(refreshMarketHistory, 60000);
+setInterval(refreshSixVerification, 60000);
+
+setInterval(() => {
+  seconds = seconds <= 1 ? 20 : seconds - 1;
+  setText('countdown', 'Refresh in ' + seconds + 's');
+}, 1000);
++outcome.bestEstimatedNetUsdc+' estimated';
+   const status=document.createElement('span');
+   status.className='pill watch';
+   status.textContent=outcome.status+' · '+outcome.atomicSimulation;
+   item.append(heading,value,status);
+   node.appendChild(item);
+  }
+ }catch(error){setText('sixVerifierStatus','Verifier history unavailable: '+String(error));node.textContent='No verified results available.';}
+}
+
 el('scanBtn').addEventListener('click', refresh);
 el('legacyExportBtn')?.addEventListener('click', exportLegacyHistory);
 window.addEventListener('resize', drawCharts);
