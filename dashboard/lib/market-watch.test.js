@@ -12,6 +12,7 @@ test('six approved Base pairs are configured and unique', () => {
   assert.deepEqual(MARKETS.map((m) => m.key),
     ['WETH/USDC','AERO/USDC','cbBTC/USDC','VIRTUAL/WETH','WETH/USDT','USDC/USDT']);
   assert.equal(new Set(MARKETS.map((m) => m.key)).size, 6);
+  assert.equal(TOKENS.VIRTUAL, '0x0b3e328455c4059eeb9e3f84b5543f74e24e7e1b');
 });
 test('only exact token contracts, Base and liquid pools count', () => {
   const rows = [pool('uni',a,3000), pool('aero',b,3030),
