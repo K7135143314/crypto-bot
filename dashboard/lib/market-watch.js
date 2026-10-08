@@ -83,7 +83,7 @@ export function evaluateMarket(market, pairs, observedAt, policy = POLICY) {
   leads.sort((a, b) => b.indicatedSpreadBps - a.indicatedSpreadBps);
   return {
     market: market.key, observedAt, chain: 'Base', status:
-      pools.length === 0 ? 'NO_ELIGIBLE_POOLS' :
+      pools.length === 0 ? 'NO_ELIGIBLE_POOLS_IN_SOURCE' :
       exchanges.size < 2 ? 'INSUFFICIENT_DEX_COVERAGE' : 'DISCOVERY_ONLY',
     eligiblePools: pools.length, eligibleDexes: exchanges.size,
     sourcePairCount: Array.isArray(pairs) ? pairs.length : 0,
@@ -105,22 +105,32 @@ export async function fetchTokenPairs(address, fetchImpl = fetch) {
 }
 
 export async function scanSixMarkets(fetchImpl = fetch, observedAt = new Date().toISOString()) {
-  // Fetch each token once; WETH supports two pairs. Partial failures stay explicit.
+  // A token endpoint may not return every relevant pool. Search both tokens
+  // for each requested pair, then deduplicate exact pool addresses.
+  const tokens = [...new Set(MARKETS.flatMap((market) => [market.base, market.quote]))];
   const fetched = new Map();
+  for (const token of tokens) {
+    try { fetched.set(token, { pairs: await fetchTokenPairs(token, fetchImpl) }); }
+    catch (error) { fetched.set(token, { error: String(error) }); }
+  }
   const results = [];
   for (const market of MARKETS) {
-    if (!fetched.has(market.base)) {
-      try { fetched.set(market.base, { pairs: await fetchTokenPairs(market.base, fetchImpl) }); }
-      catch (error) { fetched.set(market.base, { error: String(error) }); }
+    const left = fetched.get(market.base), right = fetched.get(market.quote);
+    // One successful token lookup is still usable, but source coverage is partial.
+    const records = [left, right].filter((record) => Array.isArray(record?.pairs));
+    const allPairs = records.flatMap((record) => record.pairs);
+    const data = evaluateMarket(market, allPairs, observedAt);
+    data.sourceCoverage = records.length === 2 ? 'TWO_TOKEN_SEARCH' :
+      records.length === 1 ? 'PARTIAL_SOURCE' : 'SOURCE_ERROR';
+    if (records.length === 0) {
+      data.status = 'SOURCE_ERROR';
+      data.best = null;
+      data.topLeads = [];
+      data.reason = [left.error, right.error].join(' | ');
+    } else if (records.length === 1) {
+      data.reason = 'One token search failed; results may omit eligible pools.';
     }
-    const result = fetched.get(market.base);
-    if (result.error) {
-      results.push({ market: market.key, observedAt, chain: 'Base', status: 'SOURCE_ERROR',
-        reason: result.error, eligiblePools: 0, eligibleDexes: 0, sourcePairCount: 0,
-        best: null, topLeads: [], verifiedCandidates: 0, verification: 'NOT_VERIFIED' });
-    } else {
-      results.push(evaluateMarket(market, result.pairs, observedAt));
-    }
+    results.push(data);
   }
   return { version: 1, source: 'DEX Screener', chain: 'Base',
     readOnly: true, executionAuthorized: false, generatedAt: observedAt,
