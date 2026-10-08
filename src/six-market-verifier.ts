@@ -4,7 +4,7 @@ import { TOKENS, TRADE_SIZES_USDC, PROFIT_POLICY, CONTRACTS } from './config.js'
 import { aaveV3PoolAbi } from './abis.js';
 import { normalizeScoutDex, resolveExactPool, quoteDex } from './scout-verifier.js';
 import { evaluateOpportunity } from './profit.js';
-import { scanSixMarkets } from '../dashboard/lib/market-watch.js';
+import { fetchScoutOpportunities } from './scout-verifier.js';
 
 const AERO = getAddress('0x940181a94a35a4569e4529a3cdfb74e38fd98631');
 const SUPPORTED = {
@@ -65,7 +65,8 @@ export async function verifyMarketLead(market:string,lead:MarketLead,blockNumber
 }
 export async function runSixMarketVerifier(){
   const blockNumber=await client.getBlockNumber();
-  const report=await scanSixMarkets();
+  const opportunities=await fetchScoutOpportunities();
+  const report={markets:[{market:'WETH/USDC',topLeads:opportunities.map(o=>({buyDex:o.buyDex,sellDex:o.sellDex,buyPool:o.buyPairAddress,sellPool:o.sellPairAddress,indicatedSpreadBps:o.indicatedSpreadBps,status:o.status}))},{market:'AERO/USDC',topLeads:[]}]};
   let shared:SharedCosts={gasPriceWei:0n,premiumBps:0n,ethPriceUsdcMicros:0n};
   let referenceError='';
   try{
