@@ -10,7 +10,7 @@
     "scan": "tsx src/index.ts",
     "compare": "tsx src/compare-scans.ts",
     "history": "tsx src/analyze-history.ts",
-    "test": "tsx --test src/profit.test.ts src/history.test.ts src/rolling-history.test.ts src/paper.test.ts src/atomic-preflight.test.ts src/scout.test.ts src/scout-verifier.test.ts",
+    "test": "tsx --test src/profit.test.ts src/history.test.ts src/rolling-history.test.ts src/paper.test.ts src/atomic-preflight.test.ts src/scout.test.ts src/scout-verifier.test.ts src/six-market-verifier.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "proof:candidate": "tsx src/candidate-proof.ts",
     "paper": "tsx src/analyze-paper-persistence.ts",
@@ -20,7 +20,8 @@
     "scout": "tsx src/scout-cli.ts",
     "verify:scout": "tsx src/scout-verifier-cli.ts",
     "central-history": "tsx src/update-central-history.ts",
-    "intelligence-history": "tsx src/update-intelligence-history.ts"
+    "intelligence-history": "tsx src/update-intelligence-history.ts",
+    "verify:six": "tsx src/six-market-verifier-cli.ts"
   },
   "dependencies": {
     "viem": "^2.38.0"
