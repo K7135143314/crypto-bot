@@ -30,8 +30,10 @@ jobs:
           node --check dashboard/app.js
           node --check dashboard/api/scout.js
           node --check dashboard/api/markets.js
+          node --check dashboard/api/market-history.js
           node --check dashboard/lib/market-watch.js
-          node --test dashboard/lib/market-watch.test.js dashboard/lib/market-history.test.js\n          node --check src/collect-six-markets.mjs
+          node --test dashboard/lib/market-watch.test.js dashboard/lib/market-history.test.js
+          node --check src/collect-six-markets.mjs
       - run: npm test
       - name: Generate V0.8 pinned scanner plan
         env:
