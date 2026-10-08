@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import type { QuoteDeps } from './six-market-verifier.js';
 import { chooseLeads, supportedMarket, verifyMarketLead } from './six-market-verifier.js';
 const lead={buyDex:'uniswap',sellDex:'aerodrome',buyPool:'0x'+'a'.repeat(40),
 sellPool:'0x'+'b'.repeat(40),indicatedSpreadBps:100,status:'SHORTLIST'};
@@ -25,8 +26,8 @@ test('unsupported exact pool produces no quote profit',async()=>{
 });
 test('two real legs must be quoted at same block and yield costs',async()=>{
  let matched=0,quoted=0;
- const deps={
- match:async()=>{matched++;return {dex:'aerodrome',pairAddress:'0x'+'c'.repeat(40)};},
+ const deps: QuoteDeps={
+ match:async()=>{matched++;return {dex:'aerodrome',pairAddress:('0x'+'c'.repeat(40)) as `0x${string}`};},
  quote:async(_pool,_in,_out,amount,block)=>{assert.equal(block,123n);quoted++;return amount;},
  };
  const result=await verifyMarketLead('AERO/USDC',lead,123n,costs,deps);
