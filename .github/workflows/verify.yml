@@ -31,6 +31,9 @@ jobs:
           node --check dashboard/api/scout.js
           node --check dashboard/api/markets.js
           node --check dashboard/api/market-history.js
+          node --check dashboard/api/verification-history.js
+          node --test dashboard/lib/verification-history.test.js
+          node --check src/save-six-verification.mjs
           node --check dashboard/lib/market-watch.js
           node --test dashboard/lib/market-watch.test.js dashboard/lib/market-history.test.js
           node --check src/collect-six-markets.mjs
