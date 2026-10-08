@@ -1073,6 +1073,61 @@ async function refresh() {
   }
 }
 
+
+function escapeMarketText(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[char]));
+}
+
+async function refreshMarketHistory() {
+  try {
+    const response = await fetch('/api/market-history?t=' + Date.now(), { cache:'no-store' });
+    const data = await response.json();
+    if (!response.ok || !data.ok || !Array.isArray(data.runs)) throw new Error(data.error || 'History unavailable');
+    const latest = data.runs[data.runs.length - 1];
+    setText('marketHistoryStatus', data.runs.length === 0
+      ? 'Central history ready; awaiting first scheduled six-market scan'
+      : data.runs.length + ' centrally saved six-market snapshots · last ' +
+        new Date(latest.generatedAt).toLocaleString() + ' · all opportunities unverified');
+  } catch (error) { setText('marketHistoryStatus', 'Central market history unavailable: '+String(error)); }
+}
+
+async function refreshMarketWatch() {
+  const node = el('marketWatchList');
+  if (!node) return;
+  try {
+    const response = await fetch('/api/markets?t=' + Date.now(), { cache: 'no-store' });
+    const payload = await response.json();
+    if (!response.ok || !payload.ok || !Array.isArray(payload.markets) || payload.markets.length !== 6) {
+      throw new Error(payload.error || 'Incomplete six-market report');
+    }
+    node.replaceChildren();
+    for (const market of payload.markets) {
+      const item = document.createElement('div');
+      item.className = 'marketWatchRow';
+      const best = market.best;
+      const status = best
+        ? best.status + ' · NOT VERIFIED'
+        : market.status.replaceAll('_', ' ');
+      item.innerHTML =
+        '<strong>' + escapeMarketText(market.market) + '</strong>' +
+        '<span>' + escapeMarketText(market.eligiblePools) + ' pools · ' +
+          escapeMarketText(market.eligibleDexes) + ' exchanges</span>' +
+        '<strong>' + (best ? Number(best.indicatedSpreadBps).toFixed(2) + ' bps' : '—') + '</strong>' +
+        '<span>' + escapeMarketText(best ? best.buyDex + ' → ' + best.sellDex : status) + '</span>' +
+        '<small>' + escapeMarketText(best ? status : 'No verifiable cross-DEX discovery') + '</small>';
+      node.appendChild(item);
+    }
+    setText('marketWatchUpdated',
+      'Discovery refreshed ' + new Date(payload.generatedAt).toLocaleString() +
+      ' · indicative spreads only · 0 execution-verified candidates claimed');
+  } catch (error) {
+    setText('marketWatchUpdated', 'Six-market radar unavailable: ' + String(error));
+    node.textContent = 'No current market research available. Previous readings are not being presented as live.';
+  }
+}
+
 el('scanBtn').addEventListener('click', refresh);
 el('legacyExportBtn')?.addEventListener('click', exportLegacyHistory);
 window.addEventListener('resize', drawCharts);
@@ -1083,11 +1138,15 @@ refreshCentralHistory();
 refreshIntelligence();
 refresh();
 refreshScout();
+refreshMarketWatch();
+refreshMarketHistory();
 
 setInterval(refresh, refreshMs);
 setInterval(refreshCentralHistory, 60000);
 setInterval(refreshIntelligence, 60000);
 setInterval(refreshScout, 60000);
+setInterval(refreshMarketWatch, 60000);
+setInterval(refreshMarketHistory, 60000);
 
 setInterval(() => {
   seconds = seconds <= 1 ? 20 : seconds - 1;
