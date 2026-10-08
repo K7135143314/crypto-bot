@@ -1,0 +1,48 @@
+name: Six-market quote verifier
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '42 * * * *'
+permissions:
+  contents: write
+concurrency:
+  group: six-market-quote-verifier
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - name: Read-only pinned Base block verification
+        run: npm run verify:six
+      - name: Save quote-verifier history
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin observer-data
+          mkdir -p artifacts/central
+          git show origin/observer-data:data/verification.json > artifacts/central/verification.json
+          node src/save-six-verification.mjs artifacts/central/verification.json artifacts/six-market-verification.json artifacts/central/verification.next.json
+          git switch --detach origin/observer-data
+          cp "$GITHUB_WORKSPACE/artifacts/central/verification.next.json" data/verification.json
+          git add data/verification.json
+          if git diff --cached --quiet; then
+            echo "Verification history already up to date"
+          else
+            git commit -m "Update read-only six-market verification history"
+            git push origin HEAD:observer-data
+          fi
+      - name: Upload quote-verifier report
+        uses: actions/upload-artifact@v4
+        with:
+          name: six-market-verification-${{ github.run_number }}
+          path: artifacts/six-market-verification.json
+          if-no-files-found: error
+          retention-days: 30
