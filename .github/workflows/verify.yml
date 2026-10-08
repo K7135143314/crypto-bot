@@ -29,6 +29,9 @@ jobs:
         run: |
           node --check dashboard/app.js
           node --check dashboard/api/scout.js
+          node --check dashboard/api/markets.js
+          node --check dashboard/lib/market-watch.js
+          node --test dashboard/lib/market-watch.test.js
       - run: npm test
       - name: Generate V0.8 pinned scanner plan
         env:
