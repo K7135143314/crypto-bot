@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-11T05:38:00.485Z",
+  "updatedAt": "2026-10-11T12:40:56.782Z",
   "runs": [
     {
       "generatedAt": "2026-10-07T10:09:35.396Z",
@@ -820,6 +820,48 @@
           "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
           "pinnedBlock": "52453865",
           "exactPoolMatch": false
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-11T12:40:55.988Z",
+      "pinnedBlock": "52466554",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "uniswap -> aerodrome",
+          "scoutSpreadBps": 4.2346,
+          "status": "NOT_SHORTLISTED",
+          "reason": "Scout lead did not clear the discovery shortlist threshold."
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "uniswap -> aerodrome",
+          "scoutSpreadBps": 3.6353,
+          "status": "NOT_SHORTLISTED",
+          "reason": "Scout lead did not clear the discovery shortlist threshold."
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "uniswap -> pancakeswap",
+          "scoutSpreadBps": 3.4636,
+          "status": "NOT_SHORTLISTED",
+          "reason": "Scout lead did not clear the discovery shortlist threshold."
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "uniswap -> aerodrome",
+          "scoutSpreadBps": 3.3954,
+          "status": "NOT_SHORTLISTED",
+          "reason": "Scout lead did not clear the discovery shortlist threshold."
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "aerodrome -> uniswap",
+          "scoutSpreadBps": 2.9159,
+          "status": "NOT_SHORTLISTED",
+          "reason": "Scout lead did not clear the discovery shortlist threshold."
         }
       ]
     }
