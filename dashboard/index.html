@@ -30,6 +30,13 @@
   <div id="error" class="err"></div>
   <div id="candidateAlert" class="candidateAlert">⚡ PROFIT CANDIDATE DETECTED — review before any simulation.</div>
 
+  <section class="panel coveragePanel" aria-label="Scheduled collection health">
+    <div class="panelHead"><div><div class="eyebrow">DATA RELIABILITY</div><h2>Scheduled Collection Health</h2></div><span class="pill watch">READ ONLY</span></div>
+    <p id="coverageUpdated" class="scoutNote">Checking four shared research histories…</p>
+    <div id="coverageList" class="coverageList"><p class="subtle">Loading coverage…</p></div>
+    <p class="scoutNote">Coverage is the number of UTC hours containing a saved observation over the latest 24 hour-buckets, not proof GitHub ran every hour. Recovered browser history is excluded from scheduled coverage and trading-hour averages.</p>
+  </section>
+
   <section class="kpis">
     <article class="card"><span>Candidates</span><strong id="candidates">—</strong><small>routes clearing current gates</small></article>
     <article class="card"><span>Route Matrix</span><strong id="matrixCount">—</strong><small>live route quotes complete</small></article>
@@ -66,13 +73,13 @@
 
       <article class="panel">
         <div class="panelHead">
-          <div><div class="eyebrow">TIME-OF-DAY ANALYTICS</div><h2>Average Best Net by Central-Time Hour</h2></div>
+          <div><div class="eyebrow">TIME-OF-DAY ANALYTICS</div><h2>Average Scheduled-Scan Net by Central-Time Hour</h2></div>
           <div id="hourlyBest" class="delta">Building hourly history…</div>
         </div>
         <canvas id="hourlyChart" class="chartCanvas hourlyCanvas"></canvas>
         <div class="legend">
           <span><b class="sw hourly"></b>average best estimated net</span>
-          <span id="hourlyCoverage">30-day central rollup • Central Time</span>
+          <span id="hourlyCoverage">30-day scheduled scans • Central Time</span>
           <span id="hourlyPositive">No hourly average yet</span>
         </div>
       </article>
