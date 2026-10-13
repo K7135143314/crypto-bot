@@ -9,9 +9,19 @@ import { scanSixMarkets } from '../dashboard/lib/market-watch.js';
 
 const AERO = getAddress('0x940181a94a35a4569e4529a3cdfb74e38fd98631');
 const SUPPORTED = {
-  'WETH/USDC': { token:TOKENS.WETH.address, decimals:18 },
+  'WETH/USDC': { token:TOKENS.WETH.address, decimals:TOKENS.WETH.decimals },
   'AERO/USDC': { token:AERO, decimals:18 },
+  'cbBTC/USDC': { token:TOKENS.cbBTC.address, decimals:TOKENS.cbBTC.decimals },
 } as const;
+
+// Fail closed on unknown cbBTC metadata, rather than silently treating satoshis as wei.
+const erc20DecimalsAbi = [{
+  type: 'function', name: 'decimals', stateMutability: 'view',
+  inputs: [], outputs: [{name: '', type: 'uint8'}],
+}] as const;
+export function checkTokenDecimals(actual: number, expected: number): boolean {
+  return Number.isInteger(actual) && actual === expected;
+}
 export type MarketKey = keyof typeof SUPPORTED;
 export type MarketLead = {
   buyDex:string;sellDex:string;buyPool:string;sellPool:string;indicatedSpreadBps:number;status:string;
@@ -76,8 +86,10 @@ export async function verifyMarketLead(market:string,lead:MarketLead,blockNumber
         const result=evaluateOpportunity({startUsdc:input,grossProfitUsdc:final-input,
           gasPriceWei:shared.gasPriceWei,ethPriceUsdcMicros:shared.ethPriceUsdcMicros,
           policy:{...PROFIT_POLICY,flashLoanPremiumBps:shared.premiumBps}});
-        rows.push({sizeUsdc:size,finalUsdc:formatUnits(final,6),
-          estimatedNetUsdc:formatUnits(result.estimatedNetProfitUsdc,6),decision:result.decision});
+        rows.push({sizeUsdc:size,receivedBaseToken:formatUnits(received,SUPPORTED[market].decimals),
+          baseTokenDecimals:SUPPORTED[market].decimals,finalUsdc:formatUnits(final,TOKENS.USDC.decimals),
+          estimatedNetUsdc:formatUnits(result.estimatedNetProfitUsdc,TOKENS.USDC.decimals),
+          decision:result.decision});
       }catch(error){rows.push({sizeUsdc:size,decision:'QUOTE_ERROR',reason:String(error)});}
     }
     const valid=rows.filter(r=>r.estimatedNetUsdc!==undefined);
@@ -94,6 +106,21 @@ export async function runSixMarketVerifier(){
   const report=await scanSixMarkets() as {markets:Array<{market:string,topLeads:MarketLead[];verificationLeads?:MarketLead[]}>};
   let shared:SharedCosts={gasPriceWei:0n,premiumBps:0n,ethPriceUsdcMicros:0n};
   let referenceError='';
+  // Verify the chain's actual cbBTC decimals at the pinned block. Even if the
+  // symbol/contract address is correct, unexpected metadata blocks cbBTC quotes.
+  let cbBtcDecimalsError = '';
+  try {
+    const reportedDecimals = await client.readContract({
+      address: TOKENS.cbBTC.address, abi: erc20DecimalsAbi,
+      functionName: 'decimals', blockNumber,
+    });
+    if (!checkTokenDecimals(reportedDecimals, TOKENS.cbBTC.decimals)) {
+      cbBtcDecimalsError = 'cbBTC token decimals mismatch: expected ' +
+        TOKENS.cbBTC.decimals + ', got ' + reportedDecimals;
+    }
+  } catch (error) {
+    cbBtcDecimalsError = 'cbBTC token decimals unavailable: ' + String(error);
+  }
   try{
     const [gasPriceWei,premiumBps,quotes]=await Promise.all([
       client.getGasPrice(),
@@ -107,6 +134,11 @@ export async function runSixMarketVerifier(){
   const results=[];
   for(const market of report.markets){
     if(!supportedMarket(market.market)){results.push({market:market.market,status:'UNSUPPORTED_MARKET',reason:'Non-USDC cost/quote adapter pending.',atomicSimulation:'NOT_RUN'});continue;}
+    if (market.market === 'cbBTC/USDC' && cbBtcDecimalsError) {
+      results.push({market:market.market,status:'TOKEN_METADATA_UNVERIFIED',
+        reason:cbBtcDecimalsError,atomicSimulation:'NOT_RUN'});
+      continue;
+    }
     const leads=chooseLeads(market);
     if(!leads.length){results.push({market:market.market,status:'NO_SHORTLIST',reason:'No eligible shortlists.',atomicSimulation:'NOT_RUN'});continue;}
     for(const lead of leads)results.push(await verifyMarketLead(market.market,lead,blockNumber,shared));
@@ -115,7 +147,7 @@ export async function runSixMarketVerifier(){
   const quoteCheckedCount=ranked.filter(r=>r.status==='QUOTE_REJECT'||r.status==='QUOTE_CANDIDATE').length;
   const quoteCandidateCount=ranked.filter(r=>r.status==='QUOTE_CANDIDATE').length;
   return {version:2,generatedAt:new Date().toISOString(),pinnedBlock:blockNumber.toString(),
-    readOnly:true,executionAuthorized:false,referenceError,results:ranked,
+    readOnly:true,executionAuthorized:false,referenceError,cbBtcDecimalsError,results:ranked,
     quoteCheckedCount,quoteCandidateCount,
     note:'Ranked by on-chain quote net USDC where available. Unsupported is NOT a loss. Atomic simulation not run.'};
 }
