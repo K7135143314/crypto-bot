@@ -8,7 +8,8 @@ on:
       - src/six-market-verifier.ts
       - src/scout-verifier.ts
   schedule:
-    - cron: '42 * * * *'
+    # Independent, best-effort verification; no live transaction execution.
+    - cron: '12,42 * * * *'
 permissions:
   contents: write
 concurrency:
