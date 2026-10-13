@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { normalizeScoutDex, quoteDex, verifyScoutOpportunity } from './scout-verifier.js';
+import { classicPoolMatch, classicStableFlag, normalizeScoutDex, quoteDex, verifyScoutOpportunity } from './scout-verifier.js';
 
 test('normalizes only proven verifier adapters', () => {
   assert.equal(normalizeScoutDex('uniswap'), 'uniswap');
@@ -44,4 +44,16 @@ test('unapproved Aerodrome variant is never quoted by Classic router', async () 
       ('0x'+'c'.repeat(40)) as `0x${string}`,100n,123n),
     /Unapproved Aerodrome pool variant/,
   );
+});
+
+test('Classic stable factory match preserves stable flag for routing',()=>{
+ const address=('0x'+'a'.repeat(40)) as `0x${string}`;
+ const stable=classicPoolMatch(address,address,true);
+ assert.ok(stable);
+ assert.equal(stable.variant,'AERODROME_CLASSIC');
+ assert.equal(classicStableFlag(stable),true);
+ const volatile=classicPoolMatch(address,address,false);
+ assert.ok(volatile);
+ assert.equal(classicStableFlag(volatile),false);
+ assert.equal(classicPoolMatch(('0x'+'b'.repeat(40)) as `0x${string}`,address,true),null);
 });
