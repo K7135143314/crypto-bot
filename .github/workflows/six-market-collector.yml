@@ -8,7 +8,8 @@ on:
       - dashboard/lib/market-watch.js
       - src/collect-six-markets.mjs
   schedule:
-    - cron: '27 * * * *'
+    # Two staggered attempts; only actual on-chain observations are saved.
+    - cron: '27,57 * * * *'
 permissions:
   contents: write
 concurrency:
