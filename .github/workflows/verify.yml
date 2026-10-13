@@ -37,7 +37,7 @@ jobs:
           };
           for (const [file, minutes] of Object.entries(expected)) {
             const content = fs.readFileSync('.github/workflows/' + file, 'utf8');
-            if (!content.includes("cron: '" + minutes + ' * * * *'")) {
+            if (!content.includes(`cron: '${minutes} * * * *'`)) {
               throw new Error('Observer cadence mismatch: ' + file);
             }
             if (!content.includes('cancel-in-progress: false')) {
