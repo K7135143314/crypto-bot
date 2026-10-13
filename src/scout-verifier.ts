@@ -6,6 +6,7 @@ import {
   TOKENS,
   TRADE_SIZES_USDC,
   UNISWAP_V3_FEES,
+  AERODROME_SLIPSTREAM_CL_FACTORIES,
 } from './config.js';
 import { evaluateOpportunity } from './profit.js';
 import { buildScoutReport, type ScoutConfig, type ScoutOpportunity } from './scout.js';
@@ -46,10 +47,38 @@ export function normalizeScoutDex(dexId: string): SupportedDex | null {
   return null;
 }
 
+const slipstreamPoolAbi = [{
+  type: 'function', name: 'tickSpacing', stateMutability: 'view',
+  inputs: [], outputs: [{type: 'int24', name: ''}],
+}] as const;
+const slipstreamFactoryAbi = [{
+  type: 'function', name: 'getPool', stateMutability: 'view',
+  inputs: [
+    {name:'tokenA',type:'address'}, {name:'tokenB',type:'address'},
+    {name:'tickSpacing',type:'int24'},
+  ], outputs:[{name:'pool',type:'address'}],
+}] as const;
+const slipstreamQuoterAbi = [{
+  type: 'function', name: 'quoteExactInputSingle', stateMutability: 'nonpayable',
+  inputs: [{name:'params',type:'tuple',components:[
+    {name:'tokenIn',type:'address'}, {name:'tokenOut',type:'address'},
+    {name:'amountIn',type:'uint256'}, {name:'tickSpacing',type:'int24'},
+    {name:'sqrtPriceLimitX96',type:'uint160'},
+  ]}],
+  outputs: [
+    {name:'amountOut',type:'uint256'},
+    {name:'sqrtPriceX96After',type:'uint160'},
+    {name:'initializedTicksCrossed',type:'uint32'},
+    {name:'gasEstimate',type:'uint256'},
+  ],
+}] as const;
+
 export type ExactPoolMatch = {
   dex: SupportedDex;
   pairAddress: Address;
   feeTier?: number;
+  variant?: 'AERODROME_CLASSIC' | 'AERODROME_SLIPSTREAM_V1';
+  tickSpacing?: number;
 };
 
 export async function resolveExactPool(
@@ -70,9 +99,38 @@ export async function resolveExactPool(
       blockNumber,
     });
 
-    return getAddress(pool) === scoutAddress
-      ? { dex, pairAddress: scoutAddress }
-      : null;
+    if (getAddress(pool) === scoutAddress) {
+      return { dex, pairAddress: scoutAddress, variant: 'AERODROME_CLASSIC' };
+    }
+    // The pool itself supplies tick spacing; verify it against the allowed
+    // factory at this same block, never infer spacing from discovery spreads.
+    let tickSpacing: number;
+    try {
+      tickSpacing = await client.readContract({
+        address: scoutAddress, abi: slipstreamPoolAbi,
+        functionName: 'tickSpacing', blockNumber,
+      });
+    } catch {
+      return null;
+    }
+    if (!Number.isInteger(tickSpacing) || tickSpacing <= 0 || tickSpacing > 32767) return null;
+    for (const factory of AERODROME_SLIPSTREAM_CL_FACTORIES) {
+      let actual: Address;
+      try {
+        actual = await client.readContract({
+          address: factory, abi: slipstreamFactoryAbi, functionName: 'getPool',
+          args: [tokenA, tokenB, tickSpacing], blockNumber,
+        });
+      } catch { continue; }
+      if (getAddress(actual) === scoutAddress) {
+        // Other recognized factory generations lack an approved matching
+        // QuoterV2. Fail closed; never use V1 router on an unknown version.
+        if (factory !== CONTRACTS.aerodromeSlipstreamV1Factory) return null;
+        return {dex, pairAddress: scoutAddress,
+          variant: 'AERODROME_SLIPSTREAM_V1', tickSpacing};
+      }
+    }
+    return null;
   }
 
   for (const fee of UNISWAP_V3_FEES) {
@@ -154,6 +212,22 @@ export async function quoteDex(
   blockNumber: bigint,
 ): Promise<bigint> {
   if (pool.dex === 'aerodrome') {
+    if (pool.variant === 'AERODROME_SLIPSTREAM_V1') {
+      if (!pool.tickSpacing || !Number.isInteger(pool.tickSpacing)) {
+        throw new Error('Slipstream V1 match missing verified tick spacing');
+      }
+      const quoted = await client.readContract({
+        address: CONTRACTS.aerodromeSlipstreamV1Quoter,
+        abi: slipstreamQuoterAbi, functionName: 'quoteExactInputSingle',
+        args: [{tokenIn, tokenOut, amountIn, tickSpacing: pool.tickSpacing,
+          sqrtPriceLimitX96: 0n}], blockNumber,
+      });
+      if (quoted[0] <= 0n) throw new Error('Slipstream V1 returned no output');
+      return quoted[0];
+    }
+    if (pool.variant !== undefined && pool.variant !== 'AERODROME_CLASSIC') {
+      throw new Error('Unapproved Aerodrome pool variant');
+    }
     return quoteAerodrome(tokenIn, tokenOut, amountIn, blockNumber);
   }
 
