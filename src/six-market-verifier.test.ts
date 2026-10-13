@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { QuoteDeps } from './six-market-verifier.js';
-import { chooseLeads, supportedMarket, verifyMarketLead } from './six-market-verifier.js';
+import { chooseLeads, rankQuoteResults, supportedMarket, verifyMarketLead } from './six-market-verifier.js';
 const lead={buyDex:'uniswap',sellDex:'aerodrome',buyPool:'0x'+'a'.repeat(40),
 sellPool:'0x'+'b'.repeat(40),indicatedSpreadBps:100,status:'SHORTLIST'};
 const costs={gasPriceWei:1000000n,premiumBps:5n,ethPriceUsdcMicros:3000000000n};
@@ -46,4 +46,31 @@ test('bytes32 pool identifier cannot reach any on-chain adapter',async()=>{
  assert.equal(result.status,'INVALID_POOL_ADDRESS');
  assert.equal(called,false);
  assert.equal('bestEstimatedNetUsdc' in result,false);
+});
+
+test('quotable routes outrank unsupported high-spread discovery leads',()=>{
+ const unsupported={...lead,buyDex:'pancakeswap',indicatedSpreadBps:900};
+ const supported={...lead,indicatedSpreadBps:8};
+ const selected=chooseLeads({topLeads:[unsupported,supported]},1);
+ assert.equal(selected.length,1);
+ assert.equal(selected[0]?.buyDex,'uniswap');
+});
+test('verified on-chain net ranks ahead of unsupported spread and losing quotes',()=>{
+ const rows=[
+ {status:'UNSUPPORTED_DEX',indicatedSpreadBps:800},
+ {status:'QUOTE_REJECT',bestEstimatedNetUsdc:'-0.4',indicatedSpreadBps:12},
+ {status:'QUOTE_CANDIDATE',bestEstimatedNetUsdc:'1.4',indicatedSpreadBps:7},
+ {status:'QUOTE_REJECT',bestEstimatedNetUsdc:'-0.1',indicatedSpreadBps:10},
+ ];
+ const ranked=rankQuoteResults(rows);
+ assert.deepEqual(ranked.map(r=>r.status),['QUOTE_CANDIDATE','QUOTE_REJECT','QUOTE_REJECT','UNSUPPORTED_DEX']);
+ assert.equal(ranked[1]?.bestEstimatedNetUsdc,'-0.1');
+});
+test('unsupported and malformed quote results never become profit claims',()=>{
+ const ranked=rankQuoteResults([
+ {status:'UNSUPPORTED_DEX',bestEstimatedNetUsdc:'999'},
+ {status:'QUOTE_REJECT',bestEstimatedNetUsdc:'not-a-number'},
+ {status:'QUOTE_REJECT',bestEstimatedNetUsdc:'-0.3'},
+ ]);
+ assert.equal(ranked[0]?.bestEstimatedNetUsdc,'-0.3');
 });

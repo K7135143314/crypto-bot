@@ -15,6 +15,11 @@ export const MARKETS = Object.freeze([
   { key: 'WETH/USDT', base: TOKENS.WETH, quote: TOKENS.USDT },
   { key: 'USDC/USDT', base: TOKENS.USDC, quote: TOKENS.USDT },
 ]);
+// Only these DEX families have on-chain quote adapters in V1.3.
+const quoteAdapterDexes = new Set(['uniswap', 'uniswap-v3', 'aerodrome']);
+const hasTwoQuoteAdapters = (lead) =>
+  quoteAdapterDexes.has(lead.buyDex) && quoteAdapterDexes.has(lead.sellDex);
+
 export const POLICY = Object.freeze({
   minLiquidityUsd: 100000,
   minVolume24hUsd: 50000,
@@ -88,6 +93,13 @@ export function evaluateMarket(market, pairs, observedAt, policy = POLICY) {
     eligiblePools: pools.length, eligibleDexes: exchanges.size,
     sourcePairCount: Array.isArray(pairs) ? pairs.length : 0,
     best: leads[0] || null, topLeads: leads.slice(0, 3),
+    // Spread-ranked display stays unchanged. Verification examines a wider,
+    // adapter-prioritized list to avoid unsupported markets crowding out quotes.
+    verificationLeads: leads
+      .filter((lead) => lead.status === 'SHORTLIST')
+      .sort((a, b) => Number(hasTwoQuoteAdapters(b)) - Number(hasTwoQuoteAdapters(a)) ||
+        b.indicatedSpreadBps - a.indicatedSpreadBps)
+      .slice(0, 12),
     verifiedCandidates: 0, verification: 'NOT_VERIFIED',
   };
 }
@@ -126,6 +138,7 @@ export async function scanSixMarkets(fetchImpl = fetch, observedAt = new Date().
       data.status = 'SOURCE_ERROR';
       data.best = null;
       data.topLeads = [];
+      data.verificationLeads = [];
       data.reason = [left.error, right.error].join(' | ');
     } else if (records.length === 1) {
       data.reason = 'One token search failed; results may omit eligible pools.';
