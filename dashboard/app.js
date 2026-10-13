@@ -1156,8 +1156,23 @@ async function refreshSixVerification() {
     const last = data.runs[data.runs.length - 1];
     setText('sixVerifierStatus', data.runs.length + ' centrally saved runs · latest ' +
       new Date(last.generatedAt).toLocaleString() + ' · Base block ' + last.pinnedBlock);
+    const quoteResults = (last.results || []).filter((r) =>
+      ['QUOTE_CANDIDATE', 'QUOTE_REJECT'].includes(r.status) &&
+      r.bestEstimatedNetUsdc != null && Number.isFinite(Number(r.bestEstimatedNetUsdc)));
+    const ordered = [...(last.results || [])].sort((a, b) => {
+      const net = (r) => ['QUOTE_CANDIDATE', 'QUOTE_REJECT'].includes(r.status) &&
+        r.bestEstimatedNetUsdc != null && Number.isFinite(Number(r.bestEstimatedNetUsdc))
+        ? Number(r.bestEstimatedNetUsdc) : null;
+      const an = net(a), bn = net(b);
+      return an != null && bn != null ? bn - an : an != null ? -1 : bn != null ? 1 : 0;
+    });
+    const candidates = quoteResults.filter((r) => r.status === 'QUOTE_CANDIDATE');
+    setText('sixVerifierSummary', quoteResults.length + ' cost-adjusted on-chain quotes · ' +
+      candidates.length + ' research candidates · ' +
+      ((last.results || []).length - quoteResults.length) +
+      ' unverified/unsupported · atomic simulation NOT RUN. No trading.');
     node.replaceChildren();
-    for (const result of last.results || []) {
+    for (const result of ordered) {
       const item = document.createElement('div');
       item.className = 'intelligenceRow';
       const heading = document.createElement('div');
@@ -1169,7 +1184,8 @@ async function refreshSixVerification() {
       value.textContent = result.bestEstimatedNetUsdc == null ? '—' :
         'Estimated net (USDC): ' + result.bestEstimatedNetUsdc;
       const status = document.createElement('span');
-      status.className = 'pill watch';
+      status.className = 'pill ' + (result.status === 'QUOTE_CANDIDATE' ? 'candidate' :
+        result.status === 'QUOTE_REJECT' ? 'reject' : 'watch');
       status.textContent = result.status + ' · atomic ' + (result.atomicSimulation || 'NOT_RUN');
       item.append(heading, value, status);
       node.appendChild(item);
