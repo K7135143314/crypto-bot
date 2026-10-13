@@ -26,3 +26,15 @@ test('rejects any report purporting to authorize trading',()=>{
  assert.throws(()=>mergeVerificationHistory(emptyHistory(),{...source,executionAuthorized:true}));
  assert.throws(()=>mergeVerificationHistory(emptyHistory(),{...source,pinnedBlock:'not-a-block'}));
 });
+
+test('saves unmatched pool leg classification without claiming quoted profit',()=>{
+ const now=Date.parse('2026-10-08T03:00:00Z');
+ const report={...source,results:[{market:'cbBTC/USDC',status:'UNSUPPORTED_POOL_VARIANT',
+  poolDiagnosis:'BUY_POOL_UNMATCHED',
+  buyPoolMatch:null,sellPoolMatch:{variant:'UNISWAP_V3',feeTier:500}}]};
+ const row=mergeVerificationHistory(emptyHistory(),report,now).runs[0].results[0];
+ assert.equal(row.poolDiagnosis,'BUY_POOL_UNMATCHED');
+ assert.equal(row.sellPoolMatch.feeTier,500);
+ assert.equal(row.bestEstimatedNetUsdc,null);
+ assert.equal(row.atomicSimulation,'NOT_RUN');
+});
