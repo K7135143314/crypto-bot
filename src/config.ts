@@ -36,9 +36,22 @@ export const TOKENS = {
 export const CONTRACTS = {
   aerodromeRouter: getAddress('0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43') as Address,
   aerodromePoolFactory: getAddress('0x420DD381b31aEf6683db6B902084cB0FFECe40Da') as Address,
+  // Official Aerodrome initial Slipstream deployment. New CL factories require
+  // their own independently verified quoter and may not use this quoter.
+  aerodromeSlipstreamV1Factory: getAddress('0x5e7BB104d84c7CB9B682AaC2F3d509f5F406809A') as Address,
+  aerodromeSlipstreamV1Quoter: getAddress('0x254cF9E1E6e233aa1AC962CB9B05b2cfeAaE15b0') as Address,
   uniswapV3QuoterV2: getAddress('0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a') as Address,
   aaveV3Pool: getAddress('0xA238Dd80C259a72e81d7e4664a9801593F98d1c5') as Address,
 } as const;
+
+// Recognize all three observed Aerodrome Slipstream CL factory generations,
+// but only V1 has a verified QuoterV2 deployed in our approved configuration.
+// Any other CL factory remains UNVERIFIED for quoting (never assumes fees).
+export const AERODROME_SLIPSTREAM_CL_FACTORIES = [
+  CONTRACTS.aerodromeSlipstreamV1Factory,
+  getAddress('0xaDe65c38CD4849aDBA595a4323a8C7DdfE89716a') as Address,
+  getAddress('0xf8f2eB4940CFE7d13603DDDD87f123820Fc061Ef') as Address,
+] as const;
 
 export const UNISWAP_V3_FEES = [100, 500, 3000, 10000] as const;
 
