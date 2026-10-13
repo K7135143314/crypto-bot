@@ -125,3 +125,15 @@ test('cbBTC unsupported exact-pool routes never report a profit',async()=>{
  assert.equal(result.status,'UNSUPPORTED_POOL_VARIANT');
  assert.equal('bestEstimatedNetUsdc' in result,false);
 });
+
+test('partial exact pool match reports which route leg is unsupported',async()=>{
+ const deps:QuoteDeps={
+   match:async(dex)=>dex==='uniswap'?{dex:'uniswap',pairAddress:('0x'+'c'.repeat(40)) as `0x${string}`,feeTier:500}:null,
+   quote:async()=>{throw Error('should not quote unmatched route');}
+ };
+ const result=await verifyMarketLead('cbBTC/USDC',lead,54321n,costs,deps);
+ assert.equal(result.status,'UNSUPPORTED_POOL_VARIANT');
+ assert.ok('poolDiagnosis' in result && result.poolDiagnosis==='SELL_POOL_UNMATCHED');
+ assert.ok('buyPoolMatch' in result && result.buyPoolMatch?.feeTier===500);
+ assert.equal('bestEstimatedNetUsdc' in result,false);
+});
