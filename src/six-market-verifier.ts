@@ -23,6 +23,14 @@ export function checkTokenDecimals(actual: number, expected: number): boolean {
   return Number.isInteger(actual) && actual === expected;
 }
 export type MarketKey = keyof typeof SUPPORTED;
+
+// Up to seven configured trade sizes per route, always pinned to the same
+// observed Base block. This is a research quote cap, not a trade authorization.
+export const MAX_RESEARCH_TRADE_SIZES = 7;
+export function roundTripBps(startUsdc: bigint, deltaUsdc: bigint): number {
+  if (startUsdc <= 0n) throw new Error('USDC size must be positive');
+  return Number((deltaUsdc * 1_000_000n) / startUsdc) / 100;
+}
 export type MarketLead = {
   buyDex:string;sellDex:string;buyPool:string;sellPool:string;indicatedSpreadBps:number;status:string;
 };
@@ -82,7 +90,7 @@ export async function verifyMarketLead(market:string,lead:MarketLead,blockNumber
       poolDiagnosis:!first&&!second?'BOTH_POOLS_UNMATCHED':!first?'BUY_POOL_UNMATCHED':'SELL_POOL_UNMATCHED'};
     if(shared.ethPriceUsdcMicros<=0n||shared.gasPriceWei<=0n)return {...base,status:'REFERENCE_UNAVAILABLE',reason:'Independent ETH/USDC reference or gas price missing.'};
     const rows=[];
-    for(const size of TRADE_SIZES_USDC.slice(0,4)){
+    for(const size of [...new Set(TRADE_SIZES_USDC)].slice(0,MAX_RESEARCH_TRADE_SIZES)){
       try {
         const input=parseUnits(size,6);
         const received=await deps.quote(first,TOKENS.USDC.address,SUPPORTED[market].token,input,blockNumber);
@@ -92,15 +100,36 @@ export async function verifyMarketLead(market:string,lead:MarketLead,blockNumber
         const result=evaluateOpportunity({startUsdc:input,grossProfitUsdc:final-input,
           gasPriceWei:shared.gasPriceWei,ethPriceUsdcMicros:shared.ethPriceUsdcMicros,
           policy:{...PROFIT_POLICY,flashLoanPremiumBps:shared.premiumBps}});
+        const format=(amount:bigint)=>formatUnits(amount,TOKENS.USDC.decimals);
         rows.push({sizeUsdc:size,receivedBaseToken:formatUnits(received,SUPPORTED[market].decimals),
-          baseTokenDecimals:SUPPORTED[market].decimals,finalUsdc:formatUnits(final,TOKENS.USDC.decimals),
-          estimatedNetUsdc:formatUnits(result.estimatedNetProfitUsdc,TOKENS.USDC.decimals),
+          baseTokenDecimals:SUPPORTED[market].decimals,finalUsdc:format(final),
+          grossProfitUsdc:format(final-input),
+          grossReturnBps:roundTripBps(input,final-input),
+          modeledCostsUsdc:format(result.totalModeledCostsUsdc),
+          costBreakdownUsdc:{
+            flashLoanPremium:format(result.flashLoanFeeUsdc),
+            l2GasReserve:format(result.l2GasReserveUsdc),
+            l1DataFeeReserve:format(result.l1DataFeeReserveUsdc),
+            slippageReserve:format(result.slippageReserveUsdc),
+            mevReserve:format(result.mevReserveUsdc),
+          },
+          estimatedNetUsdc:format(result.estimatedNetProfitUsdc),
+          netReturnBps:roundTripBps(input,result.estimatedNetProfitUsdc),
           decision:result.decision});
       }catch(error){rows.push({sizeUsdc:size,decision:'QUOTE_ERROR',reason:String(error)});}
     }
     const valid=rows.filter(r=>r.estimatedNetUsdc!==undefined);
+    const baseline=[...valid].sort((a,b)=>Number(a.sizeUsdc)-Number(b.sizeUsdc))[0];
+    const assessedRows=rows.map(r=>({
+      ...r,
+      // Gross round-trip return deterioration versus the smallest successful
+      // size includes fees, rounding and liquidity—not pure slippage.
+      relativeQuoteDeteriorationBps:
+        baseline?.grossReturnBps!==undefined && r.grossReturnBps!==undefined
+        ? Number((baseline.grossReturnBps-r.grossReturnBps).toFixed(2)) : null,
+    }));
     if(!valid.length)return {...base,status:'QUOTE_ERROR',exactPoolMatch:true,
-      reason:'All requested quote sizes failed.',rows};
+      reason:'All requested quote sizes failed.',rows:assessedRows};
     const best=[...valid].sort((a,b)=>Number(b.estimatedNetUsdc)-Number(a.estimatedNetUsdc))[0]!;
     return {...base,exactPoolMatch:true,
       buyPoolMatch:{variant:first.variant||'UNISWAP_V3',feeTier:first.feeTier??null,
@@ -109,7 +138,10 @@ export async function verifyMarketLead(market:string,lead:MarketLead,blockNumber
         tickSpacing:second.tickSpacing??null,stable:second.stable??null},
       status:valid.some(r=>r.decision==='CANDIDATE')?'QUOTE_CANDIDATE':'QUOTE_REJECT',
       reason:'Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.',
-      bestTradeSizeUsdc:best.sizeUsdc,bestEstimatedNetUsdc:best.estimatedNetUsdc,rows};
+      bestTradeSizeUsdc:best.sizeUsdc,bestEstimatedNetUsdc:best.estimatedNetUsdc,
+      tradeSizesQuoted:valid.length,tradeSizesRequested:rows.length,
+      quoteComparisonNote:'Relative deterioration is gross round-trip return difference versus the smallest quoted size; it includes liquidity, pool fees and token rounding, not a pure price-impact estimate.',
+      rows:assessedRows};
   }catch(error){return {...base,status:'ERROR',reason:String(error)};}
 }
 export async function runSixMarketVerifier(){
