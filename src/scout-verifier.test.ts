@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { normalizeScoutDex, verifyScoutOpportunity } from './scout-verifier.js';
+import { normalizeScoutDex, quoteDex, verifyScoutOpportunity } from './scout-verifier.js';
 
 test('normalizes only proven verifier adapters', () => {
   assert.equal(normalizeScoutDex('uniswap'), 'uniswap');
@@ -25,4 +25,23 @@ test('invalid bytes32 discovery pool IDs are rejected before RPC', async () => {
   assert.equal(result.status, 'INVALID_POOL_ADDRESS');
   assert.equal(result.exactPoolMatch, false);
   assert.equal('bestEstimatedNetUsdc' in result, false);
+});
+
+test('Slipstream V1 without verified tick spacing cannot quote', async () => {
+  await assert.rejects(
+    quoteDex({dex:'aerodrome',pairAddress:('0x'+'a'.repeat(40)) as `0x${string}`,
+      variant:'AERODROME_SLIPSTREAM_V1'},
+      ('0x'+'b'.repeat(40)) as `0x${string}`,
+      ('0x'+'c'.repeat(40)) as `0x${string}`,100n,123n),
+    /missing verified tick spacing/,
+  );
+});
+test('unapproved Aerodrome variant is never quoted by Classic router', async () => {
+  await assert.rejects(
+    quoteDex({dex:'aerodrome',pairAddress:('0x'+'a'.repeat(40)) as `0x${string}`,
+      variant:'UNAPPROVED' as 'AERODROME_CLASSIC'},
+      ('0x'+'b'.repeat(40)) as `0x${string}`,
+      ('0x'+'c'.repeat(40)) as `0x${string}`,100n,123n),
+    /Unapproved Aerodrome pool variant/,
+  );
 });
