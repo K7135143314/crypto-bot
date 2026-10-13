@@ -92,6 +92,14 @@ footer span{border:1px solid #5d4c26;border-radius:999px;padding:5px 8px}
 .intelligenceValue{font-weight:800;font-variant-numeric:tabular-nums}
 @media(max-width:700px){.intelligenceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.intelligenceRow{grid-template-columns:minmax(0,1fr) auto;gap:8px}.intelligenceRow .intelligenceValue{grid-column:1/2}.intelligenceRow .pill{grid-column:2/3;grid-row:1/3;align-self:center}}
 
+ .coveragePanel{margin:12px 0 10px}
+.coverageList{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.coverageRow{display:flex;flex-direction:column;gap:8px;min-width:0;border:1px solid #17384f;border-radius:9px;background:#081724;padding:11px;font-size:12px}
+.coverageRow strong{font-size:13px;overflow-wrap:anywhere}
+.coverageRow .pill{align-self:flex-start}
+.coverageRow small{color:var(--muted);line-height:1.35;overflow-wrap:anywhere}
+@media(max-width:900px){.coverageList{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.coverageList{grid-template-columns:1fr}}
 .marketWatchList{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .marketWatchRow{background:#081724;border:1px solid #143147;border-radius:9px;padding:12px;display:grid;gap:7px;min-width:0}
 .marketWatchRow strong{font-size:15px;overflow-wrap:anywhere}
