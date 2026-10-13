@@ -36,3 +36,14 @@ test('two real legs must be quoted at same block and yield costs',async()=>{
  assert.ok(quoted>=2);
  assert.equal(result.atomicSimulation,'NOT_RUN');
 });
+
+test('bytes32 pool identifier cannot reach any on-chain adapter',async()=>{
+ let called=false;
+ const deps:QuoteDeps={match:async()=>{called=true;throw Error('unexpected RPC');},
+   quote:async()=>{called=true;throw Error('unexpected quote');}};
+ const result=await verifyMarketLead('WETH/USDC',
+   {...lead,buyPool:'0x'+'f'.repeat(64)},123n,costs,deps);
+ assert.equal(result.status,'INVALID_POOL_ADDRESS');
+ assert.equal(called,false);
+ assert.equal('bestEstimatedNetUsdc' in result,false);
+});
