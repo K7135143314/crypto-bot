@@ -29,6 +29,8 @@ jobs:
         run: |
           node --check dashboard/app.js
           node --check dashboard/api/scout.js
+          node --check dashboard/api/coverage.js
+          node --test dashboard/lib/coverage.test.js
           node --check dashboard/api/markets.js
           node --check dashboard/api/market-history.js
           node --check dashboard/api/verification-history.js
