@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { QuoteDeps } from './six-market-verifier.js';
-import { checkTokenDecimals, chooseLeads, rankQuoteResults, supportedMarket, verifyMarketLead } from './six-market-verifier.js';
+import { checkTokenDecimals, chooseLeads, rankQuoteResults, roundTripBps, MAX_RESEARCH_TRADE_SIZES, supportedMarket, verifyMarketLead } from './six-market-verifier.js';
 import { TOKENS } from './config.js';
 const lead={buyDex:'uniswap',sellDex:'aerodrome',buyPool:'0x'+'a'.repeat(40),
 sellPool:'0x'+'b'.repeat(40),indicatedSpreadBps:100,status:'SHORTLIST'};
@@ -136,4 +136,39 @@ test('partial exact pool match reports which route leg is unsupported',async()=>
  assert.ok('poolDiagnosis' in result && result.poolDiagnosis==='SELL_POOL_UNMATCHED');
  assert.ok('buyPoolMatch' in result && result.buyPoolMatch?.feeTier===500);
  assert.equal('bestEstimatedNetUsdc' in result,false);
+});
+
+test('USDC round trip basis points and seven-size cap are deterministic',()=>{
+ assert.equal(roundTripBps(100_000_000n,-250_000n),-25);
+ assert.equal(roundTripBps(250_000_000n,500_000n),20);
+ assert.equal(MAX_RESEARCH_TRADE_SIZES,7);
+ assert.throws(()=>roundTripBps(0n,0n),/positive/);
+});
+test('cbBTC research quotes preserve fee breakdown and distinct seven trade sizes',async()=>{
+ const calledSizes:string[]=[];
+ const deps:QuoteDeps={
+  match:async()=>({dex:'aerodrome',pairAddress:('0x'+'c'.repeat(40)) as `0x${string}`}),
+  quote:async(_pool,tokenIn,_tokenOut,amount,block)=>{
+   assert.equal(block,54321n);
+   if(tokenIn.toLowerCase()===TOKENS.USDC.address.toLowerCase()){
+     calledSizes.push(String(amount));
+     return amount/1000n;
+   }
+   return amount*998n;
+  },
+ };
+ const result=await verifyMarketLead('cbBTC/USDC',lead,54321n,costs,deps);
+ assert.equal(result.status,'QUOTE_REJECT');
+ assert.ok('rows' in result);
+ if(!('rows' in result))return;
+ assert.equal(result.rows?.length,7);
+ assert.equal(new Set(calledSizes).size,7);
+ assert.ok('tradeSizesQuoted' in result && result.tradeSizesQuoted===7);
+ assert.equal(result.rows?.[0]?.sizeUsdc,'100');
+ assert.equal(result.rows?.[6]?.sizeUsdc,'10000');
+ assert.equal(result.rows?.[0]?.modeledCostsUsdc!==undefined,true);
+ assert.equal(result.rows?.[0]?.costBreakdownUsdc?.flashLoanPremium!==undefined,true);
+ assert.equal(result.rows?.[0]?.grossReturnBps,-20);
+ assert.equal(result.rows?.[0]?.relativeQuoteDeteriorationBps,0);
+ assert.equal(result.atomicSimulation,'NOT_RUN');
 });
