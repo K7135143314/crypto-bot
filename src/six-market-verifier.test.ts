@@ -1,13 +1,22 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { QuoteDeps } from './six-market-verifier.js';
-import { chooseLeads, rankQuoteResults, supportedMarket, verifyMarketLead } from './six-market-verifier.js';
+import { checkTokenDecimals, chooseLeads, rankQuoteResults, supportedMarket, verifyMarketLead } from './six-market-verifier.js';
+import { TOKENS } from './config.js';
 const lead={buyDex:'uniswap',sellDex:'aerodrome',buyPool:'0x'+'a'.repeat(40),
 sellPool:'0x'+'b'.repeat(40),indicatedSpreadBps:100,status:'SHORTLIST'};
 const costs={gasPriceWei:1000000n,premiumBps:5n,ethPriceUsdcMicros:3000000000n};
-test('only USDC-quoted pairs have proven quote paths',()=>{
+test('approved cbBTC contract is Base-native 8-decimal token',()=>{
+ assert.equal(TOKENS.cbBTC.address.toLowerCase(),'0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf');
+ assert.equal(TOKENS.cbBTC.decimals,8);
+ assert.equal(checkTokenDecimals(8,TOKENS.cbBTC.decimals),true);
+ assert.equal(checkTokenDecimals(18,TOKENS.cbBTC.decimals),false);
+ assert.equal(checkTokenDecimals(NaN,TOKENS.cbBTC.decimals),false);
+});
+test('USDC-quoted pairs are eligible for exact on-chain quote verification',()=>{
   assert.equal(supportedMarket('AERO/USDC'),true);
   assert.equal(supportedMarket('WETH/USDC'),true);
+  assert.equal(supportedMarket('cbBTC/USDC'),true);
   assert.equal(supportedMarket('VIRTUAL/WETH'),false);
 });
 test('only shortlist leads are passed forward',()=>{
@@ -73,4 +82,46 @@ test('unsupported and malformed quote results never become profit claims',()=>{
  {status:'QUOTE_REJECT',bestEstimatedNetUsdc:'-0.3'},
  ]);
  assert.equal(ranked[0]?.bestEstimatedNetUsdc,'-0.3');
+});
+
+test('cbBTC exact-pool round trip uses satoshi-sized raw output, same pinned block, USDC input/output',async()=>{
+ const observations:{rawReceived?:bigint;legs:string[];matchedTokens:string[]}={legs:[],matchedTokens:[]};
+ const deps:QuoteDeps={
+  match:async(_dex,_pool,block,tokenA,tokenB)=>{
+   assert.equal(block,54321n);
+   assert.equal(tokenA.toLowerCase(),TOKENS.cbBTC.address.toLowerCase());
+   assert.equal(tokenB.toLowerCase(),TOKENS.USDC.address.toLowerCase());
+   observations.matchedTokens.push(tokenA);
+   return {dex:'aerodrome',pairAddress:('0x'+'c'.repeat(40)) as `0x${string}`};
+  },
+  quote:async(_pool,tokenIn,tokenOut,amount,block)=>{
+   assert.equal(block,54321n);
+   observations.legs.push(tokenIn.toLowerCase()+' -> '+tokenOut.toLowerCase());
+   if(tokenIn.toLowerCase()===TOKENS.USDC.address.toLowerCase()){
+     assert.ok(amount>=100_000_000n); // USDC has six decimals
+     observations.rawReceived=123456n; // 0.00123456 cbBTC, not 18-decimal WETH
+     return 123456n;
+   }
+   assert.equal(tokenIn.toLowerCase(),TOKENS.cbBTC.address.toLowerCase());
+   assert.equal(amount,123456n);
+   return 99_800_000n; // Loss of $0.20, before all modeled costs
+  },
+ };
+ const result=await verifyMarketLead('cbBTC/USDC',lead,54321n,costs,deps);
+ assert.equal(result.status,'QUOTE_REJECT');
+ assert.equal(result.exactPoolMatch,true);
+ assert.equal(result.atomicSimulation,'NOT_RUN');
+ assert.equal(result.readOnly,true);
+ assert.equal(result.executionAuthorized,false);
+ assert.equal(result.bestEstimatedNetUsdc?.startsWith('-'),true);
+ assert.equal(result.rows?.[0]?.receivedBaseToken,'0.00123456');
+ assert.equal(result.rows?.[0]?.baseTokenDecimals,8);
+ assert.equal(observations.matchedTokens.length,2);
+ assert.ok(observations.legs.length>=2);
+});
+test('cbBTC unsupported exact-pool routes never report a profit',async()=>{
+ const deps: QuoteDeps={match:async()=>null,quote:async()=>{throw Error('quote must not run');}};
+ const result=await verifyMarketLead('cbBTC/USDC',lead,54321n,costs,deps);
+ assert.equal(result.status,'UNSUPPORTED_POOL_VARIANT');
+ assert.equal('bestEstimatedNetUsdc' in result,false);
 });
