@@ -19,7 +19,8 @@ async function main(): Promise<void> {
   const verifiedCandidates = results.filter((x) => x.status === 'VERIFIED_CANDIDATE');
   const verifiedRejects = results.filter((x) => x.status === 'VERIFIED_REJECT');
   const unsupported = results.filter((x) =>
-    x.status === 'UNSUPPORTED_DEX' || x.status === 'UNSUPPORTED_POOL_VARIANT'
+    x.status === 'UNSUPPORTED_DEX' || x.status === 'UNSUPPORTED_POOL_VARIANT' ||
+    x.status === 'INVALID_POOL_ADDRESS'
   );
 
   const report = {
@@ -33,6 +34,7 @@ async function main(): Promise<void> {
     verifiedCandidateCount: verifiedCandidates.length,
     verifiedRejectCount: verifiedRejects.length,
     unsupportedCount: unsupported.length,
+    errorCount: results.filter((x) => x.status === 'ERROR').length,
     results,
     note: 'A VERIFIED_CANDIDATE is still a research/simulation candidate only. No wallet, signing, or transaction execution is enabled.',
   };
@@ -52,6 +54,7 @@ async function main(): Promise<void> {
     `- Verified candidates: ${report.verifiedCandidateCount}`,
     `- Verified rejects: ${report.verifiedRejectCount}`,
     `- Unsupported/unverified leads: ${report.unsupportedCount}`,
+    `- Verifier errors: ${report.errorCount}`,
     '',
     '## Results',
     '',

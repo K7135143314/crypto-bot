@@ -1,4 +1,4 @@
-import { getAddress, parseUnits, type Address } from 'viem';
+import { getAddress, isAddress, parseUnits, type Address } from 'viem';
 import { aaveV3PoolAbi, aerodromeRouterAbi, uniswapV3QuoterV2Abi } from './abis.js';
 import {
   CONTRACTS,
@@ -166,6 +166,7 @@ export type VerificationStatus =
   | 'VERIFIED_REJECT'
   | 'UNSUPPORTED_DEX'
   | 'UNSUPPORTED_POOL_VARIANT'
+  | 'INVALID_POOL_ADDRESS'
   | 'NOT_SHORTLISTED'
   | 'ERROR';
 
@@ -215,6 +216,21 @@ export async function verifyScoutOpportunity(
       scoutSpreadBps: opportunity.indicatedSpreadBps,
       status: 'UNSUPPORTED_DEX',
       reason: 'One or both DEXs do not yet have a proven Base on-chain quote adapter.',
+    };
+  }
+
+  // A discovery source may supply a bytes32 pool ID instead of a 20-byte
+  // EVM address. Classify it before calling viem or any RPC contract.
+  if (!isAddress(opportunity.buyPairAddress, { strict: false }) ||
+      !isAddress(opportunity.sellPairAddress, { strict: false })) {
+    return {
+      scoutRank,
+      scoutRoute,
+      scoutSpreadBps: opportunity.indicatedSpreadBps,
+      status: 'INVALID_POOL_ADDRESS',
+      reason: 'Discovery pool identifier is not a 20-byte EVM address; no on-chain quote attempted.',
+      pinnedBlock: blockNumber.toString(),
+      exactPoolMatch: false,
     };
   }
 

@@ -1,4 +1,4 @@
-import { getAddress, formatUnits, parseUnits } from 'viem';
+import { getAddress, isAddress, formatUnits, parseUnits } from 'viem';
 import { client, quoteMatrix } from './quotes.js';
 import { TOKENS, TRADE_SIZES_USDC, PROFIT_POLICY, CONTRACTS } from './config.js';
 import { aaveV3PoolAbi } from './abis.js';
@@ -33,6 +33,8 @@ export async function verifyMarketLead(market:string,lead:MarketLead,blockNumber
   if(!supportedMarket(market))return {...base,status:'UNSUPPORTED_MARKET',reason:'This market needs an additional quote-currency adapter.'};
   const buy=normalizeScoutDex(lead.buyDex),sell=normalizeScoutDex(lead.sellDex);
   if(!buy||!sell)return {...base,status:'UNSUPPORTED_DEX',reason:'At least one exchange has no approved on-chain adapter.'};
+  if(!isAddress(lead.buyPool,{strict:false})||!isAddress(lead.sellPool,{strict:false}))
+    return {...base,status:'INVALID_POOL_ADDRESS',reason:'Pool identifier is not a 20-byte EVM address; no quote attempted.'};
   try{
     const [first,second]=await Promise.all([
       deps.match(buy,lead.buyPool,blockNumber,SUPPORTED[market].token,TOKENS.USDC.address),
