@@ -3,7 +3,9 @@ name: Hourly research collector
 on:
   workflow_dispatch:
   schedule:
-    - cron: '17 * * * *'
+    # Two staggered attempts reduce exposure to dropped GitHub schedule events.
+    # Best-effort only; dashboard reports actual saved coverage, not expected runs.
+    - cron: '17,47 * * * *'
 
 permissions:
   contents: write
