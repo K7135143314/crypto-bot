@@ -89,9 +89,9 @@ test('cbBTC exact-pool round trip uses satoshi-sized raw output, same pinned blo
  const deps:QuoteDeps={
   match:async(_dex,_pool,block,tokenA,tokenB)=>{
    assert.equal(block,54321n);
-   assert.equal(tokenA.toLowerCase(),TOKENS.cbBTC.address.toLowerCase());
-   assert.equal(tokenB.toLowerCase(),TOKENS.USDC.address.toLowerCase());
-   observations.matchedTokens.push(tokenA);
+   assert.equal(tokenA?.toLowerCase(),TOKENS.cbBTC.address.toLowerCase());
+   assert.equal(tokenB?.toLowerCase(),TOKENS.USDC.address.toLowerCase());
+   observations.matchedTokens.push(String(tokenA));
    return {dex:'aerodrome',pairAddress:('0x'+'c'.repeat(40)) as `0x${string}`};
   },
   quote:async(_pool,tokenIn,tokenOut,amount,block)=>{
@@ -109,13 +109,13 @@ test('cbBTC exact-pool round trip uses satoshi-sized raw output, same pinned blo
  };
  const result=await verifyMarketLead('cbBTC/USDC',lead,54321n,costs,deps);
  assert.equal(result.status,'QUOTE_REJECT');
- assert.equal(result.exactPoolMatch,true);
+ assert.equal('exactPoolMatch' in result && result.exactPoolMatch,true);
  assert.equal(result.atomicSimulation,'NOT_RUN');
  assert.equal(result.readOnly,true);
  assert.equal(result.executionAuthorized,false);
- assert.equal(result.bestEstimatedNetUsdc?.startsWith('-'),true);
- assert.equal(result.rows?.[0]?.receivedBaseToken,'0.00123456');
- assert.equal(result.rows?.[0]?.baseTokenDecimals,8);
+ assert.ok('bestEstimatedNetUsdc' in result && result.bestEstimatedNetUsdc?.startsWith('-'));
+ assert.ok('rows' in result && result.rows?.[0]?.receivedBaseToken === '0.00123456');
+ assert.ok('rows' in result && result.rows?.[0]?.baseTokenDecimals === 8);
  assert.equal(observations.matchedTokens.length,2);
  assert.ok(observations.legs.length>=2);
 });
