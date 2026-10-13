@@ -73,7 +73,13 @@ export async function verifyMarketLead(market:string,lead:MarketLead,blockNumber
       deps.match(buy,lead.buyPool,blockNumber,SUPPORTED[market].token,TOKENS.USDC.address),
       deps.match(sell,lead.sellPool,blockNumber,SUPPORTED[market].token,TOKENS.USDC.address),
     ]);
-    if(!first||!second)return {...base,status:'UNSUPPORTED_POOL_VARIANT',reason:'One or both pool addresses did not match an approved on-chain factory/fee tier.'};
+    if(!first||!second)return {...base,status:'UNSUPPORTED_POOL_VARIANT',
+      reason:'One or both pool addresses did not match an approved on-chain factory/fee tier.',
+      buyPoolMatch:first?{variant:first.variant||'UNISWAP_V3',feeTier:first.feeTier??null,
+        tickSpacing:first.tickSpacing??null,stable:first.stable??null}:null,
+      sellPoolMatch:second?{variant:second.variant||'UNISWAP_V3',feeTier:second.feeTier??null,
+        tickSpacing:second.tickSpacing??null,stable:second.stable??null}:null,
+      poolDiagnosis:!first&&!second?'BOTH_POOLS_UNMATCHED':!first?'BUY_POOL_UNMATCHED':'SELL_POOL_UNMATCHED'};
     if(shared.ethPriceUsdcMicros<=0n||shared.gasPriceWei<=0n)return {...base,status:'REFERENCE_UNAVAILABLE',reason:'Independent ETH/USDC reference or gas price missing.'};
     const rows=[];
     for(const size of TRADE_SIZES_USDC.slice(0,4)){
@@ -96,7 +102,12 @@ export async function verifyMarketLead(market:string,lead:MarketLead,blockNumber
     if(!valid.length)return {...base,status:'QUOTE_ERROR',exactPoolMatch:true,
       reason:'All requested quote sizes failed.',rows};
     const best=[...valid].sort((a,b)=>Number(b.estimatedNetUsdc)-Number(a.estimatedNetUsdc))[0]!;
-    return {...base,exactPoolMatch:true,status:valid.some(r=>r.decision==='CANDIDATE')?'QUOTE_CANDIDATE':'QUOTE_REJECT',
+    return {...base,exactPoolMatch:true,
+      buyPoolMatch:{variant:first.variant||'UNISWAP_V3',feeTier:first.feeTier??null,
+        tickSpacing:first.tickSpacing??null,stable:first.stable??null},
+      sellPoolMatch:{variant:second.variant||'UNISWAP_V3',feeTier:second.feeTier??null,
+        tickSpacing:second.tickSpacing??null,stable:second.stable??null},
+      status:valid.some(r=>r.decision==='CANDIDATE')?'QUOTE_CANDIDATE':'QUOTE_REJECT',
       reason:'Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.',
       bestTradeSizeUsdc:best.sizeUsdc,bestEstimatedNetUsdc:best.estimatedNetUsdc,rows};
   }catch(error){return {...base,status:'ERROR',reason:String(error)};}

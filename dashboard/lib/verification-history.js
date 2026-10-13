@@ -24,6 +24,8 @@ export function mergeVerificationHistory(previous, report, now=Date.now()) {
         indicatedSpreadBps:Number.isFinite(r.indicatedSpreadBps)?r.indicatedSpreadBps:null,
         buyDex:r.buyDex||null,sellDex:r.sellDex||null,buyPool:r.buyPool||null,sellPool:r.sellPool||null,
         exactPoolMatch:r.exactPoolMatch===true,
+        poolDiagnosis:r.poolDiagnosis||null,
+        buyPoolMatch:r.buyPoolMatch||null,sellPoolMatch:r.sellPoolMatch||null,
         bestTradeSizeUsdc:r.bestTradeSizeUsdc||null,
         bestEstimatedNetUsdc:r.bestEstimatedNetUsdc||null,
         reason:String(r.reason||''),

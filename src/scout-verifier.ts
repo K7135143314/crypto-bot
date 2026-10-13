@@ -78,8 +78,25 @@ export type ExactPoolMatch = {
   pairAddress: Address;
   feeTier?: number;
   variant?: 'AERODROME_CLASSIC' | 'AERODROME_SLIPSTREAM_V1';
+  stable?: boolean;
   tickSpacing?: number;
 };
+
+// Only the exact pool returned by an approved factory can be quoted.
+export function classicPoolMatch(
+  candidate: Address, discovered: Address, stable: boolean,
+): ExactPoolMatch | null {
+  return getAddress(candidate) === getAddress(discovered)
+    ? {dex:'aerodrome', pairAddress:getAddress(discovered),
+       variant:'AERODROME_CLASSIC',stable} : null;
+}
+export function classicStableFlag(pool: ExactPoolMatch): boolean {
+  if (pool.dex !== 'aerodrome' || (pool.variant !== undefined &&
+       pool.variant !== 'AERODROME_CLASSIC')) {
+    throw new Error('Not an approved Aerodrome Classic pool');
+  }
+  return pool.stable === true;
+}
 
 export async function resolveExactPool(
   dex: SupportedDex,
@@ -99,9 +116,14 @@ export async function resolveExactPool(
       blockNumber,
     });
 
-    if (getAddress(pool) === scoutAddress) {
-      return { dex, pairAddress: scoutAddress, variant: 'AERODROME_CLASSIC' };
-    }
+    const classicVolatile = classicPoolMatch(pool, scoutAddress, false);
+    if (classicVolatile) return classicVolatile;
+    const stablePool = await client.readContract({
+      address: CONTRACTS.aerodromePoolFactory, abi: aerodromeFactoryAbi,
+      functionName:'getPool', args:[tokenA, tokenB, true], blockNumber,
+    });
+    const classicStable = classicPoolMatch(stablePool, scoutAddress, true);
+    if (classicStable) return classicStable;
     // The pool itself supplies tick spacing; verify it against the allowed
     // factory at this same block, never infer spacing from discovery spreads.
     let tickSpacing: number;
@@ -155,11 +177,12 @@ async function quoteAerodrome(
   tokenOut: Address,
   amountIn: bigint,
   blockNumber: bigint,
+  stable = false,
 ): Promise<bigint> {
   const route = [{
     from: tokenIn,
     to: tokenOut,
-    stable: false,
+    stable,
     factory: CONTRACTS.aerodromePoolFactory,
   }] as const;
 
@@ -228,7 +251,8 @@ export async function quoteDex(
     if (pool.variant !== undefined && pool.variant !== 'AERODROME_CLASSIC') {
       throw new Error('Unapproved Aerodrome pool variant');
     }
-    return quoteAerodrome(tokenIn, tokenOut, amountIn, blockNumber);
+    return quoteAerodrome(tokenIn, tokenOut, amountIn, blockNumber,
+      classicStableFlag(pool));
   }
 
   if (!pool.feeTier) throw new Error('Uniswap exact pool is missing fee tier');

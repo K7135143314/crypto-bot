@@ -1188,6 +1188,17 @@ async function refreshSixVerification() {
         result.status === 'QUOTE_REJECT' ? 'reject' : 'watch');
       status.textContent = result.status + ' · atomic ' + (result.atomicSimulation || 'NOT_RUN');
       item.append(heading, value, status);
+      const detail = document.createElement('div');
+      detail.className = 'intelligenceReason';
+      const describe = (match) => match ?
+        match.variant + (match.stable === true ? ' stable' : match.stable === false ? ' volatile' : '') +
+          (match.feeTier != null ? ' fee ' + match.feeTier : '') +
+          (match.tickSpacing != null ? ' spacing ' + match.tickSpacing : '') : 'unmatched';
+      detail.textContent = 'Buy pool: ' + describe(result.buyPoolMatch) +
+        ' · Sell pool: ' + describe(result.sellPoolMatch) +
+        (result.poolDiagnosis ? ' · ' + result.poolDiagnosis : '') +
+        (result.reason ? ' · ' + result.reason : '');
+      item.appendChild(detail);
       node.appendChild(item);
     }
   } catch (error) {
