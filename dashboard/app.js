@@ -1139,26 +1139,43 @@ async function refreshMarketWatch() {
   }
 }
 
-async function refreshOpportunityWatchlist(){
-  const node=el('opportunityWatchList');
-  if(!node)return;
-  try{
-    const response=await fetch('/api/opportunity-watchlist?t='+Date.now(),{cache:'no-store'});
-    const data=await response.json();
-    if(!response.ok||!data.ok||!Array.isArray(data.items))throw Error(data.error||'Watchlist unavailable');
+async function refreshOpportunityWatchlist() {
+  const node = el('opportunityWatchList');
+  if (!node) return;
+  try {
+    const response = await fetch('/api/opportunity-watchlist?t=' + Date.now(), {cache:'no-store'});
+    const data = await response.json();
+    if (!response.ok || !data.ok || !Array.isArray(data.items)) throw Error(data.error || 'Watchlist unavailable');
     setText('opportunityWatchStatus',
-      data.state==='STALE'?'STALE saved quotes · last '+new Date(data.latestAt).toLocaleString():
-      data.state==='NO_DATA'?'No saved quotes yet':
-      'Latest saved '+new Date(data.latestAt).toLocaleString()+
-      ' · '+data.quotedRoutes+' quoted routes · '+data.candidates+' modeled candidates');
+      data.state === 'STALE' ? 'STALE saved quotes, last ' + new Date(data.latestAt).toLocaleString() :
+      data.state === 'NO_DATA' ? 'No saved quotes yet' :
+      'Latest saved ' + new Date(data.latestAt).toLocaleString() +
+      ', ' + data.quotedRoutes + ' quoted routes, ' + data.candidates + ' modeled candidates');
     node.replaceChildren();
-    for(const entry of data.items){
-      const card=document.createElement('div');
-      card.className='marketWatchRow';
-      const heading=document.createElement('strong');
-      heading.textContent=entry.market+' · '+entry.buyDex+' → '+entry.sellDex;
-      const net=document.createElement('strong');
-      net.textContent='USDC '+entry.latestNetUsdc.toFixed(4)+' modeled net at 
+    for (const entry of data.items) {
+      const card = document.createElement('div');
+      card.className = 'marketWatchRow';
+      const heading = document.createElement('strong');
+      heading.textContent = entry.market + ' : ' + entry.buyDex + ' to ' + entry.sellDex;
+      const net = document.createElement('strong');
+      net.textContent = entry.latestNetUsdc.toFixed(4) + ' USDC modeled net at size ' +
+        entry.bestTradeSizeUsdc + ' USDC';
+      const trend = document.createElement('span');
+      trend.textContent = entry.trend +
+        (entry.deltaNetUsdc === null ? '' : ', change ' + entry.deltaNetUsdc.toFixed(4) + ' USDC');
+      const note = document.createElement('small');
+      note.textContent = (entry.modeledCandidate ? 'QUOTE CANDIDATE: REQUIRES FORK TEST' :
+        'NOT PROFITABLE UNDER MODEL') + ', atomic simulation NOT RUN, read only';
+      card.append(heading, net, trend, note);
+      node.appendChild(card);
+    }
+    if (!data.items.length) node.textContent = 'No recent exact-pool cost-adjusted quotes to rank.';
+  } catch (error) {
+    setText('opportunityWatchStatus', 'Watchlist unavailable: ' + String(error));
+    node.textContent = 'No current profit claims without valid centralized quotes.';
+  }
+}
+async function refreshSixVerification() {
   const node = el('sixVerifierResults');
   if (!node) return;
   try {
