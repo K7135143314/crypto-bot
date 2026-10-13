@@ -30,6 +30,9 @@ export function mergeVerificationHistory(previous, report, now=Date.now()) {
         bestEstimatedNetUsdc:r.bestEstimatedNetUsdc||null,
         reason:String(r.reason||''),
         atomicSimulation:'NOT_RUN',
+        tradeSizesQuoted:Number.isInteger(r.tradeSizesQuoted)?r.tradeSizesQuoted:null,
+        tradeSizesRequested:Number.isInteger(r.tradeSizesRequested)?r.tradeSizesRequested:null,
+        quoteComparisonNote:String(r.quoteComparisonNote||''),
         rows:Array.isArray(r.rows)?r.rows:[],
       })),
     };

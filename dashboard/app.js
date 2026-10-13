@@ -1199,6 +1199,30 @@ async function refreshSixVerification() {
         (result.poolDiagnosis ? ' · ' + result.poolDiagnosis : '') +
         (result.reason ? ' · ' + result.reason : '');
       item.appendChild(detail);
+      if (Array.isArray(result.rows) && result.rows.length) {
+        const sizes = document.createElement('div');
+        sizes.className = 'intelligenceReason';
+        const items = result.rows.map((r) => {
+          const size = 'USDC ' + String(r.sizeUsdc || '?');
+          const net = r.estimatedNetUsdc == null ?
+            'quote unavailable' : String(r.estimatedNetUsdc) + ' USDC net';
+          const deterioration = r.relativeQuoteDeteriorationBps == null ? '' :
+            ', relative deterioration ' + r.relativeQuoteDeteriorationBps + ' bps';
+          return size + ': ' + net + deterioration;
+        });
+        sizes.textContent = items.join(' | ');
+        item.appendChild(sizes);
+        const summary = document.createElement('div');
+        summary.className = 'intelligenceReason';
+        const quoted = result.tradeSizesQuoted ??
+          result.rows.filter((r) => r.estimatedNetUsdc != null).length;
+        const requested = result.tradeSizesRequested ?? result.rows.length;
+        summary.textContent = quoted + '/' + requested + ' trade sizes quoted' +
+          (result.bestTradeSizeUsdc ? ', best modeled net at ' +
+            result.bestTradeSizeUsdc + ' USDC size' : '') +
+          '. Deterioration is not pure price impact.';
+        item.appendChild(summary);
+      }
       node.appendChild(item);
     }
   } catch (error) {

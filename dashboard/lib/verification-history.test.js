@@ -38,3 +38,20 @@ test('saves unmatched pool leg classification without claiming quoted profit',()
  assert.equal(row.bestEstimatedNetUsdc,null);
  assert.equal(row.atomicSimulation,'NOT_RUN');
 });
+
+test('retains size comparisons and modeled cost explanations, never enables execution',()=>{
+ const now=Date.parse('2026-10-08T03:00:00Z');
+ const report={...source,results:[{market:'cbBTC/USDC',status:'QUOTE_REJECT',
+  tradeSizesQuoted:2,tradeSizesRequested:7,
+  quoteComparisonNote:'Gross round trip not pure price impact',
+  rows:[{sizeUsdc:'100',modeledCostsUsdc:'0.30',
+    costBreakdownUsdc:{flashLoanPremium:'0.05',l2GasReserve:'0.1'},
+    grossReturnBps:-20,relativeQuoteDeteriorationBps:0,
+    estimatedNetUsdc:'-0.5',decision:'REJECT_RAW_LOSS'}]}]};
+ const result=mergeVerificationHistory(emptyHistory(),report,now).runs[0].results[0];
+ assert.equal(result.tradeSizesQuoted,2);
+ assert.equal(result.tradeSizesRequested,7);
+ assert.equal(result.rows[0].modeledCostsUsdc,'0.30');
+ assert.equal(result.rows[0].relativeQuoteDeteriorationBps,0);
+ assert.equal(result.atomicSimulation,'NOT_RUN');
+});
