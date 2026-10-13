@@ -9,6 +9,8 @@ const hourlyHistoryKey = 'cryptoBotDashboardHourlyV1';
 const hourlyHistoryWindowMs = 30 * 24 * 60 * 60 * 1000;
 const centralTimeZone = 'America/Chicago';
 const hourlyBuckets = [];
+let scheduledHistoryCount = 0;
+let recoveredHistoryCount = 0;
 
 let seconds = 20;
 let busy = false;
@@ -691,7 +693,7 @@ function updateHourlyLabels() {
 
   if (summary.length === 0) {
     setText('hourlyBest', 'Building hourly history…');
-    setText('hourlyCoverage', '30-day central rollup • Central Time');
+    setText('hourlyCoverage', '30-day scheduled scans • Central Time');
     setText('hourlyPositive', 'No hourly average yet');
     return;
   }
@@ -711,7 +713,7 @@ function updateHourlyLabels() {
 
   setText(
     'hourlyCoverage',
-    '30-day central rollup • ' +
+    '30-day scheduled scans • ' +
       totalSamples.toLocaleString() +
       ' scans • ' +
       summary.length +
@@ -891,7 +893,14 @@ async function refreshCentralHistory() {
 
     points.splice(0, points.length, ...centralPoints);
     hourlyBuckets.splice(0, hourlyBuckets.length);
-    centralPoints.forEach((point) => recordHourlyObservation(point.t, point.net));
+    const scheduled = history.observations.filter((item) =>
+      !String(item.source || '').startsWith('legacy-browser') &&
+      /^[1-9][0-9]*$/.test(String(item.blockNumber || '')) &&
+      Number.isFinite(Date.parse(item.generatedAt)) && Number.isFinite(Number(item.bestNetUsdc))
+    );
+    scheduledHistoryCount = scheduled.length;
+    recoveredHistoryCount = history.observations.length - scheduledHistoryCount;
+    scheduled.forEach((item) => recordHourlyObservation(Date.parse(item.generatedAt), Number(item.bestNetUsdc)));
 
     updateHistoryLabels();
     updateHourlyLabels();
@@ -901,7 +910,9 @@ async function refreshCentralHistory() {
       'obs',
       'Central observations: ' +
         centralPoints.length.toLocaleString() +
-        ' • shared across devices'
+        ' • shared across devices • ' +
+        scheduledHistoryCount.toLocaleString() + ' scheduled / ' +
+        recoveredHistoryCount.toLocaleString() + ' recovered'
     );
   } catch (error) {
     console.warn('Could not load centralized dashboard history', error);
@@ -1168,6 +1179,52 @@ async function refreshSixVerification() {
     node.textContent = 'No confirmed quote-verification results available.';
   }
 }
+async function refreshCoverage() {
+  const container = el('coverageList');
+  if (!container) return;
+  try {
+    const response = await fetch('/api/coverage?t=' + Date.now(), { cache: 'no-store' });
+    const report = await response.json();
+    if (!report.ok || !Array.isArray(report.streams)) {
+      throw new Error(report.error || 'Collection health unavailable');
+    }
+    const labels = {
+      research: 'WETH/USDC research',
+      markets: 'Six-market discovery',
+      verification: 'Six-market verification',
+      intelligence: 'Opportunity Intelligence',
+    };
+    container.replaceChildren();
+    for (const stream of report.streams) {
+      const row = document.createElement('div');
+      row.className = 'coverageRow';
+      const heading = document.createElement('strong');
+      heading.textContent = labels[stream.key] || stream.key;
+      const freshness = document.createElement('span');
+      freshness.className = 'pill ' + (stream.state === 'CURRENT' ? 'candidate' : 'watch');
+      freshness.textContent = stream.state === 'CURRENT' ? 'CURRENT' :
+        stream.state === 'LATE' ? 'LATE DATA' :
+        stream.state === 'SOURCE_ERROR' ? 'SOURCE ERROR' : 'NO DATA';
+      const count = document.createElement('span');
+      count.textContent = stream.hoursCovered === null ? 'Coverage unavailable' :
+        stream.hoursCovered + '/24 hourly buckets • ' +
+        (stream.samplesInWindow || 0) + ' saved snapshots';
+      const last = document.createElement('small');
+      last.textContent = stream.latestAt ? 'Last saved: ' + centralTimeStamp(stream.latestAt) :
+        (stream.error || 'No valid saved observation');
+      if (stream.key === 'research' && stream.recoveredRows !== null) {
+        last.textContent += ' • ' + stream.recoveredRows.toLocaleString() + ' recovered observations excluded';
+      }
+      row.append(heading, freshness, count, last);
+      container.appendChild(row);
+    }
+    setText('coverageUpdated', 'Shared data measured ' + centralTimeStamp(report.measuredAt) +
+      (report.partial ? ' • Some sources unavailable' : ' • Four sources checked'));
+  } catch (error) {
+    setText('coverageUpdated', 'Collection health unavailable: ' + String(error));
+    container.textContent = 'No health evidence available. Do not assume scheduled scans are current.';
+  }
+}
 el('scanBtn').addEventListener('click', refresh);
 el('legacyExportBtn')?.addEventListener('click', exportLegacyHistory);
 window.addEventListener('resize', drawCharts);
@@ -1175,6 +1232,7 @@ window.addEventListener('resize', drawCharts);
 updateLegacyExportControl();
 
 refreshCentralHistory();
+refreshCoverage();
 refreshIntelligence();
 refresh();
 refreshScout();
@@ -1184,6 +1242,7 @@ refreshSixVerification();
 
 setInterval(refresh, refreshMs);
 setInterval(refreshCentralHistory, 60000);
+setInterval(refreshCoverage, 60000);
 setInterval(refreshIntelligence, 60000);
 setInterval(refreshScout, 60000);
 setInterval(refreshMarketWatch, 60000);
