@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-13T20:04:05.883Z",
+  "updatedAt": "2026-10-13T23:07:59.523Z",
   "runs": [
     {
       "generatedAt": "2026-10-08T04:45:08.037Z",
@@ -4878,6 +4878,502 @@
           "bestTradeSizeUsdc": null,
           "bestEstimatedNetUsdc": null,
           "reason": "One or both pool addresses did not match an approved on-chain factory/fee tier.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": []
+        },
+        {
+          "market": "VIRTUAL/WETH",
+          "status": "UNSUPPORTED_MARKET",
+          "indicatedSpreadBps": null,
+          "buyDex": null,
+          "sellDex": null,
+          "buyPool": null,
+          "sellPool": null,
+          "exactPoolMatch": false,
+          "poolDiagnosis": null,
+          "buyPoolMatch": null,
+          "sellPoolMatch": null,
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "Non-USDC cost/quote adapter pending.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": []
+        },
+        {
+          "market": "WETH/USDT",
+          "status": "UNSUPPORTED_MARKET",
+          "indicatedSpreadBps": null,
+          "buyDex": null,
+          "sellDex": null,
+          "buyPool": null,
+          "sellPool": null,
+          "exactPoolMatch": false,
+          "poolDiagnosis": null,
+          "buyPoolMatch": null,
+          "sellPoolMatch": null,
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "Non-USDC cost/quote adapter pending.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": []
+        },
+        {
+          "market": "USDC/USDT",
+          "status": "UNSUPPORTED_MARKET",
+          "indicatedSpreadBps": null,
+          "buyDex": null,
+          "sellDex": null,
+          "buyPool": null,
+          "sellPool": null,
+          "exactPoolMatch": false,
+          "poolDiagnosis": null,
+          "buyPoolMatch": null,
+          "sellPoolMatch": null,
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "Non-USDC cost/quote adapter pending.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": []
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-13T23:07:57.781Z",
+      "pinnedBlock": "52571761",
+      "readOnly": true,
+      "executionAuthorized": false,
+      "referenceError": "",
+      "results": [
+        {
+          "market": "AERO/USDC",
+          "status": "QUOTE_REJECT",
+          "indicatedSpreadBps": 21.1205,
+          "buyDex": "uniswap",
+          "sellDex": "aerodrome",
+          "buyPool": "0xe5b5f522e98b5a2baae212d4da66b865b781db97",
+          "sellPool": "0xccd9cc53b63662088c738b8bc06e9078fb8d9ad4",
+          "exactPoolMatch": true,
+          "poolDiagnosis": null,
+          "buyPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 500,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "sellPoolMatch": {
+            "variant": "AERODROME_SLIPSTREAM_V1",
+            "feeTier": null,
+            "tickSpacing": 200,
+            "stable": null
+          },
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.441301",
+          "reason": "Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": [
+            {
+              "sizeUsdc": "100",
+              "receivedBaseToken": "111.113633982586343947",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "99.870761",
+              "estimatedNetUsdc": "-0.441301",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "250",
+              "receivedBaseToken": "277.695444709591453112",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "249.587389",
+              "estimatedNetUsdc": "-1.099673",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "500",
+              "receivedBaseToken": "555.096699872861796887",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "498.877608",
+              "estimatedNetUsdc": "-2.434454",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "1000",
+              "receivedBaseToken": "1109.019378469588994116",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "996.569434",
+              "estimatedNetUsdc": "-5.992628",
+              "decision": "REJECT_RAW_LOSS"
+            }
+          ]
+        },
+        {
+          "market": "AERO/USDC",
+          "status": "QUOTE_REJECT",
+          "indicatedSpreadBps": 14.4509,
+          "buyDex": "uniswap",
+          "sellDex": "aerodrome",
+          "buyPool": "0xe5b5f522e98b5a2baae212d4da66b865b781db97",
+          "sellPool": "0x6cdcb1c4a4d1c3c6d054b27ac5b77e89eafb971d",
+          "exactPoolMatch": true,
+          "poolDiagnosis": null,
+          "buyPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 500,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "sellPoolMatch": {
+            "variant": "AERODROME_CLASSIC",
+            "feeTier": null,
+            "tickSpacing": null,
+            "stable": false
+          },
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.505527",
+          "reason": "Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": [
+            {
+              "sizeUsdc": "100",
+              "receivedBaseToken": "111.113633982586343947",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "99.806535",
+              "estimatedNetUsdc": "-0.505527",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "250",
+              "receivedBaseToken": "277.695444709591453112",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "249.434938",
+              "estimatedNetUsdc": "-1.252124",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "500",
+              "receivedBaseToken": "555.096699872861796887",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "498.599695",
+              "estimatedNetUsdc": "-2.712367",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "1000",
+              "receivedBaseToken": "1109.019378469588994116",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "996.121201",
+              "estimatedNetUsdc": "-6.440861",
+              "decision": "REJECT_RAW_LOSS"
+            }
+          ]
+        },
+        {
+          "market": "AERO/USDC",
+          "status": "QUOTE_REJECT",
+          "indicatedSpreadBps": 61.1383,
+          "buyDex": "uniswap",
+          "sellDex": "aerodrome",
+          "buyPool": "0xe5b5f522e98b5a2baae212d4da66b865b781db97",
+          "sellPool": "0xbe00ff35af70e8415d0eb605a286d8a45466a4c1",
+          "exactPoolMatch": true,
+          "poolDiagnosis": null,
+          "buyPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 500,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "sellPoolMatch": {
+            "variant": "AERODROME_SLIPSTREAM_V1",
+            "feeTier": null,
+            "tickSpacing": 2000,
+            "stable": null
+          },
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.747211",
+          "reason": "Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": [
+            {
+              "sizeUsdc": "100",
+              "receivedBaseToken": "111.113633982586343947",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "99.564851",
+              "estimatedNetUsdc": "-0.747211",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "250",
+              "receivedBaseToken": "277.695444709591453112",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "248.83185",
+              "estimatedNetUsdc": "-1.855212",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "500",
+              "receivedBaseToken": "555.096699872861796887",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "497.397255",
+              "estimatedNetUsdc": "-3.914807",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "1000",
+              "receivedBaseToken": "1109.019378469588994116",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "993.731221",
+              "estimatedNetUsdc": "-8.830841",
+              "decision": "REJECT_RAW_LOSS"
+            }
+          ]
+        },
+        {
+          "market": "WETH/USDC",
+          "status": "QUOTE_REJECT",
+          "indicatedSpreadBps": 38.8636,
+          "buyDex": "aerodrome",
+          "sellDex": "uniswap",
+          "buyPool": "0xdbc6998296caa1652a810dc8d3baf4a8294330f1",
+          "sellPool": "0x0b1c2dcbbfa744ebd3fc17ff1a96a1e1eb4b2d69",
+          "exactPoolMatch": true,
+          "poolDiagnosis": null,
+          "buyPoolMatch": {
+            "variant": "AERODROME_SLIPSTREAM_V1",
+            "feeTier": null,
+            "tickSpacing": 1,
+            "stable": null
+          },
+          "sellPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 10000,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.90965",
+          "reason": "Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": [
+            {
+              "sizeUsdc": "100",
+              "receivedBaseToken": "0.040002827022650943",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "99.402412",
+              "estimatedNetUsdc": "-0.90965",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "250",
+              "receivedBaseToken": "0.099920911641476209",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "248.27896",
+              "estimatedNetUsdc": "-2.408102",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "500",
+              "receivedBaseToken": "0.199555295714691269",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "495.802854",
+              "estimatedNetUsdc": "-5.509208",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "1000",
+              "receivedBaseToken": "0.397969396842120622",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "988.599181",
+              "estimatedNetUsdc": "-13.962881",
+              "decision": "REJECT_RAW_LOSS"
+            }
+          ]
+        },
+        {
+          "market": "WETH/USDC",
+          "status": "QUOTE_REJECT",
+          "indicatedSpreadBps": 39.1218,
+          "buyDex": "aerodrome",
+          "sellDex": "uniswap",
+          "buyPool": "0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59",
+          "sellPool": "0x0b1c2dcbbfa744ebd3fc17ff1a96a1e1eb4b2d69",
+          "exactPoolMatch": true,
+          "poolDiagnosis": null,
+          "buyPoolMatch": {
+            "variant": "AERODROME_SLIPSTREAM_V1",
+            "feeTier": null,
+            "tickSpacing": 100,
+            "stable": null
+          },
+          "sellPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 10000,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.931192",
+          "reason": "Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": [
+            {
+              "sizeUsdc": "100",
+              "receivedBaseToken": "0.039994157185801961",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "99.38087",
+              "estimatedNetUsdc": "-0.931192",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "250",
+              "receivedBaseToken": "0.099985359546479164",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "248.439083",
+              "estimatedNetUsdc": "-2.247979",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "500",
+              "receivedBaseToken": "0.199970607699638481",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "496.834532",
+              "estimatedNetUsdc": "-4.47753",
+              "decision": "REJECT_RAW_LOSS"
+            },
+            {
+              "sizeUsdc": "1000",
+              "receivedBaseToken": "0.399940769826742193",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "993.494577",
+              "estimatedNetUsdc": "-9.067485",
+              "decision": "REJECT_RAW_LOSS"
+            }
+          ]
+        },
+        {
+          "market": "WETH/USDC",
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "indicatedSpreadBps": 40.5887,
+          "buyDex": "aerodrome",
+          "sellDex": "uniswap",
+          "buyPool": "0x4e392fbfe4d0557c82d2f97f02ec39daa31516dd",
+          "sellPool": "0x0b1c2dcbbfa744ebd3fc17ff1a96a1e1eb4b2d69",
+          "exactPoolMatch": false,
+          "poolDiagnosis": "BUY_POOL_UNMATCHED",
+          "buyPoolMatch": null,
+          "sellPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 10000,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "One or both pool addresses did not match an approved on-chain factory/fee tier.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": []
+        },
+        {
+          "market": "WETH/USDC",
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "indicatedSpreadBps": 35.5046,
+          "buyDex": "aerodrome",
+          "sellDex": "uniswap",
+          "buyPool": "0x3fe04a59ebd38cf06080a6f60a98d124eb59392a",
+          "sellPool": "0x0b1c2dcbbfa744ebd3fc17ff1a96a1e1eb4b2d69",
+          "exactPoolMatch": false,
+          "poolDiagnosis": "BUY_POOL_UNMATCHED",
+          "buyPoolMatch": null,
+          "sellPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 10000,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "One or both pool addresses did not match an approved on-chain factory/fee tier.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": []
+        },
+        {
+          "market": "cbBTC/USDC",
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "indicatedSpreadBps": 13.5257,
+          "buyDex": "uniswap",
+          "sellDex": "aerodrome",
+          "buyPool": "0xec558e484cc9f2210714e345298fdc53b253c27d",
+          "sellPool": "0xfcda5ab6bbc1fe5b8e1a185e86bb5f24b12e2278",
+          "exactPoolMatch": false,
+          "poolDiagnosis": "SELL_POOL_UNMATCHED",
+          "buyPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 3000,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "sellPoolMatch": null,
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "One or both pool addresses did not match an approved on-chain factory/fee tier.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": []
+        },
+        {
+          "market": "cbBTC/USDC",
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "indicatedSpreadBps": 9.7273,
+          "buyDex": "uniswap",
+          "sellDex": "aerodrome",
+          "buyPool": "0xfbb6eed8e7aa03b138556eedaf5d271a5e1e43ef",
+          "sellPool": "0xfcda5ab6bbc1fe5b8e1a185e86bb5f24b12e2278",
+          "exactPoolMatch": false,
+          "poolDiagnosis": "SELL_POOL_UNMATCHED",
+          "buyPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 500,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "sellPoolMatch": null,
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "One or both pool addresses did not match an approved on-chain factory/fee tier.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": []
+        },
+        {
+          "market": "cbBTC/USDC",
+          "status": "UNSUPPORTED_DEX",
+          "indicatedSpreadBps": 10.596,
+          "buyDex": "pancakeswap",
+          "sellDex": "aerodrome",
+          "buyPool": "0xb94b22332abf5f89877a14cc88f2abc48c34b3df",
+          "sellPool": "0xfcda5ab6bbc1fe5b8e1a185e86bb5f24b12e2278",
+          "exactPoolMatch": false,
+          "poolDiagnosis": null,
+          "buyPoolMatch": null,
+          "sellPoolMatch": null,
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "At least one exchange has no approved on-chain adapter.",
+          "atomicSimulation": "NOT_RUN",
+          "rows": []
+        },
+        {
+          "market": "cbBTC/USDC",
+          "status": "UNSUPPORTED_DEX",
+          "indicatedSpreadBps": 7.6212,
+          "buyDex": "pancakeswap",
+          "sellDex": "aerodrome",
+          "buyPool": "0x26e263efdc91f0d3279e2ec2bd58a7ca5c2fce62",
+          "sellPool": "0xfcda5ab6bbc1fe5b8e1a185e86bb5f24b12e2278",
+          "exactPoolMatch": false,
+          "poolDiagnosis": null,
+          "buyPoolMatch": null,
+          "sellPoolMatch": null,
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "At least one exchange has no approved on-chain adapter.",
           "atomicSimulation": "NOT_RUN",
           "rows": []
         },
