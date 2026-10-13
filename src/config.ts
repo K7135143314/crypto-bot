@@ -25,6 +25,12 @@ export const TOKENS = {
     address: getAddress('0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913') as Address,
     decimals: 6,
   },
+  cbBTC: {
+    symbol: 'cbBTC',
+    // Native Base cbBTC, not Ethereum BTC or a bridged substitute.
+    address: getAddress('0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf') as Address,
+    decimals: 8,
+  },
 } as const;
 
 export const CONTRACTS = {
