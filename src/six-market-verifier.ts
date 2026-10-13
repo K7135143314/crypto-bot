@@ -17,8 +17,31 @@ export type MarketLead = {
   buyDex:string;sellDex:string;buyPool:string;sellPool:string;indicatedSpreadBps:number;status:string;
 };
 export function supportedMarket(key:string): key is MarketKey { return key in SUPPORTED; }
-export function chooseLeads(market:{topLeads?:MarketLead[]},count=2):MarketLead[]{
-  return (market.topLeads || []).filter(l=>l.status==='SHORTLIST').slice(0,count);
+export function chooseLeads(market:{topLeads?:MarketLead[];verificationLeads?:MarketLead[]},count=4):MarketLead[]{
+  const leads=market.verificationLeads ?? market.topLeads ?? [];
+  return leads.filter(l=>l.status==='SHORTLIST')
+    .sort((a,b)=>Number(Boolean(normalizeScoutDex(b.buyDex)&&normalizeScoutDex(b.sellDex)))-
+                 Number(Boolean(normalizeScoutDex(a.buyDex)&&normalizeScoutDex(a.sellDex))) ||
+                 b.indicatedSpreadBps-a.indicatedSpreadBps)
+    .slice(0,Math.max(0,count));
+}
+
+// Only on-chain quoted routes can be ordered by modeled USDC profitability.
+export function rankQuoteResults<T extends {
+  status:string;bestEstimatedNetUsdc?:string;indicatedSpreadBps?:number
+}>(results:readonly T[]):T[]{
+  const net=(r:T)=>{
+    if(r.status!=='QUOTE_CANDIDATE'&&r.status!=='QUOTE_REJECT')return null;
+    const value=Number(r.bestEstimatedNetUsdc);
+    return r.bestEstimatedNetUsdc!==undefined&&Number.isFinite(value)?value:null;
+  };
+  return [...results].sort((a,b)=>{
+    const aNet=net(a),bNet=net(b);
+    if(aNet!==null&&bNet!==null)return bNet-aNet;
+    if(aNet!==null)return -1;
+    if(bNet!==null)return 1;
+    return 0;
+  });
 }
 export type QuoteDeps = {
   match: typeof resolveExactPool;
@@ -68,7 +91,7 @@ export async function verifyMarketLead(market:string,lead:MarketLead,blockNumber
 }
 export async function runSixMarketVerifier(){
   const blockNumber=await client.getBlockNumber();
-  const report=await scanSixMarkets() as {markets:Array<{market:string,topLeads:MarketLead[]}>};
+  const report=await scanSixMarkets() as {markets:Array<{market:string,topLeads:MarketLead[];verificationLeads?:MarketLead[]}>};
   let shared:SharedCosts={gasPriceWei:0n,premiumBps:0n,ethPriceUsdcMicros:0n};
   let referenceError='';
   try{
@@ -88,7 +111,11 @@ export async function runSixMarketVerifier(){
     if(!leads.length){results.push({market:market.market,status:'NO_SHORTLIST',reason:'No eligible shortlists.',atomicSimulation:'NOT_RUN'});continue;}
     for(const lead of leads)results.push(await verifyMarketLead(market.market,lead,blockNumber,shared));
   }
-  return {version:1,generatedAt:new Date().toISOString(),pinnedBlock:blockNumber.toString(),
-    readOnly:true,executionAuthorized:false,referenceError,results,
-    note:'QUOTE_CANDIDATE is not atomic-simulation verified and not executable profit.'};
+  const ranked=rankQuoteResults(results);
+  const quoteCheckedCount=ranked.filter(r=>r.status==='QUOTE_REJECT'||r.status==='QUOTE_CANDIDATE').length;
+  const quoteCandidateCount=ranked.filter(r=>r.status==='QUOTE_CANDIDATE').length;
+  return {version:2,generatedAt:new Date().toISOString(),pinnedBlock:blockNumber.toString(),
+    readOnly:true,executionAuthorized:false,referenceError,results:ranked,
+    quoteCheckedCount,quoteCandidateCount,
+    note:'Ranked by on-chain quote net USDC where available. Unsupported is NOT a loss. Atomic simulation not run.'};
 }
