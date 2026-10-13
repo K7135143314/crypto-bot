@@ -1,3 +1,4 @@
+import { isAddress } from 'viem';
 import { TOKENS } from './config.js';
 
 export type DexScreenerPair = {
@@ -69,7 +70,10 @@ export function selectEligiblePools(
       const dexId = pair.dexId?.trim();
       const pairAddress = pair.pairAddress?.trim();
 
-      if (!wethPriceUsd || !liquidityUsd || !volume24hUsd || !dexId || !pairAddress) {
+      // DEX Screener can return pool IDs that are not EVM contract addresses.
+      // Never shortlist an ID that cannot be quoted by the approved adapters.
+      if (!wethPriceUsd || !liquidityUsd || !volume24hUsd || !dexId ||
+          !pairAddress || !isAddress(pairAddress, { strict: false })) {
         return null;
       }
 
