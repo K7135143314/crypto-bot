@@ -3,7 +3,8 @@ name: Scout direct verifier
 on:
   workflow_dispatch:
   schedule:
-    - cron: '12 * * * *'
+    # Offset from six-market verification to reduce observer-data write races.
+    - cron: '2,32 * * * *'
 
 permissions:
   contents: write
