@@ -38,5 +38,6 @@ export class EvidenceWriter{
   this.records.push(item);
   return item;
  }
+ verdictCounts(): Record<string,number> { const counts:Record<string,number>={}; for(const item of this.records){const key=item.reconciliation.verdict;counts[key]=(counts[key]??0)+1;}return counts; }
  get count(){return this.records.length}
 }
