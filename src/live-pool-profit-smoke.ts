@@ -2,7 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { performance } from 'node:perf_hooks';
 import { getAddress, isAddress, parseUnits, type Abi, type Address } from 'viem';
 import { aaveV3PoolAbi } from './abis.js';
-import { CHAIN_ID, CONTRACTS, TOKENS } from './config.js';
+import { CHAIN_ID, CONTRACTS, TOKENS, TRADE_SIZES_USDC } from './config.js';
 import { client } from './quotes.js';
 import { quoteDex, resolveExactPool, type ExactPoolMatch } from './scout-verifier.js';
 import { inspectPoolState, type PoolRead } from './pool-state.js';
@@ -33,13 +33,13 @@ const started=performance.now();
 const report:{
  version:number;readOnly:true;executionAuthorized:false;atomicSimulation:'NOT_RUN';
  generatedAt:string;source:string;chainId:number|null;blockNumber:string|null;blockHash:string|null;
- status:string;reason:string;routeCount:number;poolAddresses:Record<string,string>;
+ status:string;reason:string;routeCount:number;testedSizesUsdc:string[];poolAddresses:Record<string,string>;
  proofs:MarketProof[];timingMs:number;assumptions:string[];
 }={
  version:1,readOnly:true,executionAuthorized:false,atomicSimulation:'NOT_RUN',
  generatedAt:new Date().toISOString(),source:'bounded-pinned-Base-contract-reads',
  chainId:null,blockNumber:null,blockHash:null,status:'NOT_STARTED',reason:'',
- routeCount:0,poolAddresses:{},proofs:[],timingMs:0,
+ routeCount:0,testedSizesUsdc:[],poolAddresses:{},proofs:[],timingMs:0,
  assumptions:[
   'MATCHED_UNSAFE means two queried sources agreed, not finality or execution readiness',
   'Two public RPC hostnames do not guarantee fully independent upstream infrastructure',
@@ -115,13 +115,20 @@ try {
      }),
      quote:quoteDex,
     };
-    for(const [buyPool,sellPool] of [
-     [aerodromeMatch,uniswapMatch],
-     [uniswapMatch,aerodromeMatch],
-    ] as const){
-     report.proofs.push(await proveReadOnlyMarket({
-      observed,buyPool,sellPool,sizeUsdc:'100',costs,
-     },deps));
+    // Bounded, deduplicated sample drawn from the already approved size policy.
+    // Every observation uses exactly the same historical Base block.
+    const tradeSizes= [...new Set(TRADE_SIZES_USDC)].filter(x=>['100','500','1000'].includes(x)).slice(0,3);
+    if(tradeSizes.length!==3)throw Error('Required bounded comparison sizes missing from current research configuration');
+    report.testedSizesUsdc=tradeSizes;
+    for(const sizeUsdc of tradeSizes){
+     for(const [buyPool,sellPool] of [
+      [aerodromeMatch,uniswapMatch],
+      [uniswapMatch,aerodromeMatch],
+     ] as const){
+      report.proofs.push(await proveReadOnlyMarket({
+       observed,buyPool,sellPool,sizeUsdc,costs,
+      },deps));
+     }
     }
     report.routeCount=report.proofs.length;
     report.status=report.proofs.every(p=>p.status==='MODELED_REJECT'||p.status==='MODELED_CANDIDATE')
@@ -141,7 +148,10 @@ try {
   status:report.status,readOnly:true,executionAuthorized:false,
   blockNumber:report.blockNumber,blockHash:report.blockHash,
   poolAddresses:report.poolAddresses,
-  results:report.proofs.map(p=>({status:p.status,modelDecision:p.quote?.costModelDecision??null,
+  testedSizesUsdc:report.testedSizesUsdc,
+  modeledCandidates:report.proofs.filter(p=>p.status==='MODELED_CANDIDATE').length,
+  modeledRejects:report.proofs.filter(p=>p.status==='MODELED_REJECT').length,
+  results:report.proofs.map(p=>({sizeUsdc:p.quote?.sizeUsdc??null,status:p.status,modelDecision:p.quote?.costModelDecision??null,
    modeledNetUsdcMicros:p.quote?.estimatedNetProfitMicros??null})),
   reason:report.reason,timingMs:report.timingMs,artifact:outPath,
  };
