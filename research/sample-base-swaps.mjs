@@ -1,6 +1,6 @@
 // Small read-only Base RPC sample. Does not claim arbitrage profitability.
 // Collect a bounded set of swap-event receipts from the last N blocks.
-import {createPublicClient, http, fallback, keccak256, toBytes} from 'viem';
+import {createPublicClient, http, fallback, keccak256, toBytes, toHex} from 'viem';
 import {base} from 'viem/chains';
 import {summarizeSwapReceipt,SWAP_V3,SWAP_CLASSIC} from './lib/base-receipt-evidence.js';
 const rpc=(process.env.BASE_RPC_URLS||process.env.BASE_RPC_URL||'').split(',').map(x=>x.trim()).filter(Boolean);
@@ -18,7 +18,7 @@ try{
  tip=await client.getBlockNumber();
  const fromBlock=tip-BigInt(depth-1);
  for(const topic of topics){
-  try{const group=await client.getLogs({address:pools,topics:[topic],fromBlock,toBlock:tip});logs.push(...group)}
+  try{const group=await client.request({method:'eth_getLogs',params:[{address:pools,topics:[topic],fromBlock:toHex(fromBlock),toBlock:toHex(tip)}]});logs.push(...group)}
   catch(e){throw Error('getLogs failed: '+String(e).slice(0,350))}
  }
  const hashes=[...new Set(logs.map(l=>l.transactionHash))].slice(0,limit);
