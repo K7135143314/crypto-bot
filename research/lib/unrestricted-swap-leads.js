@@ -2,7 +2,7 @@
 // Address filter is intentionally absent, but event signatures still limit protocol coverage.
 const A=/^0x[0-9a-f]{40}$/i, H=/^0x[0-9a-f]{64}$/i;
 const lower=v=>String(v??'').toLowerCase();
-const asBlock=x=>{try{const n=BigInt(x);return n>=0n?n:null;}catch{return null;}};
+const asBlock=x=>{if(x===null||x===undefined||x==='')return null;try{const n=BigInt(x);return n>=0n?n:null;}catch{return null;}};
 export function selectUnrestrictedMultiSwapLeads(logs,knownPools,limit=12){
  const tracked=new Set((knownPools||[]).map(lower).filter(x=>A.test(x)));
  const grouped=new Map();let invalidLogs=0,duplicateLogs=0;
