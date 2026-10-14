@@ -11,7 +11,7 @@ export type HeadStatus =
 export type HeadEvent =
   | { kind: 'CHAIN_OK'; chainId: 8453 }
   | { kind: 'SUBSCRIBED'; subscription: string }
-  | { kind: 'HEAD'; status: HeadStatus; number: string | null; hash: string | null; arrivalAt: string; note: string; usableForTrading: false }
+  | { kind: 'HEAD'; status: HeadStatus; number: string | null; hash: string | null; parentHash: string | null; arrivalAt: string; note: string; usableForTrading: false }
   | { kind: 'IGNORED'; reason: string }
   | { kind: 'FATAL'; reason: string };
 type Obj = Record<string, unknown>;
@@ -104,6 +104,7 @@ export class BaseHeadsSession {
     this.counts[status]++;
     return {kind:'HEAD',status,number:header?.number.toString() ?? null,
       hash:header?.hash ?? null,
+      parentHash:header?.parentHash ?? null,
       arrivalAt:clockOK?new Date(receivedAtMs).toISOString():'INVALID',
       note,usableForTrading:false};
   }
