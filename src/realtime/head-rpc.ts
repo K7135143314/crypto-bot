@@ -12,8 +12,10 @@ export async function verifyObservedHead(
  }))return reconcileHead(observed,[]);
  const input=observed as {number?:unknown}|null;
  const number=typeof input?.number==='string'?input.number:null;
- // Lookup is deliberately limited to exactly the observed block, never latest.
- if(!number||!/^0x[0-9a-fA-F]+$/.test(number))return reconcileHead(observed,[]);
+ // Observer emits decimal while Base RPC requires a hexadecimal quantity.
+ // Lookup is limited to the exact observed block, never 'latest'.
+ if(!number|| !(/^(0x[0-9a-fA-F]+|[1-9][0-9]*)$/.test(number)))return reconcileHead(observed,[]);
+ const blockTag='0x'+BigInt(number).toString(16);
  const reads:ProviderRead[]=await Promise.all(sources.map(async source=>{
   try{
    const request=async(id:number,method:string,params:unknown[])=>{
@@ -26,7 +28,7 @@ export async function verifyObservedHead(
    };
    const chainId=await request(1,'eth_chainId',[]);
    if(chainId!=='0x2105')return {source:source.name,chainId,block:null};
-   const block=await request(2,'eth_getBlockByNumber',[number,false]);
+   const block=await request(2,'eth_getBlockByNumber',[blockTag,false]);
    return {source:source.name,chainId,block};
   }catch{return {source:source.name,chainId:'0x2105',block:null,error:'RPC lookup failed'}}
  }));
