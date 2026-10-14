@@ -4,6 +4,7 @@ on:
     branches: [research/live-pool-profit-smoke-20261014]
     paths:
       - '.github/workflows/live-pool-profit-smoke.yml'
+      - 'src/live-pool-profit-smoke.ts'
   workflow_dispatch:
 permissions:
   contents: read
