@@ -1,3 +1,4 @@
+import { evaluateOpportunity, DEFAULT_PROFIT_RESERVES } from '../lib/profit-core.js';
 import {
   createPublicClient,
   fallback,
@@ -16,11 +17,6 @@ const AAVE_POOL = '0xA238Dd80C259a72e81d7e4664a9801593F98d1c5';
 
 const SIZES = ['100','250','500','1000','2500','5000','10000'];
 const FEES = [100,500,3000,10000];
-const GAS_RESERVE_UNITS = 800000n;
-const L1_DATA_FEE_RESERVE_USDC = parseUnits('0.05', 6);
-const SLIPPAGE_RESERVE_BPS = 10n;
-const MEV_RESERVE_BPS = 10n;
-const MIN_NET_USDC = parseUnits('1', 6);
 
 const client = createPublicClient({
   chain: base,
@@ -61,7 +57,6 @@ const aaveAbi=[{
   inputs:[],outputs:[{name:'',type:'uint128'}]
 }];
 
-const bps=(amount,b)=>amount*b/10000n;
 const usdc=(v)=>Number(formatUnits(v,6));
 
 async function quoteAerodrome(tokenIn,tokenOut,amounts,blockNumber){
@@ -122,7 +117,6 @@ export default async function handler(req,res){
 
     const wethReferencePrice=Number(SIZES[0])/Number(formatUnits(uniFirst[0].amountOut,18));
     const ethMicros=BigInt(Math.round(wethReferencePrice*1_000_000));
-    const gasReserve=(gasPrice*GAS_RESERVE_UNITS*ethMicros)/1_000_000_000_000_000_000n;
 
     const rows=[];
     for(let i=0;i<SIZES.length;i++){
@@ -133,16 +127,17 @@ export default async function handler(req,res){
       ];
       for(const x of routes){
         const gross=x.final-start;
-        const flashFee=bps(start,flashBps);
-        const slippageReserve=bps(start,SLIPPAGE_RESERVE_BPS);
-        const mevReserve=bps(start,MEV_RESERVE_BPS);
-        const totalModeledCosts=flashFee+gasReserve+L1_DATA_FEE_RESERVE_USDC+slippageReserve+mevReserve;
-        const net=gross-totalModeledCosts;
-        let decision='CANDIDATE';
-        if(gross<=0n) decision='REJECT_RAW_LOSS';
-        else if(gross-flashFee<=0n) decision='REJECT_FLASH_FEE';
-        else if(net<=0n) decision='REJECT_COSTS';
-        else if(net<MIN_NET_USDC) decision='REJECT_MIN_PROFIT';
+        const evaluation = evaluateOpportunity({
+          startUsdc: start, grossProfitUsdc: gross, gasPriceWei: gasPrice,
+          ethPriceUsdcMicros: ethMicros,
+          policy: { flashLoanPremiumBps: flashBps, ...DEFAULT_PROFIT_RESERVES },
+        });
+        const flashFee = evaluation.flashLoanFeeUsdc;
+        const slippageReserve = evaluation.slippageReserveUsdc;
+        const mevReserve = evaluation.mevReserveUsdc;
+        const totalModeledCosts = evaluation.totalModeledCostsUsdc;
+        const net = evaluation.estimatedNetProfitUsdc;
+        const decision = evaluation.decision;
 
         rows.push({
           route:x.route,
@@ -150,7 +145,7 @@ export default async function handler(req,res){
           finalUsdc:usdc(x.final),
           grossDeltaUsdc:usdc(gross),
           flashLoanFeeUsdc:usdc(flashFee),
-          l2GasReserveUsdc:usdc(gasReserve),
+          l2GasReserveUsdc:usdc(evaluation.l2GasReserveUsdc),
           l1DataFeeReserveUsdc:usdc(L1_DATA_FEE_RESERVE_USDC),
           slippageReserveUsdc:usdc(slippageReserve),
           mevReserveUsdc:usdc(mevReserve),
