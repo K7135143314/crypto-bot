@@ -25,7 +25,8 @@
     "test:realtime": "tsx --test src/realtime/flashblock-observer.test.ts",
     "listen:flashblocks": "tsx src/realtime/base-flashblocks-cli.ts",
     "listen:heads": "tsx src/realtime/base-heads-cli.ts",
-    "smoke:live-pool-profit": "tsx src/live-pool-profit-smoke.ts"
+    "smoke:live-pool-profit": "tsx src/live-pool-profit-smoke.ts",
+    "study:historical-pools": "tsx src/historical-pool-study.ts"
   },
   "dependencies": {
     "viem": "^2.38.0"
