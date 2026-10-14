@@ -7,6 +7,7 @@ import {
   type Address,
 } from 'viem';
 import { base } from 'viem/chains';
+import { timeStage, type StageTiming } from './quote-timing.js';
 import { aerodromeRouterAbi, uniswapV3QuoterV2Abi } from './abis.js';
 import {
   BASE_RPC_URLS,
@@ -222,46 +223,46 @@ export async function quoteMatrix(
   publicClient: BasePublicClient,
   tradeSizesUsdc: readonly string[],
   blockNumber: bigint,
+  onTiming?: (entry: StageTiming) => void,
+  options: { parallelFirstLegs?: boolean } = {},
 ): Promise<MatrixRow[]> {
+  const capture = onTiming ?? (() => {});
   const starts = tradeSizesUsdc.map((size) => parseUnits(size, TOKENS.USDC.decimals));
 
-  const aerodromeFirst = await quoteAerodromeBatch(
-    publicClient,
-    TOKENS.USDC.address,
-    TOKENS.WETH.address,
-    starts,
-    blockNumber,
-  );
+  // The two initial USDC->WETH legs do not depend on each other.
+  // Opt-in research comparison only. Default sequential mode is retained.
+  const parallelFirstLegs = options.parallelFirstLegs ?? (process.env.QUOTE_PARALLEL_FIRST_LEGS === 'true');
+  const quoteAeroFirst = () => timeStage('aerodrome-first', () =>
+    quoteAerodromeBatch(publicClient, TOKENS.USDC.address, TOKENS.WETH.address,
+      starts, blockNumber), capture);
+  const quoteUniFirst = () => timeStage('uniswap-first', () =>
+    quoteUniswapV3Batch(publicClient, TOKENS.USDC.address, TOKENS.WETH.address,
+      starts, blockNumber), capture);
+
+  let aerodromeFirst: DexQuote[];
+  let uniswapFirst: DexQuote[];
+  if (parallelFirstLegs) {
+    // Both use the same pinned state; no downstream quote starts until both succeed.
+    [aerodromeFirst, uniswapFirst] = await Promise.all([
+      quoteAeroFirst(), quoteUniFirst(),
+    ]);
+  } else {
+    aerodromeFirst = await quoteAeroFirst();
+    await sleep(600);
+    uniswapFirst = await quoteUniFirst();
+  }
 
   await sleep(600);
-
-  const uniswapFirst = await quoteUniswapV3Batch(
-    publicClient,
-    TOKENS.USDC.address,
-    TOKENS.WETH.address,
-    starts,
-    blockNumber,
-  );
+  const uniswapSecond = await timeStage('uniswap-second', () => quoteUniswapV3Batch(
+    publicClient, TOKENS.WETH.address, TOKENS.USDC.address,
+    aerodromeFirst.map((quote) => quote.amountOut), blockNumber,
+  ), capture);
 
   await sleep(600);
-
-  const uniswapSecond = await quoteUniswapV3Batch(
-    publicClient,
-    TOKENS.WETH.address,
-    TOKENS.USDC.address,
-    aerodromeFirst.map((quote) => quote.amountOut),
-    blockNumber,
-  );
-
-  await sleep(600);
-
-  const aerodromeSecond = await quoteAerodromeBatch(
-    publicClient,
-    TOKENS.WETH.address,
-    TOKENS.USDC.address,
-    uniswapFirst.map((quote) => quote.amountOut),
-    blockNumber,
-  );
+  const aerodromeSecond = await timeStage('aerodrome-second', () => quoteAerodromeBatch(
+    publicClient, TOKENS.WETH.address, TOKENS.USDC.address,
+    uniswapFirst.map((quote) => quote.amountOut), blockNumber,
+  ), capture);
 
   const rows: MatrixRow[] = [];
 

@@ -10,7 +10,7 @@
     "scan": "tsx src/index.ts",
     "compare": "tsx src/compare-scans.ts",
     "history": "tsx src/analyze-history.ts",
-    "test": "tsx --test src/profit.test.ts src/history.test.ts src/rolling-history.test.ts src/paper.test.ts src/atomic-preflight.test.ts src/scout.test.ts src/scout-verifier.test.ts src/six-market-verifier.test.ts src/realtime/flashblock-observer.test.ts src/realtime/base-flashblocks-session.test.ts src/realtime/base-heads-session.test.ts src/realtime/head-reconcile.test.ts src/realtime/head-evidence.test.ts src/realtime/head-rpc.test.ts src/realtime/head-pipeline.test.ts src/pool-state.test.ts src/pool-gated-market.test.ts src/fee-tier-selection.test.ts",
+    "test": "tsx --test src/profit.test.ts src/history.test.ts src/rolling-history.test.ts src/paper.test.ts src/atomic-preflight.test.ts src/scout.test.ts src/scout-verifier.test.ts src/six-market-verifier.test.ts src/realtime/flashblock-observer.test.ts src/realtime/base-flashblocks-session.test.ts src/realtime/base-heads-session.test.ts src/realtime/head-reconcile.test.ts src/realtime/head-evidence.test.ts src/realtime/head-rpc.test.ts src/realtime/head-pipeline.test.ts src/pool-state.test.ts src/pool-gated-market.test.ts src/fee-tier-selection.test.ts src/quote-timing.test.ts src/quote-benchmark.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "proof:candidate": "tsx src/candidate-proof.ts",
     "paper": "tsx src/analyze-paper-persistence.ts",
@@ -26,7 +26,8 @@
     "listen:flashblocks": "tsx src/realtime/base-flashblocks-cli.ts",
     "listen:heads": "tsx src/realtime/base-heads-cli.ts",
     "smoke:live-pool-profit": "tsx src/live-pool-profit-smoke.ts",
-    "study:historical-pools": "tsx src/historical-pool-study.ts"
+    "study:historical-pools": "tsx src/historical-pool-study.ts",
+    "benchmark:quotes": "tsx src/quote-benchmark-cli.ts"
   },
   "dependencies": {
     "viem": "^2.38.0"
