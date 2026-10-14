@@ -25,9 +25,15 @@ export function applyBps(amount, bps) {
 
 export function estimateGasUsdc(gasPriceWei, gasUnits, ethPriceUsdcMicros) {
   requireBigInt('gasPriceWei', gasPriceWei);
-  requireBigInt('ethPriceUsdcMicros', ethPriceUsdcMicros, 1n);
-  if (!Number.isSafeInteger(gasUnits) || gasUnits <= 0) {
-    throw new TypeError('gasUnits must be a positive safe integer');
+  requireBigInt('ethPriceUsdcMicros', ethPriceUsdcMicros);
+  if (!Number.isSafeInteger(gasUnits) || gasUnits < 0) {
+    throw new TypeError('gasUnits must be a nonnegative safe integer');
+  }
+  // Synthetic preflight may model zero gas. Live policy must supply a
+  // positive gas reserve; this case is NEVER measured profitable execution.
+  if (gasUnits === 0 || gasPriceWei === 0n) return 0n;
+  if (ethPriceUsdcMicros === 0n) {
+    throw new TypeError('A positive WETH reference price is required when gas is nonzero');
   }
   return (gasPriceWei * BigInt(gasUnits) * ethPriceUsdcMicros) /
     1_000_000_000_000_000_000n;
@@ -49,11 +55,11 @@ function assertValidOpportunity(args) {
   for (const key of ['flashLoanPremiumBps', 'slippageReserveBps', 'mevReserveBps']) {
     if (p[key] > 10_000n) throw new TypeError(key + ' must be <= 10000 bps');
   }
-  if (!Number.isSafeInteger(p.gasReserveUnits) || p.gasReserveUnits <= 0) {
+  if (!Number.isSafeInteger(p.gasReserveUnits) || p.gasReserveUnits < 0) {
     throw new TypeError('Invalid gas reserve units');
   }
   requireBigInt('gasPriceWei', args.gasPriceWei);
-  requireBigInt('ethPriceUsdcMicros', args.ethPriceUsdcMicros, 1n);
+  requireBigInt('ethPriceUsdcMicros', args.ethPriceUsdcMicros);
 }
 
 export function evaluateOpportunity(args) {
