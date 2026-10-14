@@ -19,3 +19,10 @@ test('invalid economic inputs fail closed',()=>{
   assert.throws(()=>evaluateOpportunity({...inputs,policy:{...inputs.policy,gasReserveUnits:0}}));
   assert.throws(()=>estimateGasUsdc(2n,Number.NaN,100n));
 });
+
+test('zero-cost synthetic preflight is allowed but nonzero gas requires a reference price', () => {
+  const v=evaluateOpportunity({...inputs,gasPriceWei:0n,ethPriceUsdcMicros:0n,policy:{...inputs.policy,gasReserveUnits:0},grossProfitUsdc:2_000_000n});
+  assert.equal(v.l2GasReserveUsdc,0n);
+  assert.equal(v.decision,'CANDIDATE');
+  assert.throws(()=>evaluateOpportunity({...inputs,ethPriceUsdcMicros:0n,grossProfitUsdc:2_000_000n}));
+});
