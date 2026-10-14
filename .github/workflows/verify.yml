@@ -279,3 +279,19 @@ jobs:
           path: artifacts/*.json
           if-no-files-found: ignore
           retention-days: 14
+
+      - name: Bounded read-only Uniswap fee-tier sweep
+        if: github.head_ref == 'research/weth-usdc-fee-tier-sweep-20261014'
+        timeout-minutes: 5
+        env:
+          BASE_RPC_URL: https://base-rpc.publicnode.com
+          STUDY_SWEEP_FEE_TIERS: 'true'
+        run: npm run smoke:live-pool-profit
+      - name: Preserve fee-tier sweep evidence
+        if: always() && github.head_ref == 'research/weth-usdc-fee-tier-sweep-20261014'
+        uses: actions/upload-artifact@v4
+        with:
+          name: base-fee-tier-research
+          path: artifacts/base-pool-to-profit-live.json
+          if-no-files-found: ignore
+          retention-days: 14
