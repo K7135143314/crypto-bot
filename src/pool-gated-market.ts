@@ -45,7 +45,7 @@ export async function proveReadOnlyMarket(args:{
   realizedNetUsdc:null,blockNumber:observed.number,blockHash:observed.hash,
  };
  const fail=(status:MarketProofStatus,reason:string,additional:Partial<MarketProof>={}): MarketProof =>
-   {...base,status,reason,...additional};
+   ({...base,status,reason,...additional});
  let blockNumber:bigint, size:bigint;
  try {
   blockNumber=BigInt(observed.number);
