@@ -9,6 +9,8 @@ import {
 } from './config.js';
 import { evaluateOpportunity } from './profit.js';
 import { client, formatUsdc, formatWeth, quoteMatrix } from './quotes.js';
+import { performance } from 'node:perf_hooks';
+import type { StageTiming } from './quote-timing.js';
 
 function estimateEthPriceUsdc(rows: Awaited<ReturnType<typeof quoteMatrix>>): number {
   const anchor = rows.find(
@@ -68,7 +70,11 @@ async function main(): Promise<void> {
   console.log(`Minimum estimated net profit: $${formatUsdc(PROFIT_POLICY.minNetProfitUsdc)}`);
   console.log('No wallet. No signing. No transactions.\n');
 
-  const rows = await quoteMatrix(client, TRADE_SIZES_USDC, blockNumber);
+  const quoteTimings: StageTiming[] = [];
+  const quoteStarted = performance.now();
+  const rows = await quoteMatrix(client, TRADE_SIZES_USDC, blockNumber, entry => quoteTimings.push(entry));
+  const quoteElapsedMs = Math.round((performance.now() - quoteStarted) * 1000) / 1000;
+  console.log(`Read-only pinned-block quote matrix elapsed: ${quoteElapsedMs} ms`);
   const ethPriceUsdc = estimateEthPriceUsdc(rows);
   const ethPriceUsdcMicros = BigInt(Math.round(ethPriceUsdc * 1_000_000));
 
@@ -194,6 +200,8 @@ async function main(): Promise<void> {
     },
     candidateCount,
     rows: reportRows,
+    timing: { metric: 'local-quote-matrix-wall-clock', quoteElapsedMs, stages: quoteTimings,
+      caveat: 'Includes network RPC and intentional throttling; excludes Base event delivery and transaction inclusion.' },
   };
 
   await mkdir('artifacts', { recursive: true });
