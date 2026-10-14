@@ -13,7 +13,7 @@ const topicAddress = (v) => {
   return ADDRESS.test(address) ? address : null;
 };
 const gasWei = (receipt) => {
-  if (receipt?.gasUsed === undefined || receipt?.effectiveGasPrice === undefined)
+  if (receipt?.gasUsed == null || receipt?.effectiveGasPrice == null)
     return null;
   try {
     const used = BigInt(receipt.gasUsed);
