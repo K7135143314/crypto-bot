@@ -3,6 +3,7 @@
 import {createPublicClient, http, fallback, keccak256, toBytes, toHex} from 'viem';
 import {base} from 'viem/chains';
 import {summarizeExpandedSwapReceipt,SWAP_V3,SWAP_CLASSIC} from './lib/base-receipt-evidence.js';
+import {summarizeReceiptTokenFlows} from './lib/base-transfer-flows.js';
 const rpc=(process.env.BASE_RPC_URLS||process.env.BASE_RPC_URL||'').split(',').map(x=>x.trim()).filter(Boolean);
 const urls=[...new Set([...rpc,'https://base-rpc.publicnode.com','https://mainnet.base.org'])];
 const client=createPublicClient({chain:base,transport:fallback(urls.map(url=>http(url,{timeout:18000,retryCount:0})))});
@@ -34,7 +35,7 @@ try{
  const hashes=[...new Set(logs.map(l=>l.transactionHash))].slice(0,limit);
  for(const hash of hashes){
   const receipt=await client.getTransactionReceipt({hash});
-  receipts.push(summarizeExpandedSwapReceipt(receipt,pools,topics));
+  receipts.push({...summarizeExpandedSwapReceipt(receipt,pools,topics),tokenFlows:summarizeReceiptTokenFlows(receipt)});
  }
 }catch(e){state='SOURCE_ERROR';error=String(e).slice(0,700)}
 const report={version:1,generatedAt:new Date().toISOString(),readOnly:true,
@@ -42,6 +43,6 @@ const report={version:1,generatedAt:new Date().toISOString(),readOnly:true,
  sampleDepthBlocks:depth,sampledMaxReceipts:limit,tipBlock:tip?.toString()||null,
  poolAddresses:pools,poolSources:selected.sources,observedEventCount:logs.length,receipts,
  historicalNetProfitsConfirmed:0,
- note:'Sampled up to 16 research pools and all recognized swap events within selected receipts; does not cover all Base arbitrage. Success and multi-pool swaps do NOT prove net profitability; net cash flows and all fees not reconstructed.'};
+ note:'Sampled up to 16 research pools and all recognized swap events within selected receipts; does not cover all Base arbitrage. Success and multi-pool swaps do NOT prove net profitability; ERC-20 transfer movements are observed but full ownership, debt, internal/native flows and all fee effects are not reconstructed.'};
 console.log(JSON.stringify(report,null,2));
 if(state!=='COMPLETE')process.exitCode=1;
