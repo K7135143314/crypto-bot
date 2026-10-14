@@ -24,3 +24,15 @@ Research window: October 6–13, 2026 (UTC; dynamic Dune query uses last 7 days 
 ## Outcome and next release gate
 
 The Dune query is a starting point, not a validated dataset. Existing central scanner quotes remain separate. No new exchange adapters, changes to live trading, subscriptions, wallets, or funds are authorized by this audit.
+
+## Coverage comparator (tested code, not verified transactions)
+
+The new `research/lib/base-arbitrage-comparison.js` works on a separately exported Dune candidate result and the existing saved scanner history. It compares market, DEX order, exact pool address hints and supported tokens. Results are strictly classified as source-data candidates, and `netProfitUsdc` remains `null` regardless of apparent gross profits. It does **not** pretend that a contract hint proves pool identity, that identical pool names mean identical routes, or that a historic transaction was reproducible by our scanner.
+
+Safety rules: hashes must be 32-byte hexadecimal; observations outside the seven-day window are excluded; missing quotes and unsupported markets cannot become candidates; and results cannot authorize execution. Even an address match with our scanner is `SAME_POOLS_SEEN_IN_SCANNER`, **not confirmed historical net profit**.
+
+## Dune schema and execution caveat
+
+The checked-in SQL targets `dex.trades` and `base.transactions`, intended for DuneSQL/Trino. Static field inspection and GitHub CI **do not establish that Dune accepted or executed this SQL**. Before calling the research query validated, execute it on Dune, confirm `evt_index`, `project_contract_address`, `gas_used`, `gas_price`, and `l1_fee` in its actual schema, record the execution ID, then inspect at least a sample of raw Base transaction receipts. Decoded DEX tables are not a full transaction-level accounting ledger.
+
+No current October 6–13 net-profitable transaction evidence was retrieved in this task. The comparison code and synthetic test fixtures establish **correct categorization logic only**, not verified live arbitrage.
