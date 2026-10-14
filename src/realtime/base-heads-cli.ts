@@ -20,12 +20,16 @@ const stop=()=>{if(socket.readyState===WebSocket.OPEN||socket.readyState===WebSo
 const watchdog=setTimeout(stop,seconds*1000);
 socket.addEventListener('open',()=>{
  connected=true;
+ // Verify chain before requesting any subscription. Responses can arrive
+ // out of order if chain and subscribe are issued concurrently.
  socket.send(JSON.stringify({jsonrpc:'2.0',id:1,method:'eth_chainId',params:[]}));
- socket.send(JSON.stringify({jsonrpc:'2.0',id:2,method:'eth_subscribe',params:['newHeads']}));
 });
 socket.addEventListener('message',ev=>{
  try{
   const result=pipeline.ingest(JSON.parse(String(ev.data)));
+  if(result.kind==='CHAIN_OK'){
+   socket.send(JSON.stringify({jsonrpc:'2.0',id:2,method:'eth_subscribe',params:['newHeads']}));
+  }
   if(result.kind==='HEAD')heads++;
  }catch{failures++;stop();}
 });
@@ -35,7 +39,7 @@ socket.addEventListener('close',()=>{
  void (async()=>{
   try{await pipeline.drain()}catch{failures++}
   console.log(JSON.stringify({readOnly:true,executionAuthorized:false,connected,heads,failures,
-   evidenceRecords:writer.count,pipeline:pipeline.snapshot(),
+   evidenceRecords:writer.count,verdictCounts:writer.verdictCounts(),pipeline:pipeline.snapshot(),
    note:'RPC matching is unsafe/nonfinal, not verified profit or permission to trade'}));
   if(!connected||failures||!heads||pipeline.snapshot().stopped)process.exitCode=1;
  })();
