@@ -5,6 +5,7 @@ import {base} from 'viem/chains';
 import {summarizeExpandedSwapReceipt,SWAP_V3,SWAP_CLASSIC} from './lib/base-receipt-evidence.js';
 import {summarizeReceiptTokenFlows} from './lib/base-transfer-flows.js';
 import {classifyCircularUsdcEvidence} from './lib/circular-usdc-evidence.js';
+import {selectPriorityReceipts} from './lib/receipt-priority.js';
 const rpc=(process.env.BASE_RPC_URLS||process.env.BASE_RPC_URL||'').split(',').map(x=>x.trim()).filter(Boolean);
 const urls=[...new Set([...rpc,'https://base-rpc.publicnode.com','https://mainnet.base.org'])];
 const client=createPublicClient({chain:base,transport:fallback(urls.map(url=>http(url,{timeout:18000,retryCount:0})))});
@@ -22,7 +23,7 @@ const pools=selected.poolAddresses;
 const topics=[keccak256(toBytes(SWAP_V3)),keccak256(toBytes(SWAP_CLASSIC))];
 const depth=Math.min(Math.max(Number(process.env.SAMPLE_BLOCK_DEPTH||'20')||20,1),100);
 const limit=Math.min(Math.max(Number(process.env.SAMPLE_RECEIPT_LIMIT||'12')||12,1),25);
-let state='COMPLETE',error=null,tip=null,logs=[],receipts=[];
+let state='COMPLETE',error=null,tip=null,logs=[],receipts=[],selection=null;
 try{
  tip=await client.getBlockNumber();
  const fromBlock=tip-BigInt(depth-1);
@@ -33,7 +34,8 @@ try{
    catch(e){throw Error('getLogs batch '+start+' failed: '+String(e).slice(0,350))}
   }
  }
- const hashes=[...new Set(logs.map(l=>l.transactionHash))].slice(0,limit);
+ selection=selectPriorityReceipts(logs,pools,limit);
+ const hashes=selection.selected.map(x=>x.txHash);
  for(const hash of hashes){
   const receipt=await client.getTransactionReceipt({hash});
   receipts.push({...summarizeExpandedSwapReceipt(receipt,pools,topics),tokenFlows:summarizeReceiptTokenFlows(receipt),circularUsdcEvidence:classifyCircularUsdcEvidence(receipt,topics)});
@@ -42,7 +44,7 @@ try{
 const report={version:1,generatedAt:new Date().toISOString(),readOnly:true,
  executionAuthorized:false,chainId:8453,state,error,
  sampleDepthBlocks:depth,sampledMaxReceipts:limit,tipBlock:tip?.toString()||null,
- poolAddresses:pools,poolSources:selected.sources,observedEventCount:logs.length,receipts,
+ poolAddresses:pools,poolSources:selected.sources,observedEventCount:logs.length,receiptSelection:selection,receipts,
  historicalNetProfitsConfirmed:0,
  note:'Sampled up to 16 research pools and all recognized swap events within selected receipts; does not cover all Base arbitrage. Success and multi-pool swaps do NOT prove net profitability; ERC-20 transfer movements are observed but full ownership, debt, internal/native flows and all fee effects are not reconstructed.'};
 console.log(JSON.stringify(report,null,2));
