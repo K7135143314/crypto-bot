@@ -27,3 +27,23 @@ export function summarizeSwapReceipt(receipt,poolAddresses,swapTopics){
    executionAuthorized:false,
  };
 }
+
+export function summarizeExpandedSwapReceipt(receipt,trackedPools,swapTopics){
+ const base=summarizeSwapReceipt(receipt,trackedPools,swapTopics);
+ const topics=new Set(swapTopics.map(x=>String(x).toLowerCase()));
+ const all=(receipt?.logs||[]).filter(log=>ADDR.test(String(log.address||'')) &&
+    topics.has(String(log.topics?.[0]).toLowerCase()));
+ const unique=[...new Set(all.map(x=>String(x.address).toLowerCase()))];
+ const tracked=new Set(trackedPools.map(x=>String(x).toLowerCase()));
+ return {...base,allRecognizedSwapEvents:all.length,
+  allDistinctSwapEmitters:unique.length,
+  recognizedSwapEmitterAddresses:unique.slice(0,30),
+  outsideTrackedPoolCount:unique.filter(x=>!tracked.has(x)).length,
+  classification:receipt?.status!=='success'?'FAILED_TX':
+    unique.length>=2?'MULTI_SWAP_EMITTER_CANDIDATE':
+    unique.length===1?'SINGLE_SWAP_EMITTER':'NO_RECOGNIZED_SWAP',
+  eventAnalysisScope:'TWO_APPROVED_SWAP_EVENT_SIGNATURES_ONLY',
+  netProfitUsdc:null,actualArbitrageConfirmed:false,
+  warning:'Two swap event emitters can be a normal user routing transaction; token balance deltas, actor identity, transfer traces, factory ownership and all costs remain unverified.',
+ };
+}
