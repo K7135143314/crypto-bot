@@ -24,7 +24,8 @@
     "verify:six": "tsx src/six-market-verifier-cli.ts",
     "test:realtime": "tsx --test src/realtime/flashblock-observer.test.ts",
     "listen:flashblocks": "tsx src/realtime/base-flashblocks-cli.ts",
-    "listen:heads": "tsx src/realtime/base-heads-cli.ts"
+    "listen:heads": "tsx src/realtime/base-heads-cli.ts",
+    "smoke:live-pool-profit": "tsx src/live-pool-profit-smoke.ts"
   },
   "dependencies": {
     "viem": "^2.38.0"
