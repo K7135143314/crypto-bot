@@ -89,6 +89,22 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+      - name: Audit reference Base transaction (read only)
+        continue-on-error: true
+        run: |
+          mkdir -p artifacts
+          node research/audit-reference-transaction.mjs > artifacts/reference-tx-audit.json
+          node --input-type=module -e "import fs from 'node:fs'; const r=JSON.parse(fs.readFileSync('artifacts/reference-tx-audit.json')); console.log(JSON.stringify({txHash:r.txHash,status:r.status,observedSwapEmitterCount:r.observedSwapEmitterCount,observedTransferCount:r.observedTransferCount,actualArbitrageConfirmed:r.actualArbitrageConfirmed,netProfitUsdc:r.netProfitUsdc,executionAuthorized:r.executionAuthorized}));"
+
+      - name: Upload reference transaction evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reference-tx-evidence
+          path: artifacts/reference-tx-audit.json
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Generate V0.8 pinned scanner plan
         env:
           BASE_FORK_BLOCK: '52216060'
