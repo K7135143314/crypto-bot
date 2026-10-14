@@ -28,7 +28,8 @@ export function compareBaseArbitrageCandidates(dataset,scannerHistory,now=Date.n
   const watermark=validTime(dataset?.executedAt);
   const windowStart=now-7*24*3600000;
   const historyRuns=Array.isArray(scannerHistory?.runs)?scannerHistory.runs:[];
-  // Evidence must predate the historic transaction; future runs cannot count.\n  const findings=[];
+  // Evidence must predate the historic transaction; future runs cannot count.
+  const findings=[];
   for(const r of rows.slice(0,250)){
     const txHash=normalize(r?.tx_hash);
     const ts=validTime(r?.block_time_utc??r?.block_time);
@@ -48,7 +49,17 @@ export function compareBaseArbitrageCandidates(dataset,scannerHistory,now=Date.n
     if(!market)classification='MARKET_UNSUPPORTED';
     else if(!approvedDex(firstDex)||!approvedDex(secondDex))classification='DEX_UNSUPPORTED';
     else if(!ADDRESS.test(firstPool)||!ADDRESS.test(secondPool))classification='POOL_HINTS_MISSING';
-    else {\n      const eligible=historyRuns.filter(run => run?.readOnly===true &&\n        run?.executionAuthorized===false && Array.isArray(run.results) &&\n        validTime(run.generatedAt)!==null && validTime(run.generatedAt)<=ts &&\n        ts-validTime(run.generatedAt)<=2*3600000);\n      if(eligible.some(run=>run.results.some(q=>isVerifiedQuote(q) &&\n        [q.market,normalize(q.buyDex),normalize(q.sellDex),\n          normalize(q.buyPool),normalize(q.sellPool)].join('|')===pairKey)))\n        classification='SAME_POOLS_SEEN_IN_PRIOR_SCANNER';\n      else classification='NO_PRIOR_SCANNER_MATCH';\n    }
+    else {
+      const eligible=historyRuns.filter(run => run?.readOnly===true &&
+        run?.executionAuthorized===false && Array.isArray(run.results) &&
+        validTime(run.generatedAt)!==null && validTime(run.generatedAt)<=ts &&
+        ts-validTime(run.generatedAt)<=2*3600000);
+      if(eligible.some(run=>run.results.some(q=>isVerifiedQuote(q) &&
+        [q.market,normalize(q.buyDex),normalize(q.sellDex),
+          normalize(q.buyPool),normalize(q.sellPool)].join('|')===pairKey)))
+        classification='SAME_POOLS_SEEN_IN_PRIOR_SCANNER';
+      else classification='NO_PRIOR_SCANNER_MATCH';
+    }
     const gross=fixed(r.gross_delta_usdc);
     const feeEth=fixed(r.modeled_tx_fee_eth);
     findings.push({txHash,blockTimeUtc:new Date(ts).toISOString(),market,
