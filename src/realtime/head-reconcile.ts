@@ -29,11 +29,13 @@ export function reconcileHead(observedInput:unknown,reads:readonly ProviderRead[
  if(!observed||reads.length<2||new Set(reads.map(r=>r.source)).size!==reads.length||
  reads.some(r=>typeof r.source!=='string'||!r.source.trim()))
   return {...base,verdict:'INVALID_INPUT',reason:'Valid head and at least two distinct configured sources required'};
- const wrong=reads.some(r=>numberValue(r.chainId)!==8453n);
- if(wrong)return {...base,verdict:'WRONG_CHAIN',reason:'At least one provider did not verify Base chain ID 8453'};
- const normalized=reads.map(r=>r.error?null:normalizeHead(r.block));
+ // A transport failure is not evidence of the wrong chain. Never fabricate
+ // a successful chain ID when RPC could not be reached.
+ const explicitWrong=reads.some(r=>!r.error&&numberValue(r.chainId)!==null&&numberValue(r.chainId)!==8453n);
+ if(explicitWrong)return {...base,verdict:'WRONG_CHAIN',reason:'A reachable RPC explicitly reported a non-Base chain ID'};
+ const normalized=reads.map(r=>r.error||numberValue(r.chainId)!==8453n?null:normalizeHead(r.block));
  const checkedProviders=normalized.filter(v=>v!==null).length;
- if(checkedProviders!==reads.length)return {...base,checkedProviders,verdict:'RPC_UNAVAILABLE',reason:'Missing, malformed, or failed provider block lookup'};
+ if(checkedProviders!==reads.length)return {...base,checkedProviders,verdict:'RPC_UNAVAILABLE',reason:'Missing, malformed, failed, or chain-unverified provider response'};
  const rows=normalized as HeadRef[];
  if(!rows.every(r=>same(r,rows[0]!)))
   return {...base,checkedProviders,verdict:'PROVIDER_DISAGREEMENT',reason:'Provider block identities disagree'};
