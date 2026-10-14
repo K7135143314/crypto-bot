@@ -23,7 +23,8 @@
     "intelligence-history": "tsx src/update-intelligence-history.ts",
     "verify:six": "tsx src/six-market-verifier-cli.ts",
     "test:realtime": "tsx --test src/realtime/flashblock-observer.test.ts",
-    "listen:flashblocks": "tsx src/realtime/base-flashblocks-cli.ts"
+    "listen:flashblocks": "tsx src/realtime/base-flashblocks-cli.ts",
+    "listen:heads": "tsx src/realtime/base-heads-cli.ts"
   },
   "dependencies": {
     "viem": "^2.38.0"
