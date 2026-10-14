@@ -7,6 +7,7 @@ import {
   type Address,
 } from 'viem';
 import { base } from 'viem/chains';
+import { timeStage, type StageTiming } from './quote-timing.js';
 import { aerodromeRouterAbi, uniswapV3QuoterV2Abi } from './abis.js';
 import {
   BASE_RPC_URLS,
@@ -222,46 +223,48 @@ export async function quoteMatrix(
   publicClient: BasePublicClient,
   tradeSizesUsdc: readonly string[],
   blockNumber: bigint,
+  onTiming?: (entry: StageTiming) => void,
 ): Promise<MatrixRow[]> {
+  const capture = onTiming ?? (() => {});
   const starts = tradeSizesUsdc.map((size) => parseUnits(size, TOKENS.USDC.decimals));
 
-  const aerodromeFirst = await quoteAerodromeBatch(
+  const aerodromeFirst = await timeStage('aerodrome-first', () => quoteAerodromeBatch(
     publicClient,
     TOKENS.USDC.address,
     TOKENS.WETH.address,
     starts,
     blockNumber,
-  );
+  ), capture);
 
   await sleep(600);
 
-  const uniswapFirst = await quoteUniswapV3Batch(
+  const uniswapFirst = await timeStage('uniswap-first', () => quoteUniswapV3Batch(
     publicClient,
     TOKENS.USDC.address,
     TOKENS.WETH.address,
     starts,
     blockNumber,
-  );
+  ), capture);
 
   await sleep(600);
 
-  const uniswapSecond = await quoteUniswapV3Batch(
+  const uniswapSecond = await timeStage('uniswap-second', () => quoteUniswapV3Batch(
     publicClient,
     TOKENS.WETH.address,
     TOKENS.USDC.address,
     aerodromeFirst.map((quote) => quote.amountOut),
     blockNumber,
-  );
+  ), capture);
 
   await sleep(600);
 
-  const aerodromeSecond = await quoteAerodromeBatch(
+  const aerodromeSecond = await timeStage('aerodrome-second', () => quoteAerodromeBatch(
     publicClient,
     TOKENS.WETH.address,
     TOKENS.USDC.address,
     uniswapFirst.map((quote) => quote.amountOut),
     blockNumber,
-  );
+  ), capture);
 
   const rows: MatrixRow[] = [];
 
