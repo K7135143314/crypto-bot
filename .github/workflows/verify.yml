@@ -61,6 +61,7 @@ jobs:
           node --check research/lib/base-arbitrage-comparison.js
           node --test research/lib/base-arbitrage-comparison.test.js
           node --check research/sample-base-swaps.mjs
+          node --check research/audit-reference-transaction.mjs
           node --test research/lib/base-receipt-evidence.test.js research/lib/base-expanded-receipts.test.js research/lib/base-transfer-flows.test.js
           node --test dashboard/lib/verification-history.test.js
           node --check src/save-six-verification.mjs
@@ -85,6 +86,22 @@ jobs:
         with:
           name: base-receipt-evidence
           path: artifacts/base-receipt-sample.json
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Audit reference Base transaction (read only)
+        continue-on-error: true
+        run: |
+          mkdir -p artifacts
+          node research/audit-reference-transaction.mjs > artifacts/reference-tx-audit.json
+          node --input-type=module -e "import fs from 'node:fs'; const r=JSON.parse(fs.readFileSync('artifacts/reference-tx-audit.json')); console.log(JSON.stringify({txHash:r.txHash,status:r.status,observedSwapEmitterCount:r.observedSwapEmitterCount,observedTransferCount:r.observedTransferCount,actualArbitrageConfirmed:r.actualArbitrageConfirmed,netProfitUsdc:r.netProfitUsdc,executionAuthorized:r.executionAuthorized}));"
+
+      - name: Upload reference transaction evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reference-tx-evidence
+          path: artifacts/reference-tx-audit.json
           if-no-files-found: ignore
           retention-days: 7
 
