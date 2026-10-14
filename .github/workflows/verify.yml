@@ -56,6 +56,9 @@ jobs:
           node --check dashboard/lib/scout-core.js
           node --check dashboard/api/scout.js
           node --test dashboard/lib/scout-core.test.js
+          node --check dashboard/lib/profit-core.js
+          node --check dashboard/api/scan.js
+          node --test dashboard/lib/profit-core.test.js
           node --check dashboard/api/markets.js
           node --check dashboard/api/market-history.js
           node --check dashboard/api/verification-history.js
