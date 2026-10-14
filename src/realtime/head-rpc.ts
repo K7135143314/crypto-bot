@@ -30,7 +30,7 @@ export async function verifyObservedHead(
    if(chainId!=='0x2105')return {source:source.name,chainId,block:null};
    const block=await request(2,'eth_getBlockByNumber',[blockTag,false]);
    return {source:source.name,chainId,block};
-  }catch{return {source:source.name,chainId:'0x2105',block:null,error:'RPC lookup failed'}}
+  }catch{return {source:source.name,chainId:null,block:null,error:'RPC lookup failed'}}
  }));
  return reconcileHead(observed,reads);
 }
