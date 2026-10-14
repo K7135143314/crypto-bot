@@ -103,7 +103,7 @@ try {
     // current getGasPrice() call that would leak a different time period.
     // This is only a base-fee model; all actual execution costs remain unproven.
     const gasPriceWei=block.baseFeePerGas;
-    if(gasPriceWei===undefined || gasPriceWei<=0n)throw Error('Pinned block baseFeePerGas unavailable');
+    if(gasPriceWei==null || gasPriceWei<=0n)throw Error('Pinned block baseFeePerGas unavailable');
     report.gasPriceWei=gasPriceWei.toString();
     report.gasPriceSource='PINNED_BLOCK_BASE_FEE_ONLY';
     const flashLoanPremiumBps=await client.readContract({address:CONTRACTS.aaveV3Pool,abi:aaveV3PoolAbi,
