@@ -262,3 +262,20 @@ jobs:
           path: artifacts/candidates.json
           if-no-files-found: ignore
           retention-days: 30
+
+      - name: Historical read-only pool size study (research branch only)
+        if: github.head_ref == 'research/historical-pool-size-study-20261014'
+        timeout-minutes: 6
+        env:
+          BASE_RPC_URL: https://base-rpc.publicnode.com
+          STUDY_BLOCK_COUNT: '4'
+          STUDY_BLOCK_SPACING: '300'
+        run: npm run study:historical-pools
+      - name: Preserve historical study evidence
+        if: always() && github.head_ref == 'research/historical-pool-size-study-20261014'
+        uses: actions/upload-artifact@v4
+        with:
+          name: historical-Base-pool-study
+          path: artifacts/*.json
+          if-no-files-found: ignore
+          retention-days: 14
