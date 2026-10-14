@@ -1,0 +1,36 @@
+name: Bounded live Base pool-to-profit research
+on:
+  push:
+    branches: [research/live-pool-profit-smoke-20261014]
+    paths:
+      - '.github/workflows/live-pool-profit-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: live-pool-profit-smoke
+  cancel-in-progress: false
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm test
+      - name: Verify pinned Base contract states and modeled economics (NO transaction)
+        env:
+          BASE_RPC_URL: https://base-rpc.publicnode.com
+        run: npm run smoke:live-pool-profit
+      - name: Preserve actual research results even if rejected
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pinned-live-pool-profit-research
+          path: artifacts/base-pool-to-profit-live.json
+          if-no-files-found: ignore
+          retention-days: 14
