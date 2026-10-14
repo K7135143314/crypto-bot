@@ -1,6 +1,9 @@
 name: Bounded read-only Base provider smoke
 on:
   workflow_dispatch:
+  push:
+    branches: [feature/base-bounded-provider-smoke-20261014]
+    paths: ['.github/workflows/base-head-smoke.yml']
 permissions:
   contents: read
 jobs:
