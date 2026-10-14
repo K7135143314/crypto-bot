@@ -4,6 +4,7 @@ import {createPublicClient, http, fallback, keccak256, toBytes, toHex} from 'vie
 import {base} from 'viem/chains';
 import {summarizeExpandedSwapReceipt,SWAP_V3,SWAP_CLASSIC} from './lib/base-receipt-evidence.js';
 import {summarizeReceiptTokenFlows} from './lib/base-transfer-flows.js';
+import {classifyCircularUsdcEvidence} from './lib/circular-usdc-evidence.js';
 const rpc=(process.env.BASE_RPC_URLS||process.env.BASE_RPC_URL||'').split(',').map(x=>x.trim()).filter(Boolean);
 const urls=[...new Set([...rpc,'https://base-rpc.publicnode.com','https://mainnet.base.org'])];
 const client=createPublicClient({chain:base,transport:fallback(urls.map(url=>http(url,{timeout:18000,retryCount:0})))});
@@ -35,7 +36,7 @@ try{
  const hashes=[...new Set(logs.map(l=>l.transactionHash))].slice(0,limit);
  for(const hash of hashes){
   const receipt=await client.getTransactionReceipt({hash});
-  receipts.push({...summarizeExpandedSwapReceipt(receipt,pools,topics),tokenFlows:summarizeReceiptTokenFlows(receipt)});
+  receipts.push({...summarizeExpandedSwapReceipt(receipt,pools,topics),tokenFlows:summarizeReceiptTokenFlows(receipt),circularUsdcEvidence:classifyCircularUsdcEvidence(receipt,topics)});
  }
 }catch(e){state='SOURCE_ERROR';error=String(e).slice(0,700)}
 const report={version:1,generatedAt:new Date().toISOString(),readOnly:true,
