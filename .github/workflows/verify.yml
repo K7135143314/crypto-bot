@@ -62,6 +62,8 @@ jobs:
           node --test research/lib/base-arbitrage-comparison.test.js
           node --check research/sample-base-swaps.mjs
           node --check research/lib/circular-usdc-evidence.js
+          node --check research/lib/receipt-priority.js
+          node --test research/lib/receipt-priority.test.js
           node --test research/lib/circular-usdc-evidence.test.js
           node --check research/audit-reference-transaction.mjs
           node --test research/lib/base-receipt-evidence.test.js research/lib/base-expanded-receipts.test.js research/lib/base-transfer-flows.test.js
