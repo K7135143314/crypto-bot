@@ -28,16 +28,7 @@ export function compareBaseArbitrageCandidates(dataset,scannerHistory,now=Date.n
   const watermark=validTime(dataset?.executedAt);
   const windowStart=now-7*24*3600000;
   const historyRuns=Array.isArray(scannerHistory?.runs)?scannerHistory.runs:[];
-  const verifiedPools=new Set();
-  for(const run of historyRuns){
-    if(run?.readOnly!==true||run?.executionAuthorized!==false)continue;
-    for(const r of run.results||[]){
-      if(!isVerifiedQuote(r))continue;
-      verifiedPools.add([r.market,normalize(r.buyDex),normalize(r.sellDex),
-        normalize(r.buyPool),normalize(r.sellPool)].join('|'));
-    }
-  }
-  const findings=[];
+  // Evidence must predate the historic transaction; future runs cannot count.\n  const findings=[];
   for(const r of rows.slice(0,250)){
     const txHash=normalize(r?.tx_hash);
     const ts=validTime(r?.block_time_utc??r?.block_time);
@@ -57,7 +48,7 @@ export function compareBaseArbitrageCandidates(dataset,scannerHistory,now=Date.n
     if(!market)classification='MARKET_UNSUPPORTED';
     else if(!approvedDex(firstDex)||!approvedDex(secondDex))classification='DEX_UNSUPPORTED';
     else if(!ADDRESS.test(firstPool)||!ADDRESS.test(secondPool))classification='POOL_HINTS_MISSING';
-    else if(verifiedPools.has(pairKey))classification='SAME_POOLS_SEEN_IN_SCANNER';
+    else {\n      const eligible=historyRuns.filter(run => run?.readOnly===true &&\n        run?.executionAuthorized===false && Array.isArray(run.results) &&\n        validTime(run.generatedAt)!==null && validTime(run.generatedAt)<=ts &&\n        ts-validTime(run.generatedAt)<=2*3600000);\n      if(eligible.some(run=>run.results.some(q=>isVerifiedQuote(q) &&\n        [q.market,normalize(q.buyDex),normalize(q.sellDex),\n          normalize(q.buyPool),normalize(q.sellPool)].join('|')===pairKey)))\n        classification='SAME_POOLS_SEEN_IN_PRIOR_SCANNER';\n      else classification='NO_PRIOR_SCANNER_MATCH';\n    }
     const gross=fixed(r.gross_delta_usdc);
     const feeEth=fixed(r.modeled_tx_fee_eth);
     findings.push({txHash,blockTimeUtc:new Date(ts).toISOString(),market,
@@ -76,8 +67,8 @@ export function compareBaseArbitrageCandidates(dataset,scannerHistory,now=Date.n
     analysisAt:new Date(now).toISOString(),
     rowsReceived:rows.length,rowsAnalyzed:findings.length,
     actualNetProfitsConfirmed:0,
-    scannerPoolAddressMatches:findings.filter(x=>x.classification==='SAME_POOLS_SEEN_IN_SCANNER').length,
+    scannerPoolAddressMatches:findings.filter(x=>x.classification==='SAME_POOLS_SEEN_IN_PRIOR_SCANNER').length,
     findings,
-    note:'No source chain transaction receipts were verified. This report NEVER certifies historical net profit. Inputs must be independently reviewed, and pool identity verified at the historical block.',
+    note:'Only scanner observations within two hours BEFORE historic transactions can match; matching is pool-coverage evidence, never proof of opportunity timing. No source chain transaction receipts were verified. This report NEVER certifies historical net profit. Inputs must be independently reviewed, and pool identity verified at the historical block.',
   };
 }
