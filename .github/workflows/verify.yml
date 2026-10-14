@@ -61,7 +61,7 @@ jobs:
           node --check research/lib/base-arbitrage-comparison.js
           node --test research/lib/base-arbitrage-comparison.test.js
           node --check research/sample-base-swaps.mjs
-          node --test research/lib/base-receipt-evidence.test.js
+          node --test research/lib/base-receipt-evidence.test.js research/lib/base-expanded-receipts.test.js
           node --test dashboard/lib/verification-history.test.js
           node --check src/save-six-verification.mjs
           node --check dashboard/lib/market-watch.js
