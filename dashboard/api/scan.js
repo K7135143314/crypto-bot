@@ -146,7 +146,7 @@ export default async function handler(req,res){
           grossDeltaUsdc:usdc(gross),
           flashLoanFeeUsdc:usdc(flashFee),
           l2GasReserveUsdc:usdc(evaluation.l2GasReserveUsdc),
-          l1DataFeeReserveUsdc:usdc(L1_DATA_FEE_RESERVE_USDC),
+          l1DataFeeReserveUsdc:usdc(evaluation.l1DataFeeReserveUsdc),
           slippageReserveUsdc:usdc(slippageReserve),
           mevReserveUsdc:usdc(mevReserve),
           totalModeledCostsUsdc:usdc(totalModeledCosts),
