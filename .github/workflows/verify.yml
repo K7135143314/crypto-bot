@@ -58,6 +58,8 @@ jobs:
           node --check dashboard/api/verification-history.js
           node --check dashboard/api/opportunity-watchlist.js
           node --test dashboard/lib/opportunity-watchlist.test.js
+          node --check research/lib/base-arbitrage-comparison.js
+          node --test research/lib/base-arbitrage-comparison.test.js
           node --test dashboard/lib/verification-history.test.js
           node --check src/save-six-verification.mjs
           node --check dashboard/lib/market-watch.js
