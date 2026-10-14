@@ -60,6 +60,8 @@ jobs:
           node --test dashboard/lib/opportunity-watchlist.test.js
           node --check research/lib/base-arbitrage-comparison.js
           node --test research/lib/base-arbitrage-comparison.test.js
+          node --check research/sample-base-swaps.mjs
+          node --test research/lib/base-receipt-evidence.test.js
           node --test dashboard/lib/verification-history.test.js
           node --check src/save-six-verification.mjs
           node --check dashboard/lib/market-watch.js
@@ -68,6 +70,24 @@ jobs:
       - run: npm test
       - name: Verify six-market read-only quotes on Base
         run: npm run verify:six
+      - name: Sample recent Base swap receipt evidence (read only)
+        continue-on-error: true
+        env:
+          SAMPLE_BLOCK_DEPTH: '20'
+          SAMPLE_RECEIPT_LIMIT: '12'
+        run: |
+          mkdir -p artifacts
+          node research/sample-base-swaps.mjs | tee artifacts/base-receipt-sample.json
+
+      - name: Upload bounded Base receipt evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: base-receipt-evidence
+          path: artifacts/base-receipt-sample.json
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Generate V0.8 pinned scanner plan
         env:
           BASE_FORK_BLOCK: '52216060'
