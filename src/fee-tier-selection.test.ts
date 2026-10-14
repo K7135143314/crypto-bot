@@ -1,0 +1,1 @@
+import assert from 'node:assert/strict';import test from 'node:test';import {chooseApprovedUniswapFees} from './fee-tier-selection.js';test('default remains limited and optional sweep uses only approved config',()=>{assert.deepEqual(chooseApprovedUniswapFees(false),[500,3000]);assert.deepEqual(chooseApprovedUniswapFees(true),[100,500,3000,10000]);});
