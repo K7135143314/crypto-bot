@@ -3,6 +3,7 @@ import { performance } from 'node:perf_hooks';
 import { getAddress, isAddress, parseUnits, type Abi, type Address } from 'viem';
 import { aaveV3PoolAbi } from './abis.js';
 import { CHAIN_ID, CONTRACTS, TOKENS, TRADE_SIZES_USDC } from './config.js';
+import { chooseApprovedUniswapFees } from './fee-tier-selection.js';
 import { client } from './quotes.js';
 import { quoteDex, resolveExactPool, type ExactPoolMatch } from './scout-verifier.js';
 import { inspectPoolState, type PoolRead } from './pool-state.js';
@@ -76,8 +77,8 @@ try {
    address:CONTRACTS.aerodromePoolFactory,abi:aeroPoolFactoryAbi,functionName:'getPool',
    args:[TOKENS.WETH.address,TOKENS.USDC.address,false],blockNumber,
   });
-  const feeTiers=[500,3000] as const;
-  let uniswapMatch:ExactPoolMatch|null=null;
+  const feeTiers=chooseApprovedUniswapFees(process.env.STUDY_SWEEP_FEE_TIERS==='true');
+  const uniswapMatches:ExactPoolMatch[]=[];
   for(const fee of feeTiers){
    const candidate=await client.readContract({
     address:UNISWAP_BASE_FACTORY,abi:uniswapPoolFactoryAbi,functionName:'getPool',
@@ -85,9 +86,9 @@ try {
    });
    if(!isAddress(candidate,{strict:false})||candidate.toLowerCase()===ZERO)continue;
    const matched=await resolveExactPool('uniswap',candidate,blockNumber);
-   if(matched&&matched.feeTier===fee){uniswapMatch=matched;break;}
+   if(matched&&matched.feeTier===fee)uniswapMatches.push(matched);
   }
-  if(!isAddress(aeroAddress,{strict:false})||aeroAddress.toLowerCase()===ZERO||!uniswapMatch){
+  if(!isAddress(aeroAddress,{strict:false})||aeroAddress.toLowerCase()===ZERO||!uniswapMatches.length){
    report.status='POOL_UNAVAILABLE';
    report.reason='At least one approved on-chain WETH/USDC pool was not found';
   }else{
@@ -95,10 +96,8 @@ try {
    if(!aerodromeMatch||aerodromeMatch.variant!=='AERODROME_CLASSIC'){
     report.status='POOL_UNVERIFIED';report.reason='Aerodrome Classic factory identity was not confirmed';
    }else{
-    report.poolAddresses={
-     aerodrome:getAddress(aerodromeMatch.pairAddress),
-     uniswap:getAddress(uniswapMatch.pairAddress),
-    };
+    report.poolAddresses={aerodrome:getAddress(aerodromeMatch.pairAddress)};
+    for(const u of uniswapMatches)report.poolAddresses['uniswapFee'+u.feeTier]=getAddress(u.pairAddress);
     // Historical L2 base fee is observable at this pinned block, unlike a
     // current getGasPrice() call that would leak a different time period.
     // This is only a base-fee model; all actual execution costs remain unproven.
@@ -109,7 +108,7 @@ try {
     const flashLoanPremiumBps=await client.readContract({address:CONTRACTS.aaveV3Pool,abi:aaveV3PoolAbi,
       functionName:'FLASHLOAN_PREMIUM_TOTAL',blockNumber});
     const referenceInput=parseUnits('100',TOKENS.USDC.decimals);
-    const refWeth=await quoteDex(uniswapMatch,TOKENS.USDC.address,TOKENS.WETH.address,
+    const refWeth=await quoteDex(uniswapMatches[0]!,TOKENS.USDC.address,TOKENS.WETH.address,
      referenceInput,blockNumber);
     if(refWeth<=0n)throw Error('Independent WETH reference quote failed');
     const costs={
@@ -139,13 +138,15 @@ try {
     if(tradeSizes.length!==3)throw Error('Required bounded comparison sizes missing from current research configuration');
     report.testedSizesUsdc=tradeSizes;
     for(const sizeUsdc of tradeSizes){
+     for(const u of uniswapMatches){
      for(const [buyPool,sellPool] of [
-      [aerodromeMatch,uniswapMatch],
-      [uniswapMatch,aerodromeMatch],
+      [aerodromeMatch,u],
+      [u,aerodromeMatch],
      ] as const){
       report.proofs.push(await proveReadOnlyMarket({
        observed,buyPool,sellPool,sizeUsdc,costs,
       },deps));
+     }
      }
     }
     report.routeCount=report.proofs.length;
