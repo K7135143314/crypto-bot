@@ -40,3 +40,18 @@ test('overload stops the pipeline rather than silently dropping events',async()=
  assert.equal(p.snapshot().stopped,true);
  }finally{await rm(dir,{recursive:true,force:true})}
 });
+
+test('high-frequency heads are recorded but only sampled for provider verification',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'headbudget-'));
+ try{
+ const w=await EvidenceWriter.open(join(dir,'events.jsonl'));
+ let calls=0;
+ const p=new ReadOnlyHeadPipeline(w,[{name:'a',url:'https://a.example'},{name:'b',url:'https://b.example'}],async()=>{
+  calls++;return {verdict:'RPC_UNAVAILABLE' as const,observed:null,providerCount:2,checkedProviders:0,usableForTrading:false as const,reason:'test'};
+ },10,1000);
+ p.ingest({jsonrpc:'2.0',id:1,result:'0x2105'});p.ingest({jsonrpc:'2.0',id:2,result:'0xabc'});
+ p.ingest(head(10,'a','b'),1000);p.ingest(head(11,'c','a'),1100);p.ingest(head(12,'d','c'),1200);
+ await p.drain();
+ assert.equal(calls,1);assert.equal(w.count,3);assert.equal(p.snapshot().skippedByBudget,2);
+ }finally{await rm(dir,{recursive:true,force:true})}
+});
