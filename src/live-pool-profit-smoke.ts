@@ -28,23 +28,24 @@ const publicRpcs:RpcSource[]=[
 ];
 const read:PoolRead=async(address,abi,functionName,blockNumber)=>
  client.readContract({address,abi:abi as Abi,functionName,blockNumber});
-const outPath='artifacts/base-pool-to-profit-live.json';
+const outPath=process.env.STUDY_OUTPUT_FILE??'artifacts/base-pool-to-profit-live.json';
+if(!/^artifacts\/[a-zA-Z0-9._-]+\.json$/.test(outPath))throw Error('Evidence path must be a local artifacts JSON file');
 const started=performance.now();
 const report:{
  version:number;readOnly:true;executionAuthorized:false;atomicSimulation:'NOT_RUN';
  generatedAt:string;source:string;chainId:number|null;blockNumber:string|null;blockHash:string|null;
  status:string;reason:string;routeCount:number;testedSizesUsdc:string[];poolAddresses:Record<string,string>;
- proofs:MarketProof[];timingMs:number;assumptions:string[];
+ proofs:MarketProof[];timingMs:number;assumptions:string[];blockTimestamp:string|null;gasPriceWei:string|null;gasPriceSource:string;
 }={
  version:1,readOnly:true,executionAuthorized:false,atomicSimulation:'NOT_RUN',
  generatedAt:new Date().toISOString(),source:'bounded-pinned-Base-contract-reads',
  chainId:null,blockNumber:null,blockHash:null,status:'NOT_STARTED',reason:'',
- routeCount:0,testedSizesUsdc:[],poolAddresses:{},proofs:[],timingMs:0,
+ routeCount:0,testedSizesUsdc:[],poolAddresses:{},proofs:[],timingMs:0,blockTimestamp:null,gasPriceWei:null,gasPriceSource:'UNAVAILABLE',
  assumptions:[
   'MATCHED_UNSAFE means two queried sources agreed, not finality or execution readiness',
   'Two public RPC hostnames do not guarantee fully independent upstream infrastructure',
   'Historical contract reads are pinned by block number; reconciling before/after is not a by-hash atomic snapshot',
-  'Gas price is sampled at test time, not an execution inclusion quote',
+  'Gas estimate uses the sampled historical block baseFeePerGas ONLY; omits actual priority fees and real inclusion fees',
   'WETH reference price is derived from a pinned same-market route, not a separate price oracle',
   'Modeled policy reserves do not prove actual full execution costs, fee delivery, or realized P&L',
  ],
@@ -56,13 +57,17 @@ try {
  const latest=await client.getBlockNumber();
  if(latest<=30n)throw Error('Base head unavailable');
  // Move back from the tip for public provider agreement; not a finality promise.
- const blockNumber=latest-20n;
+ const forced=process.env.STUDY_BLOCK_NUMBER;
+ if(forced!==undefined && !/^[1-9][0-9]{0,18}$/.test(forced))throw Error('Invalid historical block selection');
+ const blockNumber=forced?BigInt(forced):latest-20n;
+ if(blockNumber>latest-20n || blockNumber<=0n)throw Error('Historical block must precede current head by at least 20 blocks');
  const block=await client.getBlock({blockNumber});
  if(!block.hash||!block.parentHash||block.number!==blockNumber)
   throw Error('Pinned block unavailable or inconsistent');
  const observed:HeadRef={number:block.number.toString(),hash:block.hash,parentHash:block.parentHash};
  report.blockNumber=observed.number;
  report.blockHash=observed.hash;
+ report.blockTimestamp=new Date(Number(block.timestamp)*1000).toISOString();
  const verified=await verifyObservedHead(observed,publicRpcs);
  if(verified.verdict!=='MATCHED_UNSAFE'){
   report.status='BLOCK_UNVERIFIED';report.reason=verified.verdict+': '+verified.reason;
@@ -94,11 +99,15 @@ try {
      aerodrome:getAddress(aerodromeMatch.pairAddress),
      uniswap:getAddress(uniswapMatch.pairAddress),
     };
-    const [gasPriceWei,flashLoanPremiumBps]=await Promise.all([
-     client.getGasPrice(),
-     client.readContract({address:CONTRACTS.aaveV3Pool,abi:aaveV3PoolAbi,
-      functionName:'FLASHLOAN_PREMIUM_TOTAL',blockNumber}),
-    ]);
+    // Historical L2 base fee is observable at this pinned block, unlike a
+    // current getGasPrice() call that would leak a different time period.
+    // This is only a base-fee model; all actual execution costs remain unproven.
+    const gasPriceWei=block.baseFeePerGas;
+    if(gasPriceWei==null || gasPriceWei<=0n)throw Error('Pinned block baseFeePerGas unavailable');
+    report.gasPriceWei=gasPriceWei.toString();
+    report.gasPriceSource='PINNED_BLOCK_BASE_FEE_ONLY';
+    const flashLoanPremiumBps=await client.readContract({address:CONTRACTS.aaveV3Pool,abi:aaveV3PoolAbi,
+      functionName:'FLASHLOAN_PREMIUM_TOTAL',blockNumber});
     const referenceInput=parseUnits('100',TOKENS.USDC.decimals);
     const refWeth=await quoteDex(uniswapMatch,TOKENS.USDC.address,TOKENS.WETH.address,
      referenceInput,blockNumber);
@@ -155,7 +164,8 @@ try {
  await writeFile(outPath,JSON.stringify(report,null,2)+'\n');
  const summary={
   status:report.status,readOnly:true,executionAuthorized:false,
-  blockNumber:report.blockNumber,blockHash:report.blockHash,
+  blockNumber:report.blockNumber,blockHash:report.blockHash,blockTimestamp:report.blockTimestamp,
+  gasPriceWei:report.gasPriceWei,gasPriceSource:report.gasPriceSource,
   poolAddresses:report.poolAddresses,
   testedSizesUsdc:report.testedSizesUsdc,
   modeledCandidates:report.proofs.filter(p=>p.status==='MODELED_CANDIDATE').length,
