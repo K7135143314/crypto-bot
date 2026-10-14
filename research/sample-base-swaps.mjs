@@ -25,8 +25,11 @@ try{
  tip=await client.getBlockNumber();
  const fromBlock=tip-BigInt(depth-1);
  for(const topic of topics){
-  try{const group=await client.request({method:'eth_getLogs',params:[{address:pools,topics:[topic],fromBlock:toHex(fromBlock),toBlock:toHex(tip)}]});logs.push(...group)}
-  catch(e){throw Error('getLogs failed: '+String(e).slice(0,350))}
+  for(let start=0;start<pools.length;start+=4){
+   const batch=pools.slice(start,start+4);
+   try{const group=await client.request({method:'eth_getLogs',params:[{address:batch,topics:[topic],fromBlock:toHex(fromBlock),toBlock:toHex(tip)}]});logs.push(...group)}
+   catch(e){throw Error('getLogs batch '+start+' failed: '+String(e).slice(0,350))}
+  }
  }
  const hashes=[...new Set(logs.map(l=>l.transactionHash))].slice(0,limit);
  for(const hash of hashes){
