@@ -108,11 +108,20 @@ try {
      ethPriceUsdcMicros:(referenceInput*10n**18n)/refWeth,
     };
     if(!costs.ethPriceUsdcMicros||!gasPriceWei)throw Error('Invalid modeled cost reference');
+    // Reuse already checked pool state across multiple trade sizes for the
+    // same pinned block/hash. Any rejection is cached as a rejection.
+    const poolCache=new Map<string,ReturnType<typeof inspectPoolState>>();
     const deps={
      reconcile:(head:HeadRef)=>verifyObservedHead(head,publicRpcs),
-     inspect:(pool:ExactPoolMatch,at:bigint)=>inspectPoolState({
-      dex:pool.dex,pool:pool.pairAddress,blockNumber:at,read,
-     }),
+     inspect:(pool:ExactPoolMatch,at:bigint)=>{
+      const cacheKey=observed.hash.toLowerCase()+'|'+at.toString()+'|'+pool.pairAddress.toLowerCase();
+      let state=poolCache.get(cacheKey);
+      if(!state){
+       state=inspectPoolState({dex:pool.dex,pool:pool.pairAddress,blockNumber:at,read});
+       poolCache.set(cacheKey,state);
+      }
+      return state;
+     },
      quote:quoteDex,
     };
     // Bounded, deduplicated sample drawn from the already approved size policy.
