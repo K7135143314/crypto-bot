@@ -224,13 +224,14 @@ export async function quoteMatrix(
   tradeSizesUsdc: readonly string[],
   blockNumber: bigint,
   onTiming?: (entry: StageTiming) => void,
+  options: { parallelFirstLegs?: boolean } = {},
 ): Promise<MatrixRow[]> {
   const capture = onTiming ?? (() => {});
   const starts = tradeSizesUsdc.map((size) => parseUnits(size, TOKENS.USDC.decimals));
 
   // The two initial USDC->WETH legs do not depend on each other.
   // Opt-in research comparison only. Default sequential mode is retained.
-  const parallelFirstLegs = process.env.QUOTE_PARALLEL_FIRST_LEGS === 'true';
+  const parallelFirstLegs = options.parallelFirstLegs ?? (process.env.QUOTE_PARALLEL_FIRST_LEGS === 'true');
   const quoteAeroFirst = () => timeStage('aerodrome-first', () =>
     quoteAerodromeBatch(publicClient, TOKENS.USDC.address, TOKENS.WETH.address,
       starts, blockNumber), capture);

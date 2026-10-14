@@ -1,0 +1,39 @@
+name: Read-only pinned quote A/B benchmark
+on:
+  workflow_dispatch:
+  push:
+    branches: [perf/pinned-quote-ab-benchmark-20261014]
+    paths:
+      - 'src/quote-benchmark*'
+      - 'src/quotes.ts'
+      - 'package.json'
+      - '.github/workflows/quote-ab-benchmark.yml'
+permissions:
+  contents: read
+concurrency:
+  group: quote-ab-benchmark
+  cancel-in-progress: false
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm test
+      - name: Bounded same-block A/B sample; NO transactions
+        env:
+          BENCHMARK_REPEATS: '2'
+        run: npm run benchmark:quotes
+      - name: Preserve comparison artifact including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pinned-quote-ab
+          path: artifacts/quote-ab-benchmark.json
+          if-no-files-found: ignore
+          retention-days: 14
