@@ -228,42 +228,39 @@ export async function quoteMatrix(
   const capture = onTiming ?? (() => {});
   const starts = tradeSizesUsdc.map((size) => parseUnits(size, TOKENS.USDC.decimals));
 
-  const aerodromeFirst = await timeStage('aerodrome-first', () => quoteAerodromeBatch(
-    publicClient,
-    TOKENS.USDC.address,
-    TOKENS.WETH.address,
-    starts,
-    blockNumber,
-  ), capture);
+  // The two initial USDC->WETH legs do not depend on each other.
+  // Opt-in research comparison only. Default sequential mode is retained.
+  const parallelFirstLegs = process.env.QUOTE_PARALLEL_FIRST_LEGS === 'true';
+  const quoteAeroFirst = () => timeStage('aerodrome-first', () =>
+    quoteAerodromeBatch(publicClient, TOKENS.USDC.address, TOKENS.WETH.address,
+      starts, blockNumber), capture);
+  const quoteUniFirst = () => timeStage('uniswap-first', () =>
+    quoteUniswapV3Batch(publicClient, TOKENS.USDC.address, TOKENS.WETH.address,
+      starts, blockNumber), capture);
+
+  let aerodromeFirst: DexQuote[];
+  let uniswapFirst: DexQuote[];
+  if (parallelFirstLegs) {
+    // Both use the same pinned state; no downstream quote starts until both succeed.
+    [aerodromeFirst, uniswapFirst] = await Promise.all([
+      quoteAeroFirst(), quoteUniFirst(),
+    ]);
+  } else {
+    aerodromeFirst = await quoteAeroFirst();
+    await sleep(600);
+    uniswapFirst = await quoteUniFirst();
+  }
 
   await sleep(600);
-
-  const uniswapFirst = await timeStage('uniswap-first', () => quoteUniswapV3Batch(
-    publicClient,
-    TOKENS.USDC.address,
-    TOKENS.WETH.address,
-    starts,
-    blockNumber,
-  ), capture);
-
-  await sleep(600);
-
   const uniswapSecond = await timeStage('uniswap-second', () => quoteUniswapV3Batch(
-    publicClient,
-    TOKENS.WETH.address,
-    TOKENS.USDC.address,
-    aerodromeFirst.map((quote) => quote.amountOut),
-    blockNumber,
+    publicClient, TOKENS.WETH.address, TOKENS.USDC.address,
+    aerodromeFirst.map((quote) => quote.amountOut), blockNumber,
   ), capture);
 
   await sleep(600);
-
   const aerodromeSecond = await timeStage('aerodrome-second', () => quoteAerodromeBatch(
-    publicClient,
-    TOKENS.WETH.address,
-    TOKENS.USDC.address,
-    uniswapFirst.map((quote) => quote.amountOut),
-    blockNumber,
+    publicClient, TOKENS.WETH.address, TOKENS.USDC.address,
+    uniswapFirst.map((quote) => quote.amountOut), blockNumber,
   ), capture);
 
   const rows: MatrixRow[] = [];
