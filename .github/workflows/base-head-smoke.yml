@@ -1,0 +1,38 @@
+name: Bounded read-only Base provider smoke
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/base-bounded-provider-smoke-20261014]
+    paths: ['.github/workflows/base-head-smoke.yml']
+permissions:
+  contents: read
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/base-bounded-provider-smoke-20261014
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm test
+      - name: Public Base read-only head and dual RPC sample
+        env:
+          BASE_HEADS_WSS: wss://base.drpc.org
+          BASE_VERIFY_RPC_A: https://base-rpc.publicnode.com
+          BASE_VERIFY_RPC_B: https://mainnet.base.org
+          LISTEN_SECONDS: '12'
+          BASE_EVIDENCE_PATH: artifacts/base-head-evidence.jsonl
+        run: npm run listen:heads
+      - name: Upload only observation records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: base-bounded-head-evidence
+          path: artifacts/base-head-evidence.jsonl
+          if-no-files-found: ignore
+          retention-days: 7

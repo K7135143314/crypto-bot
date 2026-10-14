@@ -1,0 +1,35 @@
+name: Historical Base pool economics sample
+on:
+  push:
+    branches: [research/historical-pool-size-study-20261014]
+    paths:
+      - '.github/workflows/historical-pool-study.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  study:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm test
+      - name: Four historical blocks, three trade sizes, two routes; NO trades
+        env:
+          BASE_RPC_URL: https://base-rpc.publicnode.com
+          STUDY_BLOCK_COUNT: '4'
+          STUDY_BLOCK_SPACING: '300'
+        run: npm run study:historical-pools
+      - name: Persist bounded evidence including rejected and failed blocks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: historical-Base-pool-profit-evidence
+          path: artifacts/*.json
+          if-no-files-found: ignore
+          retention-days: 14
