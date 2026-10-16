@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-16T00:07:01.181Z",
+  "updatedAt": "2026-10-16T04:50:35.630Z",
   "runs": [
     {
       "generatedAt": "2026-10-07T10:09:35.396Z",
@@ -1867,6 +1867,54 @@
           "scoutSpreadBps": 109.3491,
           "status": "UNSUPPORTED_DEX",
           "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-16T04:50:34.413Z",
+      "pinnedBlock": "52668442",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "aerodrome -> uniswap",
+          "scoutSpreadBps": 101.5651,
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
+          "pinnedBlock": "52668442",
+          "exactPoolMatch": false
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "aerodrome -> uniswap",
+          "scoutSpreadBps": 99.5777,
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
+          "pinnedBlock": "52668442",
+          "exactPoolMatch": false
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "aerodrome -> pancakeswap",
+          "scoutSpreadBps": 98.7289,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "aerodrome -> alien-base",
+          "scoutSpreadBps": 98.5012,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "aerodrome -> uniswap",
+          "scoutSpreadBps": 96.3481,
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
+          "pinnedBlock": "52668442",
+          "exactPoolMatch": false
         }
       ]
     }
