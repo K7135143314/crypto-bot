@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-17T19:04:08.604Z",
+  "updatedAt": "2026-10-17T21:37:37.382Z",
   "runs": [
     {
       "generatedAt": "2026-10-07T10:09:35.396Z",
@@ -2391,6 +2391,48 @@
           "scoutRank": 5,
           "scoutRoute": "uniswap -> alien-base",
           "scoutSpreadBps": 18.9225,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-17T21:37:36.452Z",
+      "pinnedBlock": "52741854",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "pancakeswap -> quickswap",
+          "scoutSpreadBps": 15.6463,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "pancakeswap -> uniswap",
+          "scoutSpreadBps": 15.6043,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "pancakeswap -> aerodrome",
+          "scoutSpreadBps": 15.3524,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "aerodrome -> quickswap",
+          "scoutSpreadBps": 15.0703,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "aerodrome -> quickswap",
+          "scoutSpreadBps": 15.0703,
           "status": "UNSUPPORTED_DEX",
           "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
         }
