@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-19T16:50:21.275Z",
+  "updatedAt": "2026-10-19T21:22:09.916Z",
   "runs": [
     {
       "generatedAt": "2026-10-07T10:09:35.396Z",
@@ -2988,6 +2988,55 @@
           "scoutSpreadBps": 19.1601,
           "status": "UNSUPPORTED_DEX",
           "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-19T21:22:08.428Z",
+      "pinnedBlock": "52827789",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "uniswap -> quickswap",
+          "scoutSpreadBps": 19.9617,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "uniswap -> aerodrome",
+          "scoutSpreadBps": 18.2948,
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
+          "pinnedBlock": "52827789",
+          "exactPoolMatch": false
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "aerodrome -> quickswap",
+          "scoutSpreadBps": 17.2065,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "uniswap -> alien-base",
+          "scoutSpreadBps": 17.0029,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "uniswap -> aerodrome",
+          "scoutSpreadBps": 16.1694,
+          "status": "VERIFIED_REJECT",
+          "reason": "Exact scout pools matched supported adapters, but no tested size cleared the existing profitability gates.",
+          "pinnedBlock": "52827789",
+          "exactPoolMatch": true,
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.502903",
+          "decision": "REJECT_RAW_LOSS"
         }
       ]
     }
