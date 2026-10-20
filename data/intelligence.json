@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-20T15:17:23.679Z",
+  "updatedAt": "2026-10-20T19:29:58.003Z",
   "runs": [
     {
       "generatedAt": "2026-10-07T10:09:35.396Z",
@@ -3234,6 +3234,50 @@
           "scoutRank": 5,
           "scoutRoute": "alien-base -> uniswap",
           "scoutSpreadBps": 51.3971,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-20T19:29:56.613Z",
+      "pinnedBlock": "52867624",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "quickswap -> uniswap",
+          "scoutSpreadBps": 93.4984,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "aerodrome -> uniswap",
+          "scoutSpreadBps": 91.8627,
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
+          "pinnedBlock": "52867624",
+          "exactPoolMatch": false
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "pancakeswap -> uniswap",
+          "scoutSpreadBps": 91.0429,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "alien-base -> uniswap",
+          "scoutSpreadBps": 90.0444,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "pancakeswap -> uniswap",
+          "scoutSpreadBps": 89.7948,
           "status": "UNSUPPORTED_DEX",
           "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
         }
