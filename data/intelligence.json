@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-20T10:18:31.936Z",
+  "updatedAt": "2026-10-20T15:17:23.679Z",
   "runs": [
     {
       "generatedAt": "2026-10-07T10:09:35.396Z",
@@ -3187,6 +3187,55 @@
           "bestTradeSizeUsdc": "100",
           "bestEstimatedNetUsdc": "-0.943938",
           "decision": "REJECT_RAW_LOSS"
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-20T15:17:21.209Z",
+      "pinnedBlock": "52860045",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "quickswap -> uniswap",
+          "scoutSpreadBps": 72.0131,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "aerodrome -> uniswap",
+          "scoutSpreadBps": 71.21,
+          "status": "VERIFIED_REJECT",
+          "reason": "Exact scout pools matched supported adapters, but no tested size cleared the existing profitability gates.",
+          "pinnedBlock": "52860045",
+          "exactPoolMatch": true,
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-1.001845",
+          "decision": "REJECT_RAW_LOSS"
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "aerodrome -> uniswap",
+          "scoutSpreadBps": 64.8148,
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
+          "pinnedBlock": "52860045",
+          "exactPoolMatch": false
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "pancakeswap -> uniswap",
+          "scoutSpreadBps": 53.0466,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "alien-base -> uniswap",
+          "scoutSpreadBps": 51.3971,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
         }
       ]
     }
