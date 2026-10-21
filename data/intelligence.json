@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-20T22:34:37.730Z",
+  "updatedAt": "2026-10-21T01:21:37.618Z",
   "runs": [
     {
       "generatedAt": "2026-10-07T10:09:35.396Z",
@@ -3334,6 +3334,60 @@
           "scoutSpreadBps": 34.7729,
           "status": "UNSUPPORTED_DEX",
           "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-21T01:21:36.228Z",
+      "pinnedBlock": "52878172",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "uniswap -> aerodrome",
+          "scoutSpreadBps": 19.6867,
+          "status": "VERIFIED_REJECT",
+          "reason": "Exact scout pools matched supported adapters, but no tested size cleared the existing profitability gates.",
+          "pinnedBlock": "52878172",
+          "exactPoolMatch": true,
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.445459",
+          "decision": "REJECT_RAW_LOSS"
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "pancakeswap -> aerodrome",
+          "scoutSpreadBps": 19.1946,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "pancakeswap -> uniswap",
+          "scoutSpreadBps": 18.9817,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "aerodrome -> uniswap",
+          "scoutSpreadBps": 18.1617,
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
+          "pinnedBlock": "52878172",
+          "exactPoolMatch": false
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "aerodrome -> uniswap",
+          "scoutSpreadBps": 17.5878,
+          "status": "VERIFIED_REJECT",
+          "reason": "Exact scout pools matched supported adapters, but no tested size cleared the existing profitability gates.",
+          "pinnedBlock": "52878172",
+          "exactPoolMatch": true,
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.479439",
+          "decision": "REJECT_RAW_LOSS"
         }
       ]
     }
