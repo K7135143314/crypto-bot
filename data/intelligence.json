@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-23T11:57:20.175Z",
+  "updatedAt": "2026-10-23T16:38:17.224Z",
   "runs": [
     {
       "generatedAt": "2026-10-07T10:09:35.396Z",
@@ -4027,6 +4027,50 @@
           "scoutSpreadBps": 15.1489,
           "status": "UNSUPPORTED_DEX",
           "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-23T16:38:15.770Z",
+      "pinnedBlock": "52992074",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "uniswap -> quickswap",
+          "scoutSpreadBps": 25.6763,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "uniswap -> quickswap",
+          "scoutSpreadBps": 22.8818,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "uniswap -> pancakeswap",
+          "scoutSpreadBps": 22.3055,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "aerodrome -> quickswap",
+          "scoutSpreadBps": 21.9228,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "uniswap -> aerodrome",
+          "scoutSpreadBps": 20.6826,
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
+          "pinnedBlock": "52992074",
+          "exactPoolMatch": false
         }
       ]
     }
