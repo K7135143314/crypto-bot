@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-25T13:39:45.038Z",
+  "updatedAt": "2026-10-25T17:28:02.037Z",
   "runs": [
     {
       "generatedAt": "2026-10-07T10:09:35.396Z",
@@ -4656,6 +4656,48 @@
           "scoutSpreadBps": 39.7437,
           "status": "UNSUPPORTED_DEX",
           "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-25T17:28:00.530Z",
+      "pinnedBlock": "53079966",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "aerodrome -> aero",
+          "scoutSpreadBps": 4.67,
+          "status": "NOT_SHORTLISTED",
+          "reason": "Scout lead did not clear the discovery shortlist threshold."
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "aero -> uniswap",
+          "scoutSpreadBps": 4.5428,
+          "status": "NOT_SHORTLISTED",
+          "reason": "Scout lead did not clear the discovery shortlist threshold."
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "uniswap -> aero",
+          "scoutSpreadBps": 4.5001,
+          "status": "NOT_SHORTLISTED",
+          "reason": "Scout lead did not clear the discovery shortlist threshold."
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "uniswap -> aero",
+          "scoutSpreadBps": 4.3727,
+          "status": "NOT_SHORTLISTED",
+          "reason": "Scout lead did not clear the discovery shortlist threshold."
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "aero -> pancakeswap",
+          "scoutSpreadBps": 4.1183,
+          "status": "NOT_SHORTLISTED",
+          "reason": "Scout lead did not clear the discovery shortlist threshold."
         }
       ]
     }
