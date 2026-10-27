@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-27T02:20:00.309Z",
+  "updatedAt": "2026-10-27T08:15:12.806Z",
   "runs": [
     {
       "generatedAt": "2026-10-07T10:09:35.396Z",
@@ -5079,6 +5079,48 @@
           "scoutSpreadBps": 19.6749,
           "status": "UNSUPPORTED_DEX",
           "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-27T08:15:10.759Z",
+      "pinnedBlock": "53149781",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "pancakeswap -> uniswap",
+          "scoutSpreadBps": 5.1893,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "aero -> uniswap",
+          "scoutSpreadBps": 5.1028,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "pancakeswap -> uniswap",
+          "scoutSpreadBps": 4.4106,
+          "status": "NOT_SHORTLISTED",
+          "reason": "Scout lead did not clear the discovery shortlist threshold."
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "pancakeswap -> quickswap",
+          "scoutSpreadBps": 4.2379,
+          "status": "NOT_SHORTLISTED",
+          "reason": "Scout lead did not clear the discovery shortlist threshold."
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "aero -> quickswap",
+          "scoutSpreadBps": 4.1514,
+          "status": "NOT_SHORTLISTED",
+          "reason": "Scout lead did not clear the discovery shortlist threshold."
         }
       ]
     }
