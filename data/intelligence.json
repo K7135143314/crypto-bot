@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-27T19:53:26.072Z",
+  "updatedAt": "2026-10-27T23:35:15.111Z",
   "runs": [
     {
       "generatedAt": "2026-10-07T10:09:35.396Z",
@@ -5215,6 +5215,58 @@
           "scoutSpreadBps": 8.7908,
           "status": "UNSUPPORTED_DEX",
           "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-27T23:35:13.823Z",
+      "pinnedBlock": "53177381",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "pancakeswap -> aerodrome",
+          "scoutSpreadBps": 28.4402,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "uniswap -> aerodrome",
+          "scoutSpreadBps": 28.4402,
+          "status": "VERIFIED_REJECT",
+          "reason": "Exact scout pools matched supported adapters, but no tested size cleared the existing profitability gates.",
+          "pinnedBlock": "53177381",
+          "exactPoolMatch": true,
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.352186",
+          "decision": "REJECT_RAW_LOSS"
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "pancakeswap -> uniswap",
+          "scoutSpreadBps": 26.1377,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "aero -> aerodrome",
+          "scoutSpreadBps": 25.4906,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "aerodrome -> uniswap",
+          "scoutSpreadBps": 25.1973,
+          "status": "VERIFIED_REJECT",
+          "reason": "Exact scout pools matched supported adapters, but no tested size cleared the existing profitability gates.",
+          "pinnedBlock": "53177381",
+          "exactPoolMatch": true,
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.370403",
+          "decision": "REJECT_RAW_LOSS"
         }
       ]
     }
