@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-10-27T20:40:58.771Z",
+  "updatedAt": "2026-10-28T00:03:09.895Z",
   "runs": [
     {
       "generatedAt": "2026-10-08T04:45:08.037Z",
@@ -102049,6 +102049,1329 @@
           "sellDex": "pancakeswap",
           "buyPool": "0xec558e484cc9f2210714e345298fdc53b253c27d",
           "sellPool": "0xb94b22332abf5f89877a14cc88f2abc48c34b3df",
+          "exactPoolMatch": false,
+          "poolDiagnosis": null,
+          "buyPoolMatch": null,
+          "sellPoolMatch": null,
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "At least one exchange has no approved on-chain adapter.",
+          "atomicSimulation": "NOT_RUN",
+          "tradeSizesQuoted": null,
+          "tradeSizesRequested": null,
+          "quoteComparisonNote": "",
+          "rows": []
+        },
+        {
+          "market": "VIRTUAL/WETH",
+          "status": "UNSUPPORTED_MARKET",
+          "indicatedSpreadBps": null,
+          "buyDex": null,
+          "sellDex": null,
+          "buyPool": null,
+          "sellPool": null,
+          "exactPoolMatch": false,
+          "poolDiagnosis": null,
+          "buyPoolMatch": null,
+          "sellPoolMatch": null,
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "Non-USDC cost/quote adapter pending.",
+          "atomicSimulation": "NOT_RUN",
+          "tradeSizesQuoted": null,
+          "tradeSizesRequested": null,
+          "quoteComparisonNote": "",
+          "rows": []
+        },
+        {
+          "market": "WETH/USDT",
+          "status": "UNSUPPORTED_MARKET",
+          "indicatedSpreadBps": null,
+          "buyDex": null,
+          "sellDex": null,
+          "buyPool": null,
+          "sellPool": null,
+          "exactPoolMatch": false,
+          "poolDiagnosis": null,
+          "buyPoolMatch": null,
+          "sellPoolMatch": null,
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "Non-USDC cost/quote adapter pending.",
+          "atomicSimulation": "NOT_RUN",
+          "tradeSizesQuoted": null,
+          "tradeSizesRequested": null,
+          "quoteComparisonNote": "",
+          "rows": []
+        },
+        {
+          "market": "USDC/USDT",
+          "status": "UNSUPPORTED_MARKET",
+          "indicatedSpreadBps": null,
+          "buyDex": null,
+          "sellDex": null,
+          "buyPool": null,
+          "sellPool": null,
+          "exactPoolMatch": false,
+          "poolDiagnosis": null,
+          "buyPoolMatch": null,
+          "sellPoolMatch": null,
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "Non-USDC cost/quote adapter pending.",
+          "atomicSimulation": "NOT_RUN",
+          "tradeSizesQuoted": null,
+          "tradeSizesRequested": null,
+          "quoteComparisonNote": "",
+          "rows": []
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-10-28T00:03:08.568Z",
+      "pinnedBlock": "53178215",
+      "readOnly": true,
+      "executionAuthorized": false,
+      "referenceError": "",
+      "results": [
+        {
+          "market": "WETH/USDC",
+          "status": "QUOTE_REJECT",
+          "indicatedSpreadBps": 28.4227,
+          "buyDex": "uniswap",
+          "sellDex": "aerodrome",
+          "buyPool": "0xb4cb800910b228ed3d0834cf79d697127bbb00e5",
+          "sellPool": "0xcdac0d6c6c59727a65f871236188350531885c43",
+          "exactPoolMatch": true,
+          "poolDiagnosis": null,
+          "buyPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 100,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "sellPoolMatch": {
+            "variant": "AERODROME_CLASSIC",
+            "feeTier": null,
+            "tickSpacing": null,
+            "stable": false
+          },
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.354404",
+          "reason": "Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.",
+          "atomicSimulation": "NOT_RUN",
+          "tradeSizesQuoted": 7,
+          "tradeSizesRequested": 7,
+          "quoteComparisonNote": "Relative deterioration is gross round-trip return difference versus the smallest quoted size; it includes liquidity, pool fees and token rounding, not a pure price-impact estimate.",
+          "rows": [
+            {
+              "sizeUsdc": "100",
+              "receivedBaseToken": "0.042627408882952808",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "99.956921",
+              "grossProfitUsdc": "-0.043079",
+              "grossReturnBps": -4.3,
+              "modeledCostsUsdc": "0.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.05",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.1",
+                "mevReserve": "0.1"
+              },
+              "estimatedNetUsdc": "-0.354404",
+              "netReturnBps": -35.44,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0
+            },
+            {
+              "sizeUsdc": "250",
+              "receivedBaseToken": "0.106563013727492232",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "249.847748",
+              "grossProfitUsdc": "-0.152252",
+              "grossReturnBps": -6.09,
+              "modeledCostsUsdc": "0.686325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.125",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.25",
+                "mevReserve": "0.25"
+              },
+              "estimatedNetUsdc": "-0.838577",
+              "netReturnBps": -33.54,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 1.79
+            },
+            {
+              "sizeUsdc": "500",
+              "receivedBaseToken": "0.213107668386075105",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "499.547053",
+              "grossProfitUsdc": "-0.452947",
+              "grossReturnBps": -9.05,
+              "modeledCostsUsdc": "1.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.5",
+                "mevReserve": "0.5"
+              },
+              "estimatedNetUsdc": "-1.764272",
+              "netReturnBps": -35.28,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 4.75
+            },
+            {
+              "sizeUsdc": "1000",
+              "receivedBaseToken": "0.426141919471052264",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "998.50086",
+              "grossProfitUsdc": "-1.49914",
+              "grossReturnBps": -14.99,
+              "modeledCostsUsdc": "2.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "1",
+                "mevReserve": "1"
+              },
+              "estimatedNetUsdc": "-4.060465",
+              "netReturnBps": -40.6,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 10.69
+            },
+            {
+              "sizeUsdc": "2500",
+              "receivedBaseToken": "1.064773499231884048",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "2491.740848",
+              "grossProfitUsdc": "-8.259152",
+              "grossReturnBps": -33.03,
+              "modeledCostsUsdc": "6.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "1.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "2.5",
+                "mevReserve": "2.5"
+              },
+              "estimatedNetUsdc": "-14.570477",
+              "netReturnBps": -58.28,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 28.73
+            },
+            {
+              "sizeUsdc": "5000",
+              "receivedBaseToken": "2.127493276270323087",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "4968.239841",
+              "grossProfitUsdc": "-31.760159",
+              "grossReturnBps": -63.52,
+              "modeledCostsUsdc": "12.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "2.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "5",
+                "mevReserve": "5"
+              },
+              "estimatedNetUsdc": "-44.321484",
+              "netReturnBps": -88.64,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 59.22
+            },
+            {
+              "sizeUsdc": "10000",
+              "receivedBaseToken": "4.246690240716886189",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "9875.82578",
+              "grossProfitUsdc": "-124.17422",
+              "grossReturnBps": -124.17,
+              "modeledCostsUsdc": "25.061325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "10",
+                "mevReserve": "10"
+              },
+              "estimatedNetUsdc": "-149.235545",
+              "netReturnBps": -149.23,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 119.87
+            }
+          ]
+        },
+        {
+          "market": "WETH/USDC",
+          "status": "QUOTE_REJECT",
+          "indicatedSpreadBps": 24.7673,
+          "buyDex": "aerodrome",
+          "sellDex": "uniswap",
+          "buyPool": "0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59",
+          "sellPool": "0x6c561b446416e1a00e8e93e221854d6ea4171372",
+          "exactPoolMatch": true,
+          "poolDiagnosis": null,
+          "buyPoolMatch": {
+            "variant": "AERODROME_SLIPSTREAM_V1",
+            "feeTier": null,
+            "tickSpacing": 100,
+            "stable": null
+          },
+          "sellPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 3000,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.378794",
+          "reason": "Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.",
+          "atomicSimulation": "NOT_RUN",
+          "tradeSizesQuoted": 7,
+          "tradeSizesRequested": 7,
+          "quoteComparisonNote": "Relative deterioration is gross round-trip return difference versus the smallest quoted size; it includes liquidity, pool fees and token rounding, not a pure price-impact estimate.",
+          "rows": [
+            {
+              "sizeUsdc": "100",
+              "receivedBaseToken": "0.042627048075208521",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "99.932531",
+              "grossProfitUsdc": "-0.067469",
+              "grossReturnBps": -6.74,
+              "modeledCostsUsdc": "0.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.05",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.1",
+                "mevReserve": "0.1"
+              },
+              "estimatedNetUsdc": "-0.378794",
+              "netReturnBps": -37.87,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0
+            },
+            {
+              "sizeUsdc": "250",
+              "receivedBaseToken": "0.10656723217849131",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "249.830401",
+              "grossProfitUsdc": "-0.169599",
+              "grossReturnBps": -6.78,
+              "modeledCostsUsdc": "0.686325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.125",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.25",
+                "mevReserve": "0.25"
+              },
+              "estimatedNetUsdc": "-0.855924",
+              "netReturnBps": -34.23,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0.04
+            },
+            {
+              "sizeUsdc": "500",
+              "receivedBaseToken": "0.213133171004440178",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "499.657706",
+              "grossProfitUsdc": "-0.342294",
+              "grossReturnBps": -6.84,
+              "modeledCostsUsdc": "1.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.5",
+                "mevReserve": "0.5"
+              },
+              "estimatedNetUsdc": "-1.653619",
+              "netReturnBps": -33.07,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0.1
+            },
+            {
+              "sizeUsdc": "1000",
+              "receivedBaseToken": "0.426261168692890031",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "999.30303",
+              "grossProfitUsdc": "-0.69697",
+              "grossReturnBps": -6.96,
+              "modeledCostsUsdc": "2.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "1",
+                "mevReserve": "1"
+              },
+              "estimatedNetUsdc": "-3.258295",
+              "netReturnBps": -32.58,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0.22
+            },
+            {
+              "sizeUsdc": "2500",
+              "receivedBaseToken": "1.065614123745783707",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "2498.164715",
+              "grossProfitUsdc": "-1.835285",
+              "grossReturnBps": -7.34,
+              "modeledCostsUsdc": "6.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "1.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "2.5",
+                "mevReserve": "2.5"
+              },
+              "estimatedNetUsdc": "-8.14661",
+              "netReturnBps": -32.58,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0.6
+            },
+            {
+              "sizeUsdc": "5000",
+              "receivedBaseToken": "2.131098933425298609",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "4996.019921",
+              "grossProfitUsdc": "-3.980079",
+              "grossReturnBps": -7.96,
+              "modeledCostsUsdc": "12.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "2.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "5",
+                "mevReserve": "5"
+              },
+              "estimatedNetUsdc": "-16.541404",
+              "netReturnBps": -33.08,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 1.22
+            },
+            {
+              "sizeUsdc": "10000",
+              "receivedBaseToken": "4.261680704728974214",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "9990.802035",
+              "grossProfitUsdc": "-9.197965",
+              "grossReturnBps": -9.19,
+              "modeledCostsUsdc": "25.061325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "10",
+                "mevReserve": "10"
+              },
+              "estimatedNetUsdc": "-34.25929",
+              "netReturnBps": -34.25,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 2.45
+            }
+          ]
+        },
+        {
+          "market": "WETH/USDC",
+          "status": "QUOTE_REJECT",
+          "indicatedSpreadBps": 24.4889,
+          "buyDex": "uniswap",
+          "sellDex": "aerodrome",
+          "buyPool": "0xd0b53d9277642d899df5c87a3966a349a798f224",
+          "sellPool": "0xcdac0d6c6c59727a65f871236188350531885c43",
+          "exactPoolMatch": true,
+          "poolDiagnosis": null,
+          "buyPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 500,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "sellPoolMatch": {
+            "variant": "AERODROME_CLASSIC",
+            "feeTier": null,
+            "tickSpacing": null,
+            "stable": false
+          },
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.425556",
+          "reason": "Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.",
+          "atomicSimulation": "NOT_RUN",
+          "tradeSizesQuoted": 7,
+          "tradeSizesRequested": 7,
+          "quoteComparisonNote": "Relative deterioration is gross round-trip return difference versus the smallest quoted size; it includes liquidity, pool fees and token rounding, not a pure price-impact estimate.",
+          "rows": [
+            {
+              "sizeUsdc": "100",
+              "receivedBaseToken": "0.042597063061084165",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "99.885769",
+              "grossProfitUsdc": "-0.114231",
+              "grossReturnBps": -11.42,
+              "modeledCostsUsdc": "0.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.05",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.1",
+                "mevReserve": "0.1"
+              },
+              "estimatedNetUsdc": "-0.425556",
+              "netReturnBps": -42.55,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0
+            },
+            {
+              "sizeUsdc": "250",
+              "receivedBaseToken": "0.106492297026973473",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "249.68198",
+              "grossProfitUsdc": "-0.31802",
+              "grossReturnBps": -12.72,
+              "modeledCostsUsdc": "0.686325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.125",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.25",
+                "mevReserve": "0.25"
+              },
+              "estimatedNetUsdc": "-1.004345",
+              "netReturnBps": -40.17,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 1.3
+            },
+            {
+              "sizeUsdc": "500",
+              "receivedBaseToken": "0.212983391979012371",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "499.255858",
+              "grossProfitUsdc": "-0.744142",
+              "grossReturnBps": -14.88,
+              "modeledCostsUsdc": "1.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.5",
+                "mevReserve": "0.5"
+              },
+              "estimatedNetUsdc": "-2.055467",
+              "netReturnBps": -41.1,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 3.46
+            },
+            {
+              "sizeUsdc": "1000",
+              "receivedBaseToken": "0.425961975739698966",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "998.079586",
+              "grossProfitUsdc": "-1.920414",
+              "grossReturnBps": -19.2,
+              "modeledCostsUsdc": "2.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "1",
+                "mevReserve": "1"
+              },
+              "estimatedNetUsdc": "-4.481739",
+              "netReturnBps": -44.81,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 7.78
+            },
+            {
+              "sizeUsdc": "2500",
+              "receivedBaseToken": "1.064868879339971934",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "2491.963583",
+              "grossProfitUsdc": "-8.036417",
+              "grossReturnBps": -32.14,
+              "modeledCostsUsdc": "6.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "1.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "2.5",
+                "mevReserve": "2.5"
+              },
+              "estimatedNetUsdc": "-14.347742",
+              "netReturnBps": -57.39,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 20.72
+            },
+            {
+              "sizeUsdc": "5000",
+              "receivedBaseToken": "2.129617569502375257",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "4973.17977",
+              "grossProfitUsdc": "-26.82023",
+              "grossReturnBps": -53.64,
+              "modeledCostsUsdc": "12.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "2.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "5",
+                "mevReserve": "5"
+              },
+              "estimatedNetUsdc": "-39.381555",
+              "netReturnBps": -78.76,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 42.22
+            },
+            {
+              "sizeUsdc": "10000",
+              "receivedBaseToken": "4.258754395738155101",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "9903.646713",
+              "grossProfitUsdc": "-96.353287",
+              "grossReturnBps": -96.35,
+              "modeledCostsUsdc": "25.061325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "10",
+                "mevReserve": "10"
+              },
+              "estimatedNetUsdc": "-121.414612",
+              "netReturnBps": -121.41,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 84.93
+            }
+          ]
+        },
+        {
+          "market": "AERO/USDC",
+          "status": "QUOTE_REJECT",
+          "indicatedSpreadBps": 27.3145,
+          "buyDex": "uniswap",
+          "sellDex": "aerodrome",
+          "buyPool": "0xe5b5f522e98b5a2baae212d4da66b865b781db97",
+          "sellPool": "0x6cdcb1c4a4d1c3c6d054b27ac5b77e89eafb971d",
+          "exactPoolMatch": true,
+          "poolDiagnosis": null,
+          "buyPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 500,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "sellPoolMatch": {
+            "variant": "AERODROME_CLASSIC",
+            "feeTier": null,
+            "tickSpacing": null,
+            "stable": false
+          },
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.444043",
+          "reason": "Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.",
+          "atomicSimulation": "NOT_RUN",
+          "tradeSizesQuoted": 7,
+          "tradeSizesRequested": 7,
+          "quoteComparisonNote": "Relative deterioration is gross round-trip return difference versus the smallest quoted size; it includes liquidity, pool fees and token rounding, not a pure price-impact estimate.",
+          "rows": [
+            {
+              "sizeUsdc": "100",
+              "receivedBaseToken": "143.594203976225038458",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "99.867282",
+              "grossProfitUsdc": "-0.132718",
+              "grossReturnBps": -13.27,
+              "modeledCostsUsdc": "0.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.05",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.1",
+                "mevReserve": "0.1"
+              },
+              "estimatedNetUsdc": "-0.444043",
+              "netReturnBps": -44.4,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0
+            },
+            {
+              "sizeUsdc": "250",
+              "receivedBaseToken": "358.80202688297312672",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "249.529853",
+              "grossProfitUsdc": "-0.470147",
+              "grossReturnBps": -18.8,
+              "modeledCostsUsdc": "0.686325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.125",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.25",
+                "mevReserve": "0.25"
+              },
+              "estimatedNetUsdc": "-1.156472",
+              "netReturnBps": -46.25,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 5.53
+            },
+            {
+              "sizeUsdc": "500",
+              "receivedBaseToken": "716.993174147321592686",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "498.599138",
+              "grossProfitUsdc": "-1.400862",
+              "grossReturnBps": -28.01,
+              "modeledCostsUsdc": "1.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.5",
+                "mevReserve": "0.5"
+              },
+              "estimatedNetUsdc": "-2.712187",
+              "netReturnBps": -54.24,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 14.74
+            },
+            {
+              "sizeUsdc": "1000",
+              "receivedBaseToken": "1431.548401293606082415",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "995.360634",
+              "grossProfitUsdc": "-4.639366",
+              "grossReturnBps": -46.39,
+              "modeledCostsUsdc": "2.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "1",
+                "mevReserve": "1"
+              },
+              "estimatedNetUsdc": "-7.200691",
+              "netReturnBps": -72,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 33.12
+            },
+            {
+              "sizeUsdc": "2500",
+              "receivedBaseToken": "3560.933011713404771822",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "2474.87511",
+              "grossProfitUsdc": "-25.12489",
+              "grossReturnBps": -100.49,
+              "modeledCostsUsdc": "6.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "1.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "2.5",
+                "mevReserve": "2.5"
+              },
+              "estimatedNetUsdc": "-31.436215",
+              "netReturnBps": -125.74,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 87.22
+            },
+            {
+              "sizeUsdc": "5000",
+              "receivedBaseToken": "7065.604607470100431318",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "4907.20951",
+              "grossProfitUsdc": "-92.79049",
+              "grossReturnBps": -185.58,
+              "modeledCostsUsdc": "12.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "2.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "5",
+                "mevReserve": "5"
+              },
+              "estimatedNetUsdc": "-105.351815",
+              "netReturnBps": -210.7,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 172.31
+            },
+            {
+              "sizeUsdc": "10000",
+              "receivedBaseToken": "13919.810501420037421238",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "9654.376809",
+              "grossProfitUsdc": "-345.623191",
+              "grossReturnBps": -345.62,
+              "modeledCostsUsdc": "25.061325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "10",
+                "mevReserve": "10"
+              },
+              "estimatedNetUsdc": "-370.684516",
+              "netReturnBps": -370.68,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 332.35
+            }
+          ]
+        },
+        {
+          "market": "cbBTC/USDC",
+          "status": "QUOTE_REJECT",
+          "indicatedSpreadBps": 19.657,
+          "buyDex": "aerodrome",
+          "sellDex": "uniswap",
+          "buyPool": "0x3e66e55e97ce60096f74b7c475e8249f2d31a9fb",
+          "sellPool": "0xec558e484cc9f2210714e345298fdc53b253c27d",
+          "exactPoolMatch": true,
+          "poolDiagnosis": null,
+          "buyPoolMatch": {
+            "variant": "AERODROME_SLIPSTREAM_V1",
+            "feeTier": null,
+            "tickSpacing": 2000,
+            "stable": null
+          },
+          "sellPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 3000,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.44604",
+          "reason": "Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.",
+          "atomicSimulation": "NOT_RUN",
+          "tradeSizesQuoted": 7,
+          "tradeSizesRequested": 7,
+          "quoteComparisonNote": "Relative deterioration is gross round-trip return difference versus the smallest quoted size; it includes liquidity, pool fees and token rounding, not a pure price-impact estimate.",
+          "rows": [
+            {
+              "sizeUsdc": "100",
+              "receivedBaseToken": "0.00123757",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "99.865285",
+              "grossProfitUsdc": "-0.134715",
+              "grossReturnBps": -13.47,
+              "modeledCostsUsdc": "0.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.05",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.1",
+                "mevReserve": "0.1"
+              },
+              "estimatedNetUsdc": "-0.44604",
+              "netReturnBps": -44.6,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0
+            },
+            {
+              "sizeUsdc": "250",
+              "receivedBaseToken": "0.0030939",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "249.659728",
+              "grossProfitUsdc": "-0.340272",
+              "grossReturnBps": -13.61,
+              "modeledCostsUsdc": "0.686325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.125",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.25",
+                "mevReserve": "0.25"
+              },
+              "estimatedNetUsdc": "-1.026597",
+              "netReturnBps": -41.06,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0.14
+            },
+            {
+              "sizeUsdc": "500",
+              "receivedBaseToken": "0.00618768",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "499.302983",
+              "grossProfitUsdc": "-0.697017",
+              "grossReturnBps": -13.94,
+              "modeledCostsUsdc": "1.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.5",
+                "mevReserve": "0.5"
+              },
+              "estimatedNetUsdc": "-2.008342",
+              "netReturnBps": -40.16,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0.47
+            },
+            {
+              "sizeUsdc": "1000",
+              "receivedBaseToken": "0.01237483",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "998.533605",
+              "grossProfitUsdc": "-1.466395",
+              "grossReturnBps": -14.66,
+              "modeledCostsUsdc": "2.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "1",
+                "mevReserve": "1"
+              },
+              "estimatedNetUsdc": "-4.02772",
+              "netReturnBps": -40.27,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 1.19
+            },
+            {
+              "sizeUsdc": "2500",
+              "receivedBaseToken": "0.03093311",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "2495.788161",
+              "grossProfitUsdc": "-4.211839",
+              "grossReturnBps": -16.84,
+              "modeledCostsUsdc": "6.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "1.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "2.5",
+                "mevReserve": "2.5"
+              },
+              "estimatedNetUsdc": "-10.523164",
+              "netReturnBps": -42.09,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 3.37
+            },
+            {
+              "sizeUsdc": "5000",
+              "receivedBaseToken": "0.06185299",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "4989.752931",
+              "grossProfitUsdc": "-10.247069",
+              "grossReturnBps": -20.49,
+              "modeledCostsUsdc": "12.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "2.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "5",
+                "mevReserve": "5"
+              },
+              "estimatedNetUsdc": "-22.808394",
+              "netReturnBps": -45.61,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 7.02
+            },
+            {
+              "sizeUsdc": "10000",
+              "receivedBaseToken": "0.12365308",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "9972.206142",
+              "grossProfitUsdc": "-27.793858",
+              "grossReturnBps": -27.79,
+              "modeledCostsUsdc": "25.061325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "10",
+                "mevReserve": "10"
+              },
+              "estimatedNetUsdc": "-52.855183",
+              "netReturnBps": -52.85,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 14.32
+            }
+          ]
+        },
+        {
+          "market": "cbBTC/USDC",
+          "status": "QUOTE_REJECT",
+          "indicatedSpreadBps": 19.9393,
+          "buyDex": "aerodrome",
+          "sellDex": "uniswap",
+          "buyPool": "0x4e962bb3889bf030368f56810a9c96b83cb3e778",
+          "sellPool": "0xec558e484cc9f2210714e345298fdc53b253c27d",
+          "exactPoolMatch": true,
+          "poolDiagnosis": null,
+          "buyPoolMatch": {
+            "variant": "AERODROME_SLIPSTREAM_V1",
+            "feeTier": null,
+            "tickSpacing": 100,
+            "stable": null
+          },
+          "sellPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 3000,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.462227",
+          "reason": "Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.",
+          "atomicSimulation": "NOT_RUN",
+          "tradeSizesQuoted": 7,
+          "tradeSizesRequested": 7,
+          "quoteComparisonNote": "Relative deterioration is gross round-trip return difference versus the smallest quoted size; it includes liquidity, pool fees and token rounding, not a pure price-impact estimate.",
+          "rows": [
+            {
+              "sizeUsdc": "100",
+              "receivedBaseToken": "0.00123737",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "99.849098",
+              "grossProfitUsdc": "-0.150902",
+              "grossReturnBps": -15.09,
+              "modeledCostsUsdc": "0.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.05",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.1",
+                "mevReserve": "0.1"
+              },
+              "estimatedNetUsdc": "-0.462227",
+              "netReturnBps": -46.22,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0
+            },
+            {
+              "sizeUsdc": "250",
+              "receivedBaseToken": "0.00309341",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "249.620069",
+              "grossProfitUsdc": "-0.379931",
+              "grossReturnBps": -15.19,
+              "modeledCostsUsdc": "0.686325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.125",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.25",
+                "mevReserve": "0.25"
+              },
+              "estimatedNetUsdc": "-1.066256",
+              "netReturnBps": -42.65,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0.1
+            },
+            {
+              "sizeUsdc": "500",
+              "receivedBaseToken": "0.00618671",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "499.224478",
+              "grossProfitUsdc": "-0.775522",
+              "grossReturnBps": -15.51,
+              "modeledCostsUsdc": "1.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.5",
+                "mevReserve": "0.5"
+              },
+              "estimatedNetUsdc": "-2.086847",
+              "netReturnBps": -41.73,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0.42
+            },
+            {
+              "sizeUsdc": "1000",
+              "receivedBaseToken": "0.01237299",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "998.385505",
+              "grossProfitUsdc": "-1.614495",
+              "grossReturnBps": -16.14,
+              "modeledCostsUsdc": "2.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "1",
+                "mevReserve": "1"
+              },
+              "estimatedNetUsdc": "-4.17582",
+              "netReturnBps": -41.75,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 1.05
+            },
+            {
+              "sizeUsdc": "2500",
+              "receivedBaseToken": "0.03092924",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "2495.475833",
+              "grossProfitUsdc": "-4.524167",
+              "grossReturnBps": -18.09,
+              "modeledCostsUsdc": "6.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "1.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "2.5",
+                "mevReserve": "2.5"
+              },
+              "estimatedNetUsdc": "-10.835492",
+              "netReturnBps": -43.34,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 3
+            },
+            {
+              "sizeUsdc": "5000",
+              "receivedBaseToken": "0.06184767",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "4989.323409",
+              "grossProfitUsdc": "-10.676591",
+              "grossReturnBps": -21.35,
+              "modeledCostsUsdc": "12.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "2.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "5",
+                "mevReserve": "5"
+              },
+              "estimatedNetUsdc": "-23.237916",
+              "netReturnBps": -46.47,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 6.26
+            },
+            {
+              "sizeUsdc": "10000",
+              "receivedBaseToken": "0.12365213",
+              "baseTokenDecimals": 8,
+              "finalUsdc": "9972.129344",
+              "grossProfitUsdc": "-27.870656",
+              "grossReturnBps": -27.87,
+              "modeledCostsUsdc": "25.061325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "10",
+                "mevReserve": "10"
+              },
+              "estimatedNetUsdc": "-52.931981",
+              "netReturnBps": -52.93,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 12.78
+            }
+          ]
+        },
+        {
+          "market": "WETH/USDC",
+          "status": "QUOTE_REJECT",
+          "indicatedSpreadBps": 25.5281,
+          "buyDex": "aerodrome",
+          "sellDex": "uniswap",
+          "buyPool": "0xdbc6998296caa1652a810dc8d3baf4a8294330f1",
+          "sellPool": "0x6c561b446416e1a00e8e93e221854d6ea4171372",
+          "exactPoolMatch": true,
+          "poolDiagnosis": null,
+          "buyPoolMatch": {
+            "variant": "AERODROME_SLIPSTREAM_V1",
+            "feeTier": null,
+            "tickSpacing": 1,
+            "stable": null
+          },
+          "sellPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 3000,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.499191",
+          "reason": "Pinned-block read-only round-trip quote after modeled costs; atomic simulation not run.",
+          "atomicSimulation": "NOT_RUN",
+          "tradeSizesQuoted": 7,
+          "tradeSizesRequested": 7,
+          "quoteComparisonNote": "Relative deterioration is gross round-trip return difference versus the smallest quoted size; it includes liquidity, pool fees and token rounding, not a pure price-impact estimate.",
+          "rows": [
+            {
+              "sizeUsdc": "100",
+              "receivedBaseToken": "0.042575691521295976",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "99.812134",
+              "grossProfitUsdc": "-0.187866",
+              "grossReturnBps": -18.78,
+              "modeledCostsUsdc": "0.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.05",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.1",
+                "mevReserve": "0.1"
+              },
+              "estimatedNetUsdc": "-0.499191",
+              "netReturnBps": -49.91,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 0
+            },
+            {
+              "sizeUsdc": "250",
+              "receivedBaseToken": "0.106225385336627954",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "249.028994",
+              "grossProfitUsdc": "-0.971006",
+              "grossReturnBps": -38.84,
+              "modeledCostsUsdc": "0.686325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.125",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.25",
+                "mevReserve": "0.25"
+              },
+              "estimatedNetUsdc": "-1.657331",
+              "netReturnBps": -66.29,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 20.06
+            },
+            {
+              "sizeUsdc": "500",
+              "receivedBaseToken": "0.211763488291879571",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "496.446698",
+              "grossProfitUsdc": "-3.553302",
+              "grossReturnBps": -71.06,
+              "modeledCostsUsdc": "1.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "0.5",
+                "mevReserve": "0.5"
+              },
+              "estimatedNetUsdc": "-4.864627",
+              "netReturnBps": -97.29,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 52.28
+            },
+            {
+              "sizeUsdc": "1000",
+              "receivedBaseToken": "0.420828270704655307",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "986.566452",
+              "grossProfitUsdc": "-13.433548",
+              "grossReturnBps": -134.33,
+              "modeledCostsUsdc": "2.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "0.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "1",
+                "mevReserve": "1"
+              },
+              "estimatedNetUsdc": "-15.994873",
+              "netReturnBps": -159.94,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 115.55
+            },
+            {
+              "sizeUsdc": "2500",
+              "receivedBaseToken": "1.01975780106578678",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "2390.661909",
+              "grossProfitUsdc": "-109.338091",
+              "grossReturnBps": -437.35,
+              "modeledCostsUsdc": "6.311325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "1.25",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "2.5",
+                "mevReserve": "2.5"
+              },
+              "estimatedNetUsdc": "-115.649416",
+              "netReturnBps": -462.59,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 418.57
+            },
+            {
+              "sizeUsdc": "5000",
+              "receivedBaseToken": "1.927666281250561455",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "4519.105767",
+              "grossProfitUsdc": "-480.894233",
+              "grossReturnBps": -961.78,
+              "modeledCostsUsdc": "12.561325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "2.5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "5",
+                "mevReserve": "5"
+              },
+              "estimatedNetUsdc": "-493.455558",
+              "netReturnBps": -986.91,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 943
+            },
+            {
+              "sizeUsdc": "10000",
+              "receivedBaseToken": "3.605560202946881871",
+              "baseTokenDecimals": 18,
+              "finalUsdc": "8452.643197",
+              "grossProfitUsdc": "-1547.356803",
+              "grossReturnBps": -1547.35,
+              "modeledCostsUsdc": "25.061325",
+              "costBreakdownUsdc": {
+                "flashLoanPremium": "5",
+                "l2GasReserve": "0.011325",
+                "l1DataFeeReserve": "0.05",
+                "slippageReserve": "10",
+                "mevReserve": "10"
+              },
+              "estimatedNetUsdc": "-1572.418128",
+              "netReturnBps": -1572.41,
+              "decision": "REJECT_RAW_LOSS",
+              "relativeQuoteDeteriorationBps": 1528.57
+            }
+          ]
+        },
+        {
+          "market": "cbBTC/USDC",
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "indicatedSpreadBps": 22.0383,
+          "buyDex": "aerodrome",
+          "sellDex": "uniswap",
+          "buyPool": "0x160d7e9d948b16c163332a277b393c288408eb12",
+          "sellPool": "0xec558e484cc9f2210714e345298fdc53b253c27d",
+          "exactPoolMatch": false,
+          "poolDiagnosis": "BUY_POOL_UNMATCHED",
+          "buyPoolMatch": null,
+          "sellPoolMatch": {
+            "variant": "UNISWAP_V3",
+            "feeTier": 3000,
+            "tickSpacing": null,
+            "stable": null
+          },
+          "bestTradeSizeUsdc": null,
+          "bestEstimatedNetUsdc": null,
+          "reason": "One or both pool addresses did not match an approved on-chain factory/fee tier.",
+          "atomicSimulation": "NOT_RUN",
+          "tradeSizesQuoted": null,
+          "tradeSizesRequested": null,
+          "quoteComparisonNote": "",
+          "rows": []
+        },
+        {
+          "market": "cbBTC/USDC",
+          "status": "UNSUPPORTED_DEX",
+          "indicatedSpreadBps": 22.0457,
+          "buyDex": "aero",
+          "sellDex": "uniswap",
+          "buyPool": "0x42609aa1e58c5dd7e5a012dc74118fff975f0eac",
+          "sellPool": "0xec558e484cc9f2210714e345298fdc53b253c27d",
           "exactPoolMatch": false,
           "poolDiagnosis": null,
           "buyPoolMatch": null,
