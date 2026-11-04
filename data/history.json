@@ -3,7 +3,7 @@
   "source": "hourly-research-collector",
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-11-03T23:22:42.223Z",
+  "updatedAt": "2026-11-04T03:19:36.839Z",
   "observations": [
     {
       "generatedAt": "2026-10-05T22:04:00.000Z",
@@ -17956,6 +17956,16 @@
       "bestNetUsdc": -0.380136,
       "wethReferencePrice": 2287.898836,
       "gasPriceGwei": 0.006
+    },
+    {
+      "generatedAt": "2026-11-04T03:19:22.580Z",
+      "blockNumber": "53486504",
+      "candidateCount": 0,
+      "bestRoute": "Aerodrome -> Uniswap v3",
+      "bestStartUsdc": 100,
+      "bestNetUsdc": -0.400474,
+      "wethReferencePrice": 2237.238954,
+      "gasPriceGwei": 0.006008235
     }
   ]
 }
