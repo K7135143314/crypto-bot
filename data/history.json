@@ -3,18 +3,8 @@
   "source": "hourly-research-collector",
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-11-04T18:53:22.260Z",
+  "updatedAt": "2026-11-05T00:22:59.512Z",
   "observations": [
-    {
-      "generatedAt": "2026-10-05T22:04:00.000Z",
-      "blockNumber": "historical-recovered",
-      "candidateCount": 0,
-      "bestRoute": "Aerodrome -> Uniswap v3",
-      "bestStartUsdc": 100,
-      "bestNetUsdc": -0.365487,
-      "wethReferencePrice": null,
-      "gasPriceGwei": null
-    },
     {
       "generatedAt": "2026-10-06T02:21:00.000Z",
       "blockNumber": "historical-recovered",
@@ -17985,6 +17975,16 @@
       "bestStartUsdc": 100,
       "bestNetUsdc": -0.441384,
       "wethReferencePrice": 2422.966339,
+      "gasPriceGwei": 0.006
+    },
+    {
+      "generatedAt": "2026-11-05T00:22:40.099Z",
+      "blockNumber": "53524403",
+      "candidateCount": 0,
+      "bestRoute": "Aerodrome -> Uniswap v3",
+      "bestStartUsdc": 100,
+      "bestNetUsdc": -0.613891,
+      "wethReferencePrice": 2429.242455,
       "gasPriceGwei": 0.006
     }
   ]
