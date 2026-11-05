@@ -2,7 +2,7 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-11-05T01:41:14.829Z",
+  "updatedAt": "2026-11-05T09:05:15.002Z",
   "runs": [
     {
       "generatedAt": "2026-10-07T10:09:35.396Z",
@@ -6956,6 +6956,58 @@
           "scoutRank": 5,
           "scoutRoute": "aerodrome -> pancakeswap",
           "scoutSpreadBps": 105.3211,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-11-05T09:05:11.773Z",
+      "pinnedBlock": "53540081",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "uniswap -> aerodrome",
+          "scoutSpreadBps": 27.1705,
+          "status": "VERIFIED_REJECT",
+          "reason": "Exact scout pools matched supported adapters, but no tested size cleared the existing profitability gates.",
+          "pinnedBlock": "53540081",
+          "exactPoolMatch": true,
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.365754",
+          "decision": "REJECT_RAW_LOSS"
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "pancakeswap -> aerodrome",
+          "scoutSpreadBps": 26.9629,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "uniswap -> aerodrome",
+          "scoutSpreadBps": 26.7968,
+          "status": "VERIFIED_REJECT",
+          "reason": "Exact scout pools matched supported adapters, but no tested size cleared the existing profitability gates.",
+          "pinnedBlock": "53540081",
+          "exactPoolMatch": true,
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.408803",
+          "decision": "REJECT_RAW_LOSS"
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "aero -> aerodrome",
+          "scoutSpreadBps": 26.6722,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "quickswap -> aerodrome",
+          "scoutSpreadBps": 26.34,
           "status": "UNSUPPORTED_DEX",
           "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
         }
