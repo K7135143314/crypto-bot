@@ -2,56 +2,8 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-11-08T06:57:58.780Z",
+  "updatedAt": "2026-11-08T14:08:41.572Z",
   "runs": [
-    {
-      "generatedAt": "2026-10-09T13:07:49.844Z",
-      "pinnedBlock": "52380960",
-      "scoutLeadCount": 5,
-      "results": [
-        {
-          "scoutRank": 1,
-          "scoutRoute": "uniswap -> alien-base",
-          "scoutSpreadBps": 31.4825,
-          "status": "UNSUPPORTED_DEX",
-          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
-        },
-        {
-          "scoutRank": 2,
-          "scoutRoute": "uniswap -> pancakeswap",
-          "scoutSpreadBps": 29.8382,
-          "status": "UNSUPPORTED_DEX",
-          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
-        },
-        {
-          "scoutRank": 3,
-          "scoutRoute": "uniswap -> aerodrome",
-          "scoutSpreadBps": 29.8382,
-          "status": "UNSUPPORTED_POOL_VARIANT",
-          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
-          "pinnedBlock": "52380960",
-          "exactPoolMatch": false
-        },
-        {
-          "scoutRank": 4,
-          "scoutRoute": "uniswap -> aerodrome",
-          "scoutSpreadBps": 27.873,
-          "status": "UNSUPPORTED_POOL_VARIANT",
-          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
-          "pinnedBlock": "52380960",
-          "exactPoolMatch": false
-        },
-        {
-          "scoutRank": 5,
-          "scoutRoute": "uniswap -> aerodrome",
-          "scoutSpreadBps": 27.5121,
-          "status": "UNSUPPORTED_POOL_VARIANT",
-          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
-          "pinnedBlock": "52380960",
-          "exactPoolMatch": false
-        }
-      ]
-    },
     {
       "generatedAt": "2026-10-09T18:46:31.813Z",
       "pinnedBlock": "52391121",
@@ -7168,6 +7120,58 @@
           "scoutRank": 5,
           "scoutRoute": "pancakeswap -> aerodrome",
           "scoutSpreadBps": 27.2616,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-11-08T14:08:38.528Z",
+      "pinnedBlock": "54782696",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "aero -> aerodrome",
+          "scoutSpreadBps": 26.175,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "pancakeswap -> aerodrome",
+          "scoutSpreadBps": 25.5021,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "uniswap -> aerodrome",
+          "scoutSpreadBps": 24.5154,
+          "status": "VERIFIED_REJECT",
+          "reason": "Exact scout pools matched supported adapters, but no tested size cleared the existing profitability gates.",
+          "pinnedBlock": "54782696",
+          "exactPoolMatch": true,
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.428286",
+          "decision": "REJECT_RAW_LOSS"
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "uniswap -> aerodrome",
+          "scoutSpreadBps": 24.4706,
+          "status": "VERIFIED_REJECT",
+          "reason": "Exact scout pools matched supported adapters, but no tested size cleared the existing profitability gates.",
+          "pinnedBlock": "54782696",
+          "exactPoolMatch": true,
+          "bestTradeSizeUsdc": "100",
+          "bestEstimatedNetUsdc": "-0.390897",
+          "decision": "REJECT_RAW_LOSS"
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "aero -> aerodrome",
+          "scoutSpreadBps": 24.336,
           "status": "UNSUPPORTED_DEX",
           "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
         }
