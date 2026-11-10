@@ -2,58 +2,8 @@
   "version": 1,
   "timezone": "America/Chicago",
   "retentionDays": 30,
-  "updatedAt": "2026-11-09T20:58:05.010Z",
+  "updatedAt": "2026-11-10T03:17:49.837Z",
   "runs": [
-    {
-      "generatedAt": "2026-10-10T23:29:07.900Z",
-      "pinnedBlock": "52442800",
-      "scoutLeadCount": 5,
-      "results": [
-        {
-          "scoutRank": 1,
-          "scoutRoute": "aerodrome -> uniswap",
-          "scoutSpreadBps": 19.9232,
-          "status": "UNSUPPORTED_POOL_VARIANT",
-          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
-          "pinnedBlock": "52442800",
-          "exactPoolMatch": false
-        },
-        {
-          "scoutRank": 2,
-          "scoutRoute": "pancakeswap -> uniswap",
-          "scoutSpreadBps": 19.8432,
-          "status": "UNSUPPORTED_DEX",
-          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
-        },
-        {
-          "scoutRank": 3,
-          "scoutRoute": "aerodrome -> uniswap",
-          "scoutSpreadBps": 19.4831,
-          "status": "UNSUPPORTED_POOL_VARIANT",
-          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
-          "pinnedBlock": "52442800",
-          "exactPoolMatch": false
-        },
-        {
-          "scoutRank": 4,
-          "scoutRoute": "aerodrome -> uniswap",
-          "scoutSpreadBps": 19.3631,
-          "status": "UNSUPPORTED_POOL_VARIANT",
-          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
-          "pinnedBlock": "52442800",
-          "exactPoolMatch": false
-        },
-        {
-          "scoutRank": 5,
-          "scoutRoute": "aerodrome -> uniswap",
-          "scoutSpreadBps": 18.6432,
-          "status": "UNSUPPORTED_POOL_VARIANT",
-          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
-          "pinnedBlock": "52442800",
-          "exactPoolMatch": false
-        }
-      ]
-    },
     {
       "generatedAt": "2026-10-11T05:37:59.636Z",
       "pinnedBlock": "52453865",
@@ -7145,6 +7095,50 @@
           "scoutRank": 5,
           "scoutRoute": "aerodrome -> pancakeswap",
           "scoutSpreadBps": 11.7072,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        }
+      ]
+    },
+    {
+      "generatedAt": "2026-11-10T03:17:47.905Z",
+      "pinnedBlock": "55451460",
+      "scoutLeadCount": 5,
+      "results": [
+        {
+          "scoutRank": 1,
+          "scoutRoute": "aerodrome -> uniswap",
+          "scoutSpreadBps": 38.8738,
+          "status": "UNSUPPORTED_POOL_VARIANT",
+          "reason": "The scout pool address does not match the exact Uniswap V3 or Aerodrome Classic pool supported by this verifier.",
+          "pinnedBlock": "55451460",
+          "exactPoolMatch": false
+        },
+        {
+          "scoutRank": 2,
+          "scoutRoute": "quickswap -> uniswap",
+          "scoutSpreadBps": 38.8738,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 3,
+          "scoutRoute": "aero -> uniswap",
+          "scoutSpreadBps": 38.2581,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 4,
+          "scoutRoute": "pancakeswap -> uniswap",
+          "scoutSpreadBps": 37.2922,
+          "status": "UNSUPPORTED_DEX",
+          "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
+        },
+        {
+          "scoutRank": 5,
+          "scoutRoute": "aero -> uniswap",
+          "scoutSpreadBps": 36.4117,
           "status": "UNSUPPORTED_DEX",
           "reason": "One or both DEXs do not yet have a proven Base on-chain quote adapter."
         }
